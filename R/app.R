@@ -2,6 +2,42 @@ library(shiny)
 library(shinyFiles)
 library(stringr)
 library(jpeg)
+duflor.check <- function(files) {
+    ## for each file, one-by-one perform the following steps:
+    ## fulfills naming conventions (decide how strict this must be later)
+    ##
+    return(files)
+}
+duflor.display <- function(cimg) {
+    imager::display(cimg)
+}
+duflor.load_rgb_colorspace <- function(file) {
+    return(imager::load.image(file))
+}
+duflor.load_hsv_colorspace <- function(file) {
+    image <- imager::load.image(file)
+    hsv <- imager::RGBtoHSV(imager::sRGBtoRGB(image))
+    return(hsv)
+}
+duflor.get_image_dimensions <- function(path) {
+    # get image dimensions.
+    if(!file.exists(path))
+        stop("No file found", call. = FALSE)
+
+    # Ensure file ends with .png or .jpg or jpeg
+    if (!grepl("\\.(png|jpg|jpeg)$", x = path, ignore.case = TRUE))
+        stop("File must end with .png, .jpg, or .jpeg", call. = FALSE)
+
+    # Get return of file system command
+    s <- system(paste0("file ", str_c("'", path, "'")), intern = TRUE)
+    # Extract width and height from string
+    return(
+        list(
+            width = regmatches(s, gregexpr("(?<=, )[0-9]+(?=(x| x )[0-9]+,)", s, perl = TRUE))[[1]],
+            height = regmatches(s, gregexpr(", [0-9]+(x| x )\\K[0-9]+(?=,)", s, perl = TRUE))[[1]]
+            )
+        )
+}
 # Define UI for app that draws a histogram ----
 ui <- fluidPage(
     # App title ----
@@ -24,6 +60,7 @@ ui <- fluidPage(
                                       "WFA" = 2),
                        selected = 1),
             actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
+            actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
             actionButton(inputId = "render_plant",label = "Render Plant"),
             ## works only post 'execute_analysis'
             radioButtons(inputId = "KPI_type",
@@ -34,6 +71,7 @@ ui <- fluidPage(
                                       "TBD3" = 4),
                        selected = 1),
             h4("Crop Image"),
+            actionButton(inputId = "reset_crops", label = "Reset"),
             numericInput(inputId = "crop_left",label = "Crop Left",value = 0,min = 0),
             numericInput(inputId = "crop_right",label = "Crop Right",value = 0,min = 0),
             numericInput(inputId = "crop_top",label = "Crop Top",value = 0,min = 0),
@@ -54,14 +92,14 @@ ui <- fluidPage(
         # Main panel for displaying outputs ----
         mainPanel(
             # plotOutput(outputId = "distPlot"),
-            plotOutput(
-                outputId = "image_offset_plot",
-                dblclick = "image_offset_dblclick",
-                brush = brushOpts(
-                    id = "image_offset_plot_brush",
-                    resetOnNew = TRUE
-                )
-                ),
+            # plotOutput(
+            #     outputId = "image_offset_plot",
+            #     dblclick = "image_offset_dblclick",
+            #     brush = brushOpts(
+            #         id = "image_offset_plot_brush",
+            #         resetOnNew = TRUE
+            #     )
+            #     ),
             #tableOutput(outputId = "tbl_dir_files"),
             tabsetPanel(id = "tabset_panel",
               tabPanel("Image Files",verbatimTextOutput("Image Files"),DT::dataTableOutput("tbl_dir_files")),
@@ -76,7 +114,8 @@ ui <- fluidPage(
 )
 
 # Define server logic required to draw a histogram ----
-server <- function(input, output) {
+server <- function(input, output,session) {
+    #### INIT VARIABLES ####
     preview_is_loaded <-- FALSE
     DATA <- reactiveValues(          #  nomenclature: reactives start with "r__"
         r__tbl_dir_files  = NA,
@@ -108,6 +147,7 @@ server <- function(input, output) {
     d__crop_right <- r__crop_right %>% debounce(1300)
     d__crop_top <- r__crop_top %>% debounce(1300)
     d__crop_bottom <- r__crop_bottom %>% debounce(1300)
+    volumes <- getVolumes()()
     # Histogram of the Old Faithful Geyser Data ----
     # with requested number of bins
     # This expression that generates a histogram is wrapped in a call
@@ -116,7 +156,6 @@ server <- function(input, output) {
     # 1. It is "reactive" and therefore should be automatically
     #    re-executed when inputs (input$bins) change
     # 2. Its output type is a plot
-    volumes <- getVolumes()()
     # output$distPlot <- renderPlot({
     #
     #     req(input$folder,image_files()) # if you must require the result of a different ctrl, make sure to append the () to it.
@@ -129,53 +168,54 @@ server <- function(input, output) {
     #          main = "Histogram of waiting times")
     #
     # })
-    ### TODO: change this to render instead of the histogram.
-    ### The selection works, so when selecting an image, populate the space
-    ### above. Then react-grab the contents of the cutoff-select and display as
-    ### red bars offset from the edges
+    # TODO: change this to render instead of the histogram.
+    # The selection works, so when selecting an image, populate the space
+    # above. Then react-grab the contents of the cutoff-select and display as
+    # red bars offset from the edges
 
-    output$image_offset_plot <- renderPlot({
-        #TODO: reset render_plant
-        req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected,DATA$preview_img)
-        # print(stringr::str_c("offset_plot: preview_img: ",DATA$preview_img))
-        if (isTRUE(preview_is_loaded)) {
-            # isolate({
-                preview_is_loaded <<- FALSE
-            # })
-            if (is.null(ranges$x)) {
-                xmin <- 0
-            } else {
-                xmin <- ranges$x[1]
-            }
-            if (is.null(ranges$x)) {
-                xmax <- 6000
-            } else {
-                xmax <- ranges$x[2]
-            }
-            if (is.null(ranges$y)) {
-                ymin <- 0
-            } else {
-                ymin <- ranges$y[1]
-            }
-            if (is.null(ranges$y)) {
-                ymax <- 4000
-            } else {
-                ymax <- ranges$y[2]
-            }
-
-            plot(NULL,xlim = c(xmin,xmax),ylim = c(ymin,ymax))
-            rasterImage(DATA$preview_img,xmin,ymin,xmax,ymax,interpolate = F)
-            showNotification(str_c("plotted "," ", (DATA$r__tbl_dir_files[input$tbl_dir_files_rows_selected,]$images_filtered)),duration = 3)
-        # d__crop_left
-        # d__crop_right
-        # d__crop_top
-        # d__crop_bottom
-            rect(xleft = 0, ybottom = 0, xright = d__crop_left(), ytop = ymax,col = "red",density = 5) # CL  ## works
-            rect(xleft = xmax - d__crop_right(), ybottom = 0, xright = xmax, ytop = ymax, col = "red",density = 5) # CR
-            rect(xleft = xmin, ybottom = ymax - d__crop_top(), xright = xmax, ytop = ymax, col = "red",density = 5) # CT
-            rect(xleft = xmin, ybottom = 0, xright = xmax, ytop = 0 + d__crop_bottom(), col = "red",density = 5) # CB
-        }
-    })
+    # output$image_offset_plot <- renderPlot({
+    #     #TODO: reset render_plant
+    #     req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected,DATA$preview_img)
+    #     # print(stringr::str_c("offset_plot: preview_img: ",DATA$preview_img))
+    #     if (isTRUE(preview_is_loaded)) {
+    #         # isolate({
+    #             preview_is_loaded <<- FALSE
+    #         # })
+    #         if (is.null(ranges$x)) {
+    #             xmin <- 0
+    #         } else {
+    #             xmin <- ranges$x[1]
+    #         }
+    #         if (is.null(ranges$x)) {
+    #             xmax <- 6000
+    #         } else {
+    #             xmax <- ranges$x[2]
+    #         }
+    #         if (is.null(ranges$y)) {
+    #             ymin <- 0
+    #         } else {
+    #             ymin <- ranges$y[1]
+    #         }
+    #         if (is.null(ranges$y)) {
+    #             ymax <- 4000
+    #         } else {
+    #             ymax <- ranges$y[2]
+    #         }
+    #
+    #         plot(NULL,xlim = c(xmin,xmax),ylim = c(ymin,ymax))
+    #         rasterImage(DATA$preview_img,xmin,ymin,xmax,ymax,interpolate = F)
+    #         showNotification(str_c("plotted "," ", (DATA$r__tbl_dir_files[input$tbl_dir_files_rows_selected,]$images_filtered)),duration = 3)
+    #     # d__crop_left
+    #     # d__crop_right
+    #     # d__crop_top
+    #     # d__crop_bottom
+    #         rect(xleft = 0, ybottom = 0, xright = d__crop_left(), ytop = ymax,col = "red",density = 5) # CL  ## works
+    #         rect(xleft = xmax - d__crop_right(), ybottom = 0, xright = xmax, ytop = ymax, col = "red",density = 5) # CR
+    #         rect(xleft = xmin, ybottom = ymax - d__crop_top(), xright = xmax, ytop = ymax, col = "red",density = 5) # CT
+    #         rect(xleft = xmin, ybottom = 0, xright = xmax, ytop = 0 + d__crop_bottom(), col = "red",density = 5) # CB
+    #     }
+    # })
+    ##### DISPLAYING AND RENDERING FILES AND STUFF ####
     image_files <- reactive({ # image_files is a list of filepaths, which gets set reactively.
         req(input$folder,input$image_file_suffix,input$radio_analysis_type)
             shinyDirChoose(input = input, 'folder', roots=volumes)
@@ -213,7 +253,7 @@ server <- function(input, output) {
         )
             ### selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
 
-    ## DEV TOGGLES ##
+    #### DEV TOGGLES ####
     observeEvent(input$dev_pass, {
         # add valid keys here
         # private, undocumentable keys must be prefixed with 3 `-`
@@ -234,22 +274,47 @@ server <- function(input, output) {
 
         }
     })
-
+    #### MISC ####
     observeEvent(input$image_offset_dblclick, {
         #TODO: the brush shall not reset the ranges. else we fuck up a lot.
-        #instead, make it
+        #instead, make it modify the crop_X inputs - or, as a simpler first
+        #solution, give us the vaues of its corners first
         brush <- input$image_offset_plot_brush
         if (!is.null(brush)) {
-            ranges$x <- c(brush$xmin, brush$xmax)
-            ranges$y <- c(brush$ymin, brush$ymax)
+            # ranges$x <- c(brush$xmin, brush$xmax)
+            # ranges$y <- c(brush$ymin, brush$ymax)
+            showNotification(str_c("Bounding Coordinates: X(",brush$xmin,brush$xmax,"),Y(",brush$ymin,brush$ymax,")"),duration = 3)
+            updateNumericInput(session,"crop_left",value = as.integer(brush$xmin))
+            updateNumericInput(session,"crop_right",value = as.integer(brush$xmax))
+            updateNumericInput(session,"crop_bottom",value = as.integer(brush$ymin))
+            updateNumericInput(session,"crop_top",value = as.integer(brush$ymax))
+            ## TODO: get the dimensions of the first image loaded, then fix the values above so that the right and bottom edges of the reported rectangle are correctly displayed?
+            ## Right now, it seems like the program is miscalculating the edges somehow ¯\_(ツ)_/¯
         } else {
-            ranges$x <- NULL
-            ranges$y <- NULL
+            # ranges$x <- NULL
+            # ranges$y <- NULL
         }
     })
 
-
-    ## MAIN CALLBACK>EXECUTE DUFLOR_PACKAGE HERE:
+    #### RESET CROPPING ####
+    observeEvent(input$reset_crops, {
+        showModal(modalDialog(
+            tags$h3('Do you want to reset the croppings?'),
+            footer=tagList(
+                actionButton('submit_reset_crops', 'Reset'),
+                modalButton('cancel')
+            )
+        ))
+    })
+    observeEvent(input$submit_reset_crops, {
+        removeModal()
+        showNotification(str_c("not implemented: reset crops to 0/0/0/0"))
+        updateNumericInput(session,"crop_left",value = 0)
+        updateNumericInput(session,"crop_right",value = 0)
+        updateNumericInput(session,"crop_bottom",value = 0)
+        updateNumericInput(session,"crop_top",value = 0)
+    })
+    #### MAIN CALLBACK>EXECUTE DUFLOR_PACKAGE HERE ####
     observeEvent(input$render_plant, {
         req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
         print("passed render_plant reqs")
@@ -258,8 +323,35 @@ server <- function(input, output) {
         DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
         # selectedrow
         showNotification(str_c("loading "," ", selectedrow$images_filtered),duration = 3)
-        DATA$preview_img <- readJPEG(selectedrow$images_filtered)
+        showNotification(str_c(input$crop_left),duration = 3)
+        # DATA$preview_img <- readJPEG(selectedrow$images_filtered)
+
+        im <- duflor::load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+        dims <- dim(im)
+        if ((input$crop_left!=0) && (input$crop_right!=0)  && (input$crop_top!=0)  && (input$crop_bottom!=0))  { # add previously selected rect to new image
+
+            im <- imager::draw_rect(im,
+                                    x0 = input$crop_left,
+                                    x1 = dims[[1]] - input$crop_right,
+                                    y0 = input$crop_top,
+                                    y1 = input$crop_bottom,color = "red",opacity = 0.25,filled = T
+                                    )
+        }
+        rect <- imager::grabRect(im)
+        # DATA$rect <- rect
+        showNotification(str_c("x0: ",rect["x0"],"X1: ",rect["x1"],"\n","Y0: ",rect["y0"],"Y1: ",rect["y1"]))
+        cl <- rect["x0"]
+        cr <- rect["x1"]
+        ct <- rect["y0"]
+        cb <- rect["y1"]
+        updateNumericInput(session,"crop_left",value = as.integer(cl))
+        updateNumericInput(session,"crop_right",value = as.integer(dims[[1]] - cr))
+        updateNumericInput(session,"crop_bottom",value = as.integer(cb))
+        updateNumericInput(session,"crop_top",value = as.integer(ct))
         preview_is_loaded <<- TRUE
+    })
+    observeEvent(input$execute_analysis_single, {
+        showNotification(str_c("not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."))
     })
     observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
         ## file-check: only pass through files that are considered valid
@@ -267,6 +359,8 @@ server <- function(input, output) {
 
         #TODO: insert dev keys to toggle under-the-hood behaviour
         isolate(input$dev_pass) # retrieve reactive input value without reevaluating all other reacts?
+        DATA$r__img_type <- input$radio_analysis_type
+        DATA$r__KPI_type <- input$KPI_type
 
 
         for (index in valid_files$count) {
@@ -280,8 +374,6 @@ server <- function(input, output) {
             ## duflor.identify_pixels_of_root_area(thresholds.root,image_file) # if settings.wfa
             ## duflor
             ##
-            DATA$r__img_type <- input$radio_analysis_type
-            DATA$r__KPI_type <- input$KPI_type
             image_dimensions <- duflor.get_image_dimensions(file) ## get image dimensions
             #red_dot_pixels <- duflor.identify_pixels_of_dot(file)
         #bm <- readbitmap::read.bitmap(file,native = FALSE)
