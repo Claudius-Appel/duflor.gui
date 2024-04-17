@@ -16,7 +16,11 @@
 #' @importFrom shiny radioButtons
 #' @importFrom shiny actionButton
 #' @importFrom shiny modalButton
+#' @importFrom shiny modalDialog
+#' @importFrom shiny showModal
+#' @importFrom shiny removeModal
 #' @importFrom shiny numericInput
+#' @importFrom shiny updateNumericInput
 #' @importFrom shiny passwordInput
 #' @importFrom shiny checkboxInput
 #' @importFrom shiny textOutput
@@ -26,7 +30,11 @@
 #' @importFrom shiny verbatimTextOutput
 #' @importFrom shiny reactiveValues
 #' @importFrom shiny reactive
+#' @importFrom shiny observeEvent
 #' @importFrom shiny debounce
+#' @importFrom shiny tagList
+#' @importFrom shiny tags
+#' @importFrom shiny req
 #' @importFrom shinyFiles shinyDirChoose
 #' @importFrom shinyFiles parseDirPath
 #' @importFrom shinyFiles getVolumes
@@ -38,10 +46,16 @@
 #' @importFrom stringr str_c
 #' @importFrom stringr str_flatten_comma
 #' @importFrom stringr str_to_lower
+#' @importFrom stringr str_to_upper
 #' @importFrom stringr str_replace_all
 #' @importFrom DT renderDataTable
+#' @importFrom DT dataTableOutput
 #' @importFrom parallel detectCores
 #' @importFrom foreach getDoParRegistered
+#' @importFrom stats df
+#' @importFrom imager draw_rect
+#' @importFrom imager grabRect
+#' @importFrom duflor load_image
 #' @return .
 #' @export
 #'
@@ -112,8 +126,8 @@ duflor_gui <- function() {
                 #     ),
                 #tableOutput(outputId = "tbl_dir_files"),
                 tabsetPanel(id = "tabset_panel",
-                  tabPanel("Image Files",verbatimTextOutput("Image Files"),DT::dataTableOutput("tbl_dir_files")),
-                  tabPanel("Analytics (red dot deviations?)",verbatimTextOutput("Analytics (red dot deviations?)"),DT::dataTableOutput("tbl_dir_files_selectedrow"))
+                  tabPanel("Image Files",verbatimTextOutput("Image Files"),dataTableOutput("tbl_dir_files")),
+                  tabPanel("Analytics (red dot deviations?)",verbatimTextOutput("Analytics (red dot deviations?)"),dataTableOutput("tbl_dir_files_selectedrow"))
                   #tabPanel("Analytics (misc1)",verbatimTextOutput("TAB3")),
                   #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
                   #tabPanel("Analytics (misc3)",verbatimTextOutput("TAB5"))
@@ -233,7 +247,7 @@ duflor_gui <- function() {
             if (dir.exists(folder_path)) {
                 images_ <- list.files(folder_path,pattern = paste0("*.",input$image_file_suffix),recursive = F,full.names = T)
                 images_ <- list.files(folder_path,pattern = paste0("*.(",str_to_lower(input$image_file_suffix),"|",str_to_upper(input$image_file_suffix),")"),recursive = F,full.names = T)
-                images_filtered <- images_[!stringr::str_count(basename(images_),"_")]
+                images_filtered <- images_[!str_count(basename(images_),"_")]
                 ret <- as.data.frame(images_filtered) # TODO: see here for paginated tables in shiny-apps https://stackoverflow.com/questions/50043152/r-shiny-how-to-add-pagination-in-dtrenderdatatable
                 ret$count <- c(1:1:dim(ret)[1])
                 DATA$r__tbl_dir_files <- ret
@@ -250,7 +264,7 @@ duflor_gui <- function() {
         # parameter set in 'r__KPI_type', by default for all entries
         # selecting entries in the table should render the respective KPI for these
         # images only.
-        output$tbl_dir_files <- DT::renderDataTable({
+        output$tbl_dir_files <- renderDataTable({
             image_files()
         }, server = TRUE,
         selection = "single",
@@ -335,18 +349,18 @@ duflor_gui <- function() {
             showNotification(str_c(input$crop_left),duration = 3)
             # DATA$preview_img <- readJPEG(selectedrow$images_filtered)
 
-            im <- duflor::load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+            im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
             dims <- dim(im)
             if ((input$crop_left!=0) && (input$crop_right!=0)  && (input$crop_top!=0)  && (input$crop_bottom!=0))  { # add previously selected rect to new image
 
-                im <- imager::draw_rect(im,
+                im <- draw_rect(im,
                                         x0 = input$crop_left,
                                         x1 = dims[[1]] - input$crop_right,
                                         y0 = input$crop_top,
                                         y1 = input$crop_bottom,color = "red",opacity = 0.25,filled = T
                 )
             }
-            rect <- imager::grabRect(im)
+            rect <- grabRect(im)
             if (sum(rect)>0) {
                 # DATA$rect <- rect
                 showNotification(str_c("x0: ",rect["x0"],"X1: ",rect["x1"],"\n","Y0: ",rect["y0"],"Y1: ",rect["y1"]))
