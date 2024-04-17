@@ -126,7 +126,6 @@ duflor_gui <- function() {
     # Define server logic required to draw a histogram ----
     server <- function(input, output,session) {
         #### INIT VARIABLES ####
-        preview_is_loaded <-- FALSE
         DATA <- reactiveValues(          #  nomenclature: reactives start with "r__"
             r__tbl_dir_files  = NA,
             r__img_type = "PNG",
@@ -329,7 +328,7 @@ duflor_gui <- function() {
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
             print("passed render_plant reqs")
             # DATA$r__render_plant <- DATA$r__render_plant + 1
-            selectedrowindex <<- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
+            selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
             DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
             # selectedrow
             showNotification(str_c("loading "," ", selectedrow$images_filtered),duration = 3)
@@ -359,7 +358,6 @@ duflor_gui <- function() {
                 updateNumericInput(session,"crop_right",value = as.integer(dims[[1]] - cr))
                 updateNumericInput(session,"crop_bottom",value = as.integer(cb))
                 updateNumericInput(session,"crop_top",value = as.integer(ct))
-                preview_is_loaded <<- TRUE
             }
         })
         #### MAIN CALLBACK>EXECUTE DUFLOR_PACKAGE HERE ####
