@@ -16,6 +16,7 @@ Imports:
     duflor,
     foreach,
     shiny,
+    shinyjs,
     shinyFiles,
     stringr,
     imager,
