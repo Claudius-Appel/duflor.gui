@@ -1,0 +1,22 @@
+Package: duflor.gui
+Title: Frontend for duflor-package
+Version: 0.0.0.9001
+Author: Claudius Appel
+Authors@R: c(
+    person("Claudius", "Appel", email =   "claudius.appel@freenet.de" , role = c("aut", "cre"))
+  )
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports:
+    DT,
+    doParallel,
+    duflor,
+    foreach,
+    shiny,
+    shinyFiles,
+    stringr,
+    imager,
+    magrittr
