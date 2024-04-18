@@ -9,7 +9,6 @@
 #' @importFrom shiny sidebarLayout
 #' @importFrom shiny sidebarPanel
 #' @importFrom shiny selectInput
-#' @importFrom shinyFiles shinyDirButton
 #' @importFrom shiny shinyApp
 #' @importFrom shiny h4
 #' @importFrom shiny h5
@@ -35,12 +34,17 @@
 #' @importFrom shiny tagList
 #' @importFrom shiny tags
 #' @importFrom shiny req
-#' @importFrom shinyFiles shinyDirChoose
-#' @importFrom shinyFiles parseDirPath
-#' @importFrom shinyFiles getVolumes
 #' @importFrom shiny renderText
 #' @importFrom shiny showNotification
 #' @importFrom shiny isolate
+#' @importFrom shiny conditionalPanel
+#' @importFrom shinyFiles shinyDirButton
+#' @importFrom shinyFiles shinyDirChoose
+#' @importFrom shinyFiles parseDirPath
+#' @importFrom shinyFiles getVolumes
+#' @importFrom shinyjs useShinyjs
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs show
 #' @importFrom stringr str_count
 #' @importFrom stringr str_split
 #' @importFrom stringr str_c
@@ -60,29 +64,45 @@
 #' @export
 #'
 duflor_gui <- function() {
-    ui <- fluidPage(
-        # App title ----
+    ##### UI ####
+        ui <- fluidPage(
+        # App title
         titlePanel("Hello Shiny!"),
-
-        # Sidebar layout with input and output definitions ----
+        useShinyjs(),
+        # Sidebar layout with input and output definitions
         sidebarLayout(
 
-            # Sidebar panel for inputs ----
+            # Sidebar panel for inputs
             sidebarPanel(
-
+                ## FILES
                 h4("Select folder containing images"),
                 shinyDirButton(id = 'folder', 'Select a folder', 'Please select a folder', FALSE),
                 selectInput(inputId = "image_file_suffix",label = "Select filetype to import",choices = c("JPG","PNG")),
                 "Current Folder:",
                 textOutput(outputId = "ctrl_current_folder"),
+                ## ANALYSIS_TYPE
                 radioButtons(inputId = "radio_analysis_type",
                            h4("Type of Analysis"),
                            choices = list("GFA" = 1,
                                           "WFA" = 2),
                            selected = 1),
-                actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
-                actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
-                actionButton(inputId = "render_plant",label = "Render Plant"),
+                ## BUTTONS_1
+                actionButton(inputId = "render_plant",label = "Render Plant/Select processed area"),
+                actionButton(inputId = "open_edit_HSV_ranges_conditionalPanel",label = "Edit HSV Ranges"),
+                ## CONFIGURE_HSV_BOUNDS
+                conditionalPanel(
+                    condition = "input.open_edit_HSV_ranges_conditionalPanel %% 2 == 1", # Condition to open the panel
+                    id = "HSV_PANEL",
+                    selectInput("selected_HSV_spectrum", "Select spectrum to edit.", choices = names(getOption("duflor.default_hsv_spectrums")$lower_bound)),
+                    numericInput(inputId = "lower_bound_H",label = "Lower Bound (H)", value = 0, min = 0, max = 360, step = 0.01),
+                    numericInput(inputId = "lower_bound_S",label = "Lower Bound (S)", value = 0, min = 0, max = 1, step = 0.01),
+                    numericInput(inputId = "lower_bound_V",label = "Lower Bound (V)", value = 0, min = 0, max = 1, step = 0.0001),
+                    numericInput(inputId = "upper_bound_H",label = "Upper Bound (H)", value = 0, min = 0, max = 360, step = 0.01),
+                    numericInput(inputId = "upper_bound_S",label = "Upper Bound (S)", value = 0, min = 0, max = 1, step = 0.01),
+                    numericInput(inputId = "upper_bound_V",label = "Upper Bound (V)", value = 0, min = 0, max = 1, step = 0.0001),
+                    actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed HSV-spectra"),
+                    useShinyjs() # Enable shinyjs inside the conditional panel
+                ),
                 ## works only post 'execute_analysis'
                 radioButtons(inputId = "KPI_type",
                            h4("Select KPI to render"),
@@ -91,40 +111,38 @@ duflor_gui <- function() {
                                           "TBD2" = 3,
                                           "TBD3" = 4),
                            selected = 1),
+                ## CROPPING TO_BE_ANALYSED MATRIX
                 h4("Crop Image"),
-                actionButton(inputId = "reset_crops", label = "Reset"),
-                numericInput(inputId = "crop_left",label = "Crop Left",value = 0,min = 0),
-                numericInput(inputId = "crop_right",label = "Crop Right",value = 0,min = 0),
-                numericInput(inputId = "crop_top",label = "Crop Top",value = 0,min = 0),
-                numericInput(inputId = "crop_bottom",label = "Crop Bottom",value = 0,min = 0),
+                checkboxInput(inputId = "open_croppingPanel",label = "Do you want to analyse only a cropped section?"),
+                conditionalPanel(
+                    condition = "input.open_croppingPanel %% 2 == 1",
+                    id = "CROPPING_PANEL",
+                    actionButton(inputId = "reset_crops", label = "Reset"),
+                    numericInput(inputId = "crop_left",label = "Crop Left",value = 0,min = 0),
+                    numericInput(inputId = "crop_right",label = "Crop Right",value = 0,min = 0),
+                    numericInput(inputId = "crop_top",label = "Crop Top",value = 0,min = 0),
+                    numericInput(inputId = "crop_bottom",label = "Crop Bottom",value = 0,min = 0),
+                ),
 
 
-                h5("Parallel Processing"),
-                checkboxInput(inputId = "parallelise",label = "Run analysis in parallel?"),
-                numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores() - 1)),
+                ## PARALLELISATION
+                h4("Parallel Processing"),
+                checkboxInput(inputId = "open_parallelPanel",label = "Run analysis in parallel?"),
+                conditionalPanel(
+                    condition = "input.open_parallelPanel %% 2 == 1",
+                    id = "PARALLEL_PANEL",
+                    numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores() - 1)),
+                ),
+                ## BUTTONS_2
+                actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
+                actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
+                ## MISCELLANEOUS STUFF
                 h5("Misc"),
                 passwordInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands")
-
-
-
-
-
-
-
             ),
 
-            # Main panel for displaying outputs ----
+            # Main panel for displaying outputs
             mainPanel(
-                # plotOutput(outputId = "distPlot"),
-                # plotOutput(
-                #     outputId = "image_offset_plot",
-                #     dblclick = "image_offset_dblclick",
-                #     brush = brushOpts(
-                #         id = "image_offset_plot_brush",
-                #         resetOnNew = TRUE
-                #     )
-                #     ),
-                #tableOutput(outputId = "tbl_dir_files"),
                 tabsetPanel(id = "tabset_panel",
                   tabPanel("Image Files",verbatimTextOutput("Image Files"),dataTableOutput("tbl_dir_files")),
                   tabPanel("Analytics (red dot deviations?)",verbatimTextOutput("Analytics (red dot deviations?)"),dataTableOutput("tbl_dir_files_selectedrow"))
@@ -136,8 +154,7 @@ duflor_gui <- function() {
             ),
         )
     )
-
-    # Define server logic required to draw a histogram ----
+    #### SERVER ####
     server <- function(input, output,session) {
         #### INIT VARIABLES ####
         DATA <- reactiveValues(          #  nomenclature: reactives start with "r__"
@@ -147,6 +164,7 @@ duflor_gui <- function() {
             r__tbl_dir_files_selectedrow = NA,
             # r__render_plant = 0,
             preview_img = NA,
+            spectrums = getOption("duflor.default_hsv_spectrums")
         )
         DEBUGKEYS <- reactiveValues(
             force.prints = FALSE,
@@ -158,7 +176,6 @@ duflor_gui <- function() {
             x = NULL,
             y = NULL
         )
-
         # to make values only trigger reactives after x seconds of non-interaction, first assign them reactive.
         # next, assign a debounce-expression with a set timout after which the value is hnaded onwards to the reactive-pipeline
         # finally, refer to the debounce-expression via `expression()` instead of the input-value `input$value` in callbacks.
@@ -171,74 +188,7 @@ duflor_gui <- function() {
         d__crop_top <- r__crop_top %>% debounce(1300)
         d__crop_bottom <- r__crop_bottom %>% debounce(1300)
         volumes <- getVolumes()()
-        # Histogram of the Old Faithful Geyser Data ----
-        # with requested number of bins
-        # This expression that generates a histogram is wrapped in a call
-        # to renderPlot to indicate that:
-        #
-        # 1. It is "reactive" and therefore should be automatically
-        #    re-executed when inputs (input$bins) change
-        # 2. Its output type is a plot
-        # output$distPlot <- renderPlot({
-        #
-        #     req(input$folder,image_files()) # if you must require the result of a different ctrl, make sure to append the () to it.
-        #
-        #     x    <- faithful$waiting
-        #     bins <- seq(min(x), max(x), length.out = input$bins + 1)
-        #
-        #     hist(x, breaks = bins, col = "#007bc2", border = "white",
-        #          xlab = "Waiting time to next eruption (in mins)",
-        #          main = "Histogram of waiting times")
-        #
-        # })
-        # TODO: change this to render instead of the histogram.
-        # The selection works, so when selecting an image, populate the space
-        # above. Then react-grab the contents of the cutoff-select and display as
-        # red bars offset from the edges
-
-        # output$image_offset_plot <- renderPlot({
-        #     #TODO: reset render_plant
-        #     req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected,DATA$preview_img)
-        #     # print(stringr::str_c("offset_plot: preview_img: ",DATA$preview_img))
-        #     if (isTRUE(preview_is_loaded)) {
-        #         # isolate({
-        #             preview_is_loaded <<- FALSE
-        #         # })
-        #         if (is.null(ranges$x)) {
-        #             xmin <- 0
-        #         } else {
-        #             xmin <- ranges$x[1]
-        #         }
-        #         if (is.null(ranges$x)) {
-        #             xmax <- 6000
-        #         } else {
-        #             xmax <- ranges$x[2]
-        #         }
-        #         if (is.null(ranges$y)) {
-        #             ymin <- 0
-        #         } else {
-        #             ymin <- ranges$y[1]
-        #         }
-        #         if (is.null(ranges$y)) {
-        #             ymax <- 4000
-        #         } else {
-        #             ymax <- ranges$y[2]
-        #         }
-        #
-        #         plot(NULL,xlim = c(xmin,xmax),ylim = c(ymin,ymax))
-        #         rasterImage(DATA$preview_img,xmin,ymin,xmax,ymax,interpolate = F)
-        #         showNotification(str_c("plotted "," ", (DATA$r__tbl_dir_files[input$tbl_dir_files_rows_selected,]$images_filtered)),duration = 3)
-        #     # d__crop_left
-        #     # d__crop_right
-        #     # d__crop_top
-        #     # d__crop_bottom
-        #         rect(xleft = 0, ybottom = 0, xright = d__crop_left(), ytop = ymax,col = "red",density = 5) # CL  ## works
-        #         rect(xleft = xmax - d__crop_right(), ybottom = 0, xright = xmax, ytop = ymax, col = "red",density = 5) # CR
-        #         rect(xleft = xmin, ybottom = ymax - d__crop_top(), xright = xmax, ytop = ymax, col = "red",density = 5) # CT
-        #         rect(xleft = xmin, ybottom = 0, xright = xmax, ytop = 0 + d__crop_bottom(), col = "red",density = 5) # CB
-        #     }
-        # })
-        ##### DISPLAYING AND RENDERING FILES AND STUFF ####
+        #### DISPLAYING AND RENDERING FILES AND STUFF ####
         image_files <- reactive({ # image_files is a list of filepaths, which gets set reactively.
             req(input$folder,input$image_file_suffix,input$radio_analysis_type)
             shinyDirChoose(input = input, 'folder', roots=volumes)
@@ -276,6 +226,10 @@ duflor_gui <- function() {
         )
         ### selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
 
+        #### HIDE_PANELS_BY_DEFAULT ####
+        hide("HSV_PANEL")
+        hide("CROPPING_PANEL")
+        hide("PARALLEL_PANEL")
         #### DEV TOGGLES ####
         observeEvent(input$dev_pass, {
             # add valid keys here
@@ -297,32 +251,32 @@ duflor_gui <- function() {
 
             }
         })
-        #### MISC ####
-        observeEvent(input$image_offset_dblclick, {
-            #TODO: the brush shall not reset the ranges. else we fuck up a lot.
-            #instead, make it modify the crop_X inputs - or, as a simpler first
-            #solution, give us the vaues of its corners first
-            brush <- input$image_offset_plot_brush
-            if (!is.null(brush)) {
-                # ranges$x <- c(brush$xmin, brush$xmax)
-                # ranges$y <- c(brush$ymin, brush$ymax)
-                showNotification(str_c("Bounding Coordinates: X(",brush$xmin,brush$xmax,"),Y(",brush$ymin,brush$ymax,")"),duration = 3)
-                updateNumericInput(session,"crop_left",value = as.integer(brush$xmin))
-                updateNumericInput(session,"crop_right",value = as.integer(brush$xmax))
-                updateNumericInput(session,"crop_bottom",value = as.integer(brush$ymin))
-                updateNumericInput(session,"crop_top",value = as.integer(brush$ymax))
-                ## TODO: get the dimensions of the first image loaded, then fix the values above so that the right and bottom edges of the reported rectangle are correctly displayed?
-                ## Right now, it seems like the program is miscalculating the edges somehow ¯\_(ツ)_/¯
+        #### SETUP PARALLELISATION ####
+        observeEvent(input$open_parallelPanel, {
+            # controls whether or not the number of cores can be selected.
+            # Unchecking this will set the number of used cores to `1`
+            if (input$open_parallelPanel) {
+                show("PARALLEL_PANEL")
             } else {
-                # ranges$x <- NULL
-                # ranges$y <- NULL
+                hide("PARALLEL_PANEL")
+                updateNumericInput(session,inputId = "parallel_cores",value = 1)
+                showNotification(str_c("Disabled parallelisation, program will utilise 1 core."))
             }
         })
-
-        #### RESET CROPPING ####
+        #### EDIT CROPPING ####
+        observeEvent(input$open_croppingPanel, {
+            #TODO: edit HSV ranges loaded from duflor-package
+            print(input$open_croppingPanel)
+            if (input$open_croppingPanel) {
+                show("CROPPING_PANEL")
+            } else {
+                hide("CROPPING_PANEL")
+            }
+        })
         observeEvent(input$reset_crops, {
             showModal(modalDialog(
                 tags$h3('Do you want to reset the croppings?'),
+                tags$h5('As a result, all images will be processed at full resolution. This is safer, but slower.'),
                 footer=tagList(
                     actionButton('submit_reset_crops', 'Reset'),
                     modalButton('cancel')
@@ -337,33 +291,69 @@ duflor_gui <- function() {
             updateNumericInput(session,"crop_bottom",value = 0)
             updateNumericInput(session,"crop_top",value = 0)
         })
+        #### EDIT HSV RANGES ####
+        observeEvent(input$open_edit_HSV_ranges_conditionalPanel, {
+            #TODO: edit HSV ranges loaded from duflor-package
+            show("HSV_PANEL")
+            default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
+            # 1. create a modal for each of these spectrums
+            # 2.
+        })
+        observeEvent(input$selected_HSV_spectrum, {
+            ## load spectrums in
+            spectrums <- DATA$spectrums
+            updateNumericInput(session, inputId = "lower_bound_H", value = spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
+            updateNumericInput(session, inputId = "lower_bound_S", value = spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
+            updateNumericInput(session, inputId = "lower_bound_V", value = spectrums$lower_bound[[input$selected_HSV_spectrum]][3])
+            updateNumericInput(session, inputId = "upper_bound_H", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][1])
+            updateNumericInput(session, inputId = "upper_bound_S", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
+            updateNumericInput(session, inputId = "upper_bound_V", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
+        })
+        observeEvent(input$reset_HSV_ranges, {
+
+        })
+        observeEvent(input$close_edit_HSV_ranges_conditionalPanel, {
+            hide("HSV_PANEL")
+            DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]] <- c(input$lower_bound_H,input$lower_bound_S,input$lower_bound_V)
+            DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]] <- c(input$upper_bound_H,input$upper_bound_S,input$upper_bound_V)
+
+
+        })
         #### RENDER PLOT ####
         observeEvent(input$render_plant, {
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
-            print("passed render_plant reqs")
-            # DATA$r__render_plant <- DATA$r__render_plant + 1
+
             selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
             DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
-            # selectedrow
             showNotification(str_c("loading "," ", selectedrow$images_filtered),duration = 3)
             showNotification(str_c(input$crop_left),duration = 3)
-            # DATA$preview_img <- readJPEG(selectedrow$images_filtered)
 
             im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
             dims <- dim(im)
             if ((input$crop_left!=0) && (input$crop_right!=0)  && (input$crop_top!=0)  && (input$crop_bottom!=0))  { # add previously selected rect to new image
 
-                im <- draw_rect(im,
-                                        x0 = input$crop_left,
-                                        x1 = dims[[1]] - input$crop_right,
-                                        y0 = input$crop_top,
-                                        y1 = input$crop_bottom,color = "red",opacity = 0.25,filled = T
+                im <- draw_rect(
+                    im,
+                    x0 = input$crop_left,
+                    x1 = dims[[1]] - input$crop_right,
+                    y0 = input$crop_top,
+                    y1 = input$crop_bottom,
+                    color = "red",
+                    opacity = 0.25,
+                    filled = T
                 )
             }
             rect <- grabRect(im)
             if (sum(rect)>0) {
                 # DATA$rect <- rect
-                showNotification(str_c("x0: ",rect["x0"],"X1: ",rect["x1"],"\n","Y0: ",rect["y0"],"Y1: ",rect["y1"]))
+                showNotification(
+                    str_c(
+                        "x0: ",rect["x0"],
+                        "X1: ",rect["x1"],
+                        "\n","Y0: ",rect["y0"],
+                        "Y1: ",rect["y1"]
+                        )
+                    )
                 cl <- rect["x0"]
                 cr <- rect["x1"]
                 ct <- rect["y0"]
@@ -379,9 +369,8 @@ duflor_gui <- function() {
             showNotification(str_c("not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."))
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
-            ## file-check: only pass through files that are considered valid
-            valid_files <- duflor.check(DATA$r__tbl_dir_files)
             print(input$parallel_cores)
+            ## SETUP PARALLELISATION
             if (input$parallel_cores>1) {
                 if (.Platform$OS.type == "windows") {
                     cluster_type <- "PSOCK"
@@ -397,6 +386,10 @@ duflor_gui <- function() {
                     shutdown_parallel()
                 }
             }
+            ## CONFIGURE HSV RANGES
+            # when running `duflor::extract_pixels_HSV(...,lower_bound = lb,upper_bound = ub,...)`, ingest values of `DATA$spectrums$lower_bound` & `DATA$spectrums$upper_bound`
+            valid_files <- duflor.check(DATA$r__tbl_dir_files)
+            ## file-check: only pass through files that are considered valid
             #TODO: insert dev keys to toggle under-the-hood behaviour
             isolate(input$dev_pass) # retrieve reactive input value without reevaluating all other reacts?
             DATA$r__img_type <- input$radio_analysis_type
@@ -413,27 +406,26 @@ duflor_gui <- function() {
                 ## duflor
                 ##
                 image_dimensions <- duflor.get_image_dimensions(file) ## get image dimensions
-                #red_dot_pixels <- duflor.identify_pixels_of_dot(file)
-                #bm <- readbitmap::read.bitmap(file,native = FALSE)
-                used_color_space <- "HSV" # TODO: wait for response in https://github.com/asgr/imager/issues/14
-                if (used_color_space=="HSV") {
-                    # image2 <- duflor.load_hsv_colorspace(file)
-                    image <- duflor.load_rgb_colorspace(file)
-                } else if (used_color_space=="RGB") {
-                    image <- duflor.load_rgb_colorspace(file)
-                }
-                duflor.display(image)
-                if (input$radio_analysis_type==1) { # GFA
-                    color_ranges <- list(
-                        Lower <- c(1,2,3),
-                        Higher <- c(4,5,6)
+
+                if (validate_croppings(image_dimensions, input$crop_left, input$crop_right, input$crop_top, input$crop_bottom)) {
+                    im <- load_image(
+                        image.path = file,
+                        subset_only = T,
+                        return_hsv = T,
+                        crop_left = input$crop_left,
+                        crop_right = input$crop_right,
+                        crop_top = input$crop_top,
+                        crop_bottom = input$crop_bottom
                     )
-                } else if (input$radio_analysis_type==2) { # WFA
-                    color_ranges <- list(
-                        Lower <- c(1,2,3),
-                        Higher <- c(4,5,6)
+                } else {
+                    # throwError(image '%path%' could not be cropped by selected values, will load complete image instead)
+                    im <- load_image(
+                        image.path = file,
+                        subset_only = F,
+                        return_hsv = T
                     )
                 }
+                #REST OF PIPELINE#
                 print(file)
                 print(DATA$r__img_type)
             }
@@ -441,9 +433,7 @@ duflor_gui <- function() {
                 shutdown_parallel()
             }
         })
-        ## CALLBACK FOR SELECTING FILES IN THE `IMAGE FILES`-TBL:
-        ##
-        ## this
+
     }
     shinyApp(ui = ui, server = server)
 }
