@@ -38,6 +38,7 @@
 #' @importFrom shiny showNotification
 #' @importFrom shiny isolate
 #' @importFrom shiny conditionalPanel
+#' @importFrom shiny a
 #' @importFrom shinyFiles shinyDirButton
 #' @importFrom shinyFiles shinyDirChoose
 #' @importFrom shinyFiles parseDirPath
@@ -87,7 +88,7 @@ duflor_gui <- function() {
                                           "WFA" = 2),
                            selected = 1),
                 ## BUTTONS_1
-                actionButton(inputId = "render_plant",label = "Render Plant/Select processed area"),
+                actionButton(inputId = "render_plant",label = "Render Plant/Select subset area"),
                 actionButton(inputId = "open_edit_HSV_ranges_conditionalPanel",label = "Edit HSV Ranges"),
                 ## CONFIGURE_HSV_BOUNDS
                 conditionalPanel(
@@ -156,6 +157,7 @@ duflor_gui <- function() {
     )
     #### SERVER ####
     server <- function(input, output,session) {
+        notification_duration <- 1.300
         #### INIT VARIABLES ####
         DATA <- reactiveValues(          #  nomenclature: reactives start with "r__"
             r__tbl_dir_files  = NA,
@@ -240,12 +242,12 @@ duflor_gui <- function() {
             for (each in Keys) {
                 if (each %in% Arr[[1]]) {
                     if (each=="-h") {
-                        showNotification(str_c("Available dev Keys (see documentation): ",str_flatten_comma(Arr[[1]][!str_count(Arr[[1]],"---")])),duration = 5)
+                        showNotification(str_c("Available dev Keys (see documentation): ",str_flatten_comma(Arr[[1]][!str_count(Arr[[1]],"---")])), duration = notification_duration)
                     } else {
                         key <- str_replace_all(str_replace_all(each,"---",""),"--","")
                         key <- str_replace_all(key,"-",".")
                         DEBUGKEYS[[key]] <- !DEBUGKEYS[[key]]
-                        showNotification(str_c("DEBUG KEY "," ",each, " set to ", DEBUGKEYS[[key]]))
+                        showNotification(str_c("DEBUG KEY "," ",each, " set to ", DEBUGKEYS[[key]]), duration = notification_duration)
                     }
                 }
 
@@ -257,10 +259,17 @@ duflor_gui <- function() {
             # Unchecking this will set the number of used cores to `1`
             if (input$open_parallelPanel) {
                 show("PARALLEL_PANEL")
+                showNotification(
+                    str_c(
+                        "Enabled parallelisation, please select the number of used cores. The minimum-required 1 core which must not be used is already accounted for."
+                    ),
+                    duration = notification_duration
+                )
             } else {
                 hide("PARALLEL_PANEL")
                 updateNumericInput(session,inputId = "parallel_cores",value = 1)
-                showNotification(str_c("Disabled parallelisation, program will utilise 1 core."))
+                showNotification(str_c("Disabled parallelisation, program will utilise 1 core."),
+                                 duration = notification_duration)
             }
         })
         #### EDIT CROPPING ####
@@ -269,8 +278,10 @@ duflor_gui <- function() {
             print(input$open_croppingPanel)
             if (input$open_croppingPanel) {
                 show("CROPPING_PANEL")
+                showNotification(str_c("Enabled cropping. After being loaded, the image-matrix will be cropped by the values selected below before being processed."),a(href = "https://www.google.com","google"))
             } else {
                 hide("CROPPING_PANEL")
+                showNotification(str_c("Disabled cropping. After being loaded, the complete image-matrix will be processed."))
             }
         })
         observeEvent(input$reset_crops, {
@@ -316,7 +327,7 @@ duflor_gui <- function() {
             hide("HSV_PANEL")
             DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]] <- c(input$lower_bound_H,input$lower_bound_S,input$lower_bound_V)
             DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]] <- c(input$upper_bound_H,input$upper_bound_S,input$upper_bound_V)
-
+            showNotification(str_c("Updated values for spectrum '",input$selected_HSV_spectrum,"'"))
 
         })
         #### RENDER PLOT ####
@@ -325,8 +336,7 @@ duflor_gui <- function() {
 
             selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
             DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
-            showNotification(str_c("loading "," ", selectedrow$images_filtered),duration = 3)
-            showNotification(str_c(input$crop_left),duration = 3)
+            showNotification(str_c("loading "," ", selectedrow$images_filtered), duration = notification_duration)
 
             im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
             dims <- dim(im)
@@ -347,12 +357,12 @@ duflor_gui <- function() {
             if (sum(rect)>0) {
                 # DATA$rect <- rect
                 showNotification(
-                    str_c(
-                        "x0: ",rect["x0"],
-                        "X1: ",rect["x1"],
-                        "\n","Y0: ",rect["y0"],
-                        "Y1: ",rect["y1"]
-                        )
+                    str_c("Only pixels within the rectange defined below will be analysed:",
+                        "\nx0: ",rect["x0"],
+                        " x1: ",rect["x1"],
+                        "\n","y0: ",rect["y0"],
+                        " y1: ",rect["y1"]
+                        ), duration = notification_duration * 5
                     )
                 cl <- rect["x0"]
                 cr <- rect["x1"]
@@ -366,7 +376,7 @@ duflor_gui <- function() {
         })
         #### MAIN CALLBACK>EXECUTE DUFLOR_PACKAGE HERE ####
         observeEvent(input$execute_analysis_single, {
-            showNotification(str_c("not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."))
+            showNotification(str_c("not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."), duration = notification_duration)
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
             print(input$parallel_cores)
