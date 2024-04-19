@@ -32,10 +32,10 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 image.path = file,
                 subset_only = T,
                 return_hsv = T,
-                crop_left = input$crop_left,
-                crop_right = input$crop_right,
-                crop_top = input$crop_top,
-                crop_bottom = input$crop_bottom
+                crop_left = input$x0,
+                crop_right = current_results$image_width - input$x1,
+                crop_top = input$y0,
+                crop_bottom = current_results$image_height - input$y1
             )
         } else {
             im <- load_image(

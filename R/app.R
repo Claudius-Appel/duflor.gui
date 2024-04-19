@@ -123,10 +123,10 @@ duflor_gui <- function() {
                     condition = "input.do_crop_image %% 2 == 1",
                     id = "CROPPING_PANEL",
                     actionButton(inputId = "reset_crops", label = "Reset"),
-                    numericInput(inputId = "crop_left",label = "Crop Left",value = 0,min = 0),
-                    numericInput(inputId = "crop_right",label = "Crop Right",value = 0,min = 0),
-                    numericInput(inputId = "crop_top",label = "Crop Top",value = 0,min = 0),
-                    numericInput(inputId = "crop_bottom",label = "Crop Bottom",value = 0,min = 0),
+                    numericInput(inputId = "x0",label = "x0",value = 0,min = 0),
+                    numericInput(inputId = "x1",label = "x1",value = 0,min = 0),
+                    numericInput(inputId = "y0",label = "y0",value = 0,min = 0),
+                    numericInput(inputId = "y1",label = "y1",value = 0,min = 0),
                 ),
 
 
@@ -189,14 +189,6 @@ duflor_gui <- function() {
         # to make values only trigger reactives after x seconds of non-interaction, first assign them reactive.
         # next, assign a debounce-expression with a set timout after which the value is hnaded onwards to the reactive-pipeline
         # finally, refer to the debounce-expression via `expression()` instead of the input-value `input$value` in callbacks.
-        r__crop_left <- reactive(input$crop_left)
-        r__crop_right <- reactive(input$crop_right)
-        r__crop_top <- reactive(input$crop_top)
-        r__crop_bottom <- reactive(input$crop_bottom)
-        d__crop_left <- r__crop_left %>% debounce(1300)
-        d__crop_right <- r__crop_right %>% debounce(1300)
-        d__crop_top <- r__crop_top %>% debounce(1300)
-        d__crop_bottom <- r__crop_bottom %>% debounce(1300)
         volumes <- getVolumes()()
         #### DISPLAYING AND RENDERING FILES AND STUFF ####
         image_files <- reactive({ # image_files is a list of filepaths, which gets set reactively.
@@ -306,10 +298,10 @@ duflor_gui <- function() {
         observeEvent(input$submit_reset_crops, {
             removeModal()
             showNotification(str_c("not implemented: reset crops to 0/0/0/0"))
-            updateNumericInput(session,"crop_left",value = 0)
-            updateNumericInput(session,"crop_right",value = 0)
-            updateNumericInput(session,"crop_bottom",value = 0)
-            updateNumericInput(session,"crop_top",value = 0)
+            updateNumericInput(session,"x0",value = 0)
+            updateNumericInput(session,"x1",value = 0)
+            updateNumericInput(session,"y1",value = 0)
+            updateNumericInput(session,"y0",value = 0)
         })
         #### EDIT HSV RANGES ####
         observeEvent(input$open_edit_HSV_ranges_conditionalPanel, {
@@ -349,14 +341,14 @@ duflor_gui <- function() {
 
             im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
             dims <- dim(im)
-            if ((input$crop_left!=0) && (input$crop_right!=0)  && (input$crop_top!=0)  && (input$crop_bottom!=0))  { # add previously selected rect to new image
+            if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add previously selected rect to new image
 
                 im <- draw_rect(
                     im,
-                    x0 = input$crop_left,
-                    x1 = dims[[1]] - input$crop_right,
-                    y0 = input$crop_top,
-                    y1 = input$crop_bottom,
+                    x0 = input$x0,
+                    x1 = input$x1,
+                    y0 = input$y0,
+                    y1 = input$y1,
                     color = "red",
                     opacity = 0.25,
                     filled = T
@@ -377,10 +369,10 @@ duflor_gui <- function() {
                 cr <- rect["x1"]
                 ct <- rect["y0"]
                 cb <- rect["y1"]
-                updateNumericInput(session,"crop_left",value = as.integer(cl))
-                updateNumericInput(session,"crop_right",value = as.integer(dims[[1]] - cr))
-                updateNumericInput(session,"crop_bottom",value = as.integer(cb))
-                updateNumericInput(session,"crop_top",value = as.integer(ct))
+                updateNumericInput(session,"x0",value = as.integer(cl))
+                updateNumericInput(session,"x1",value = as.integer(cr))
+                updateNumericInput(session,"y1",value = as.integer(cb))
+                updateNumericInput(session,"y0",value = as.integer(ct))
             }
         })
         #### MAIN CALLBACK>EXECUTE DUFLOR_PACKAGE HERE ####
