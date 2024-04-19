@@ -22,7 +22,7 @@ execute_analysis <- function(input, DATA, DEBUGKEYS, FLAGS) {
         isolate(DATA$r__tbl_dir_files)
         file <- DATA$r__tbl_dir_files$images_filtered[[input$tbl_dir_files_rows_selected]]
         file <- duflor.check(file)
-        execute_single(file,input,DATA, DEBUGKEYS, FLAGS)
+        results <- execute_single(file, input, DATA, DEBUGKEYS, FLAGS)
     } else {
         files <- duflor.check(DATA$r__tbl_dir_files)
         results <- execute_multiple(files, input, DATA, DEBUGKEYS, FLAGS)
@@ -34,4 +34,5 @@ execute_analysis <- function(input, DATA, DEBUGKEYS, FLAGS) {
         # finally, shutdown the cluster if work was performed in parallel
         shutdown_parallel()
     }
+    return(results)
 }
