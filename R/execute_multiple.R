@@ -3,6 +3,18 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
     results_object <- prepare_resultsObject(input,DATA,DEBUGKEYS)
     #### ITERATE OVER IMAGES ####
     for (index in files$count) {
+        # create a results-row to be merged into the `results_object`
+        current_results <- data.frame(matrix(NA, nrow = 1, ncol = length(names(results_object))))
+        colnames(current_results) <- names(results_object)
+        ## NAME
+        file <- files$images_filtered[index]
+        current_results$full_path <- file
+        current_results$image_name <- basename(file)
+        ## DATE_OF_ANALYSIS
+        ## IMAGE DIMENSIONS
+        image_dimensions <- as.integer(duflor.get_image_dimensions(file))
+        current_results$image_width <- image_dimensions[[1]]
+        current_results$image_height <- image_dimensions[[2]]
 
     }
 }
