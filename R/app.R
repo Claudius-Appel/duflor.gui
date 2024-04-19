@@ -65,6 +65,7 @@
 #' @export
 #'
 duflor_gui <- function() {
+    use_logical_cores <- F
     ##### UI ####
         ui <- fluidPage(
         # App title
@@ -132,7 +133,7 @@ duflor_gui <- function() {
                 conditionalPanel(
                     condition = "input.open_parallelPanel %% 2 == 1",
                     id = "PARALLEL_PANEL",
-                    numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores() - 1)),
+                    numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores(logical = use_logical_cores) - 1)),
                 ),
                 ## BUTTONS_2
                 actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
@@ -261,9 +262,10 @@ duflor_gui <- function() {
                 show("PARALLEL_PANEL")
                 showNotification(
                     str_c(
-                        "Enabled parallelisation, please select the number of used cores. The minimum-required 1 core which must not be used is already accounted for."
+                        "Enabled parallelisation, please select the number of used cores."
+                        ,"\nThe system has ",detectCores(all.tests = T,logical = use_logical_cores)," available cores, of which up to ",detectCores(all.tests = T,logical = use_logical_cores) - 1," cores may be used by this program."
                     ),
-                    duration = notification_duration
+                    duration = notification_duration * 5
                 )
             } else {
                 hide("PARALLEL_PANEL")
