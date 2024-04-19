@@ -34,6 +34,16 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 return_hsv = T
             )
         }
+        ## EXTRACT RESULTS
+        hsv_results <- duflor::extract_pixels_HSV(
+            pixel.array = im,
+            lower_bound = DATA$spectrums$lower_bound,
+            upper_bound = DATA$spectrums$upper_bound,
+            fast_eval = T,
+            bundle_pixelarray = F,
+            check_value = T,
+            use_single_iteration_cpp = T
+        )
 
     }
 }
