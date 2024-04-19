@@ -27,6 +27,9 @@ execute_analysis <- function(input, DATA, DEBUGKEYS, FLAGS) {
         files <- duflor.check(DATA$r__tbl_dir_files)
         results <- execute_multiple(files, input, DATA, DEBUGKEYS, FLAGS)
     }
+    ## save the results
+    if (isFALSE(store_results_to_file(results, input$save_to_xlsx))) {
+        # TODO: throw error - file could not be saved. WHY?
     }
 
     #### TEAR DOWN PARALLELISATION ####
