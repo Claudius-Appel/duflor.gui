@@ -24,9 +24,9 @@ execute_analysis <- function(input, DATA, DEBUGKEYS, FLAGS) {
         file <- duflor.check(file)
         execute_single(file,input,DATA, DEBUGKEYS, FLAGS)
     } else {
-        valid_files <- duflor.check(DATA$r__tbl_dir_files)
-        execute_multiple(valid_files,input, DATA, DEBUGKEYS, FLAGS)
-        ## do nothing?
+        files <- duflor.check(DATA$r__tbl_dir_files)
+        results <- execute_multiple(files, input, DATA, DEBUGKEYS, FLAGS)
+    }
     }
 
     #### TEAR DOWN PARALLELISATION ####

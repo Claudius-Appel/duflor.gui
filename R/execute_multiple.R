@@ -56,5 +56,8 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
             current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
         }
+        ## UPDATE RESULTS_OBJECT
+        results_object <- update_resultsObject(results_object,current_results)
     }
+    return(results_object)
 }
