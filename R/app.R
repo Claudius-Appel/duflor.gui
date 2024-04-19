@@ -225,14 +225,14 @@ duflor_gui <- function() {
         # selecting entries in the table should render the respective KPI for these
         # images only.
         output$tbl_dir_files <- renderDataTable({
-            image_files()
-        }, server = TRUE,
-        selection = "single",
-        options = list(
-            paging = TRUE,
-            pageLength = 15,
-            autoWidth = TRUE
-        )
+            image_files()},
+            server = TRUE,
+            selection = "single",
+            options = list(
+                paging = TRUE,
+                pageLength = 15,
+                autoWidth = TRUE
+            )
         )
         ### selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
 
@@ -406,6 +406,3 @@ duflor_gui <- function() {
     }
     shinyApp(ui = ui, server = server)
 }
-
-
-
