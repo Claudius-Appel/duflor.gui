@@ -1,4 +1,4 @@
-execute_analysis <- function(input, DATA, DEBUGKEYS) {
+execute_analysis <- function(input, DATA, DEBUGKEYS, FLAGS) {
     #### SETUP PARALLELISATION ####
     if (input$parallel_cores > 1) {
         if (.Platform$OS.type == "windows") {

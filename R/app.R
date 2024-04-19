@@ -399,7 +399,7 @@ duflor_gui <- function() {
             spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             DATA$spectrums <- spectrums
-            execute_analysis(input,DATA,DEBUGKEYS)
+            execute_analysis(input,DATA,DEBUGKEYS,FLAGS)
         })
     }
     shinyApp(ui = ui, server = server)
