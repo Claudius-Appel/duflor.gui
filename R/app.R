@@ -177,6 +177,9 @@ duflor_gui <- function() {
             set.author = FALSE
 
         )
+        FLAGS <- reactiveValues(
+            analyse_single_image = FALSE
+        )
         ranges <- reactiveValues(
             x = NULL,
             y = NULL
@@ -380,33 +383,15 @@ duflor_gui <- function() {
         })
         #### MAIN CALLBACK>EXECUTE DUFLOR_PACKAGE HERE ####
         observeEvent(input$execute_analysis_single, {
+            isolate(FLAGS$analyse_single_image)
+            FLAGS$analyse_single_image <- TRUE
             showNotification(str_c("not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."), duration = notification_duration)
+            select_spectra_gui_comp(input)
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
-            all_choices <- names(getOption("duflor.default_hsv_spectrums")$upper_bound)
-            if (input$radio_analysis_type==1) { # GFA
-                choices_GFA <- c("bex_identifier_dot","bex_green_HSV","bex_drought_HSV","bex_complete_HSV")
-                showModal(modalDialog(
-                    tags$h3('Choose which ranges to analyse'),
-                    # tags$h5('As a result, all images will be processed at full resolution. This is safer, but slower.'),
-                    footer=tagList(
-                        checkboxGroupInput("selected_spectra","Select spectra to analyse",choices = all_choices,selected = choices_GFA),
-                        actionButton('submit_selected_spectra', 'Submit choices'),
-                        modalButton('cancel')
-                    )
-                ))
-            } else {
-                choices_WFA <- c("bex_identifier_dot","bex_root_HSV")
-                showModal(modalDialog(
-                    tags$h3('Choose which ranges to analyse'),
-                    # tags$h5('As a result, all images will be processed at full resolution. This is safer, but slower.'),
-                    footer=tagList(
-                        checkboxGroupInput("selected_spectra","Select spectra to analyse",choices = all_choices,selected = choices_WFA),
-                        actionButton('submit_selected_spectra2', 'Submit choices'),
-                        modalButton('cancel')
-                    )
-                ))
-            }
+            isolate(FLAGS$analyse_single_image)
+            FLAGS$analyse_single_image <- FALSE
+            select_spectra_gui_comp(input)
         })
         observeEvent(input$submit_selected_spectra, {
             removeModal()
