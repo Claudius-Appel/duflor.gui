@@ -1,4 +1,14 @@
 execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
+    #### INPUT VALIDATION ####
+    if (any(!is.na(DATA$r__tbl_dir_files_selectedrow))) {
+        warning(simpleWarning(
+            str_c(
+                "All images will be evaluated, even though only image '",
+                DATA$r__tbl_dir_files_selectedrow,
+                "' was selected."
+            )
+        ))
+    }
     #### INIT RESULTS-OBJECT ####
     results_object <- prepare_resultsObject(input,DATA,DEBUGKEYS)
     #### ITERATE OVER IMAGES ####
