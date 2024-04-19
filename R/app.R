@@ -117,9 +117,9 @@ duflor_gui <- function() {
                            selected = 1),
                 ## CROPPING TO_BE_ANALYSED MATRIX
                 h4("Crop Image"),
-                checkboxInput(inputId = "open_croppingPanel",label = "Do you want to analyse only a cropped section?"),
+                checkboxInput(inputId = "do_crop_image",label = "Do you want to analyse only a cropped section?"),
                 conditionalPanel(
-                    condition = "input.open_croppingPanel %% 2 == 1",
+                    condition = "input.do_crop_image %% 2 == 1",
                     id = "CROPPING_PANEL",
                     actionButton(inputId = "reset_crops", label = "Reset"),
                     numericInput(inputId = "crop_left",label = "Crop Left",value = 0,min = 0),
@@ -277,10 +277,10 @@ duflor_gui <- function() {
             }
         })
         #### EDIT CROPPING ####
-        observeEvent(input$open_croppingPanel, {
+        observeEvent(input$do_crop_image, {
             #TODO: edit HSV ranges loaded from duflor-package
-            print(input$open_croppingPanel)
-            if (input$open_croppingPanel) {
+            print(input$do_crop_image)
+            if (input$do_crop_image) {
                 show("CROPPING_PANEL")
                 showNotification(str_c("Enabled cropping. After being loaded, the image-matrix will be cropped by the values selected below before being processed."),a(href = "https://www.google.com","google"))
             } else {
