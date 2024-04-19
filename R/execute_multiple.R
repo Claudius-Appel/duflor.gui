@@ -11,6 +11,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
         current_results$full_path <- file
         current_results$image_name <- basename(file)
         ## DATE_OF_ANALYSIS
+        current_results$date_of_analysis <- input$date_of_image_shooting
         ## IMAGE DIMENSIONS
         image_dimensions <- as.integer(duflor.get_image_dimensions(file))
         current_results$image_width <- image_dimensions[[1]]
