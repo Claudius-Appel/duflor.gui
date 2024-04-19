@@ -151,7 +151,7 @@ duflor_gui <- function() {
             mainPanel(
                 tabsetPanel(id = "tabset_panel",
                   tabPanel("Image Files",verbatimTextOutput("Image Files"),dataTableOutput("tbl_dir_files")),
-                  tabPanel("Analytics (red dot deviations?)",verbatimTextOutput("Analytics (red dot deviations?)"),dataTableOutput("tbl_dir_files_selectedrow"))
+                  tabPanel("Results",verbatimTextOutput("Analytics (red dot deviations?)"),dataTableOutput("tbl_results"))
                   #tabPanel("Analytics (misc1)",verbatimTextOutput("TAB3")),
                   #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
                   #tabPanel("Analytics (misc3)",verbatimTextOutput("TAB5"))
@@ -401,7 +401,20 @@ duflor_gui <- function() {
             spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             DATA$spectrums <- spectrums
-            execute_analysis(input,DATA,DEBUGKEYS,FLAGS)
+            #TODO: add modal "analysis is ongoing, please wait"
+            results <- execute_analysis(input,DATA,DEBUGKEYS,FLAGS)
+            #TODO: remove modal "analysis is ongoing, please wait", add modal (analysis has finished, please inspect results)
+            # RENDER RESULTS OBJECT
+            output$tbl_results <- renderDataTable({
+                results},
+                server = TRUE,
+                selection = "single",
+                options = list(
+                    paging = TRUE,
+                    pageLength = 15,
+                    autoWidth = TRUE
+                )
+            )
         })
     }
     shinyApp(ui = ui, server = server)
