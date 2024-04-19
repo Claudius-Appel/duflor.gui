@@ -9,6 +9,7 @@
 #' @importFrom shiny sidebarLayout
 #' @importFrom shiny sidebarPanel
 #' @importFrom shiny selectInput
+#' @importFrom shinyFiles shinyDirButton
 #' @importFrom shiny shinyApp
 #' @importFrom shiny h4
 #' @importFrom shiny h5
@@ -22,6 +23,7 @@
 #' @importFrom shiny updateNumericInput
 #' @importFrom shiny passwordInput
 #' @importFrom shiny checkboxInput
+#' @importFrom shiny checkboxGroupInput
 #' @importFrom shiny textOutput
 #' @importFrom shiny mainPanel
 #' @importFrom shiny tabsetPanel
@@ -381,71 +383,39 @@ duflor_gui <- function() {
             showNotification(str_c("not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."), duration = notification_duration)
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
-            print(input$parallel_cores)
-            ## SETUP PARALLELISATION
-            if (input$parallel_cores>1) {
-                if (.Platform$OS.type == "windows") {
-                    cluster_type <- "PSOCK"
-                } else {
-                    cluster_type <- "FORK"
-                }
-                if (getDoParRegistered()) { # shut down existing cluster first (?)
-                    shutdown_parallel()
-                }
-                setup_parallel(input$parallel_cores,cluster_type)
+            all_choices <- names(getOption("duflor.default_hsv_spectrums")$upper_bound)
+            if (input$radio_analysis_type==1) { # GFA
+                choices_GFA <- c("bex_identifier_dot","bex_green_HSV","bex_drought_HSV","bex_complete_HSV")
+                showModal(modalDialog(
+                    tags$h3('Choose which ranges to analyse'),
+                    # tags$h5('As a result, all images will be processed at full resolution. This is safer, but slower.'),
+                    footer=tagList(
+                        checkboxGroupInput("selected_spectra","Select spectra to analyse",choices = all_choices,selected = choices_GFA),
+                        actionButton('submit_selected_spectra', 'Submit choices'),
+                        modalButton('cancel')
+                    )
+                ))
             } else {
-                if (getDoParRegistered()) { # shut down existing cluster first (?)
-                    shutdown_parallel()
-                }
-            }
-            ## CONFIGURE HSV RANGES
-            # when running `duflor::extract_pixels_HSV(...,lower_bound = lb,upper_bound = ub,...)`, ingest values of `DATA$spectrums$lower_bound` & `DATA$spectrums$upper_bound`
-            valid_files <- duflor.check(DATA$r__tbl_dir_files)
-            ## file-check: only pass through files that are considered valid
-            #TODO: insert dev keys to toggle under-the-hood behaviour
-            isolate(input$dev_pass) # retrieve reactive input value without reevaluating all other reacts?
-            DATA$r__img_type <- input$radio_analysis_type
-            DATA$r__KPI_type <- input$KPI_type
-            for (index in valid_files$count) {
-                file <- valid_files$images_filtered[index]
-                ## duflor.init()
-                ## duflor.validateSettings() # load in the selected thresholds for pinkdot, analysis-type etc
-                ## duflor.identify_pixels_of_dot() # use the thresholds and extract the pixels which fulfill it
-                ## respective subset of:
-                ## duflor.identify_pixels_of_green_area(thresholds.green,image_file) # if settings.gfa
-                ## duflor.identify_pixels_of_drought_area(thresholds.drought,image_file) # if settings.include_drought (must be added to GUI first)
-                ## duflor.identify_pixels_of_root_area(thresholds.root,image_file) # if settings.wfa
-                ## duflor
-                ##
-                image_dimensions <- duflor.get_image_dimensions(file) ## get image dimensions
-
-                if (validate_croppings(image_dimensions, input$crop_left, input$crop_right, input$crop_top, input$crop_bottom)) {
-                    im <- load_image(
-                        image.path = file,
-                        subset_only = T,
-                        return_hsv = T,
-                        crop_left = input$crop_left,
-                        crop_right = input$crop_right,
-                        crop_top = input$crop_top,
-                        crop_bottom = input$crop_bottom
+                choices_WFA <- c("bex_identifier_dot","bex_root_HSV")
+                showModal(modalDialog(
+                    tags$h3('Choose which ranges to analyse'),
+                    # tags$h5('As a result, all images will be processed at full resolution. This is safer, but slower.'),
+                    footer=tagList(
+                        checkboxGroupInput("selected_spectra","Select spectra to analyse",choices = all_choices,selected = choices_WFA),
+                        actionButton('submit_selected_spectra2', 'Submit choices'),
+                        modalButton('cancel')
                     )
-                } else {
-                    # throwError(image '%path%' could not be cropped by selected values, will load complete image instead)
-                    im <- load_image(
-                        image.path = file,
-                        subset_only = F,
-                        return_hsv = T
-                    )
-                }
-                #REST OF PIPELINE#
-                print(file)
-                print(DATA$r__img_type)
-            }
-            if (getDoParRegistered()) { # finally, shutdown the cluster if work was performed in parallel
-                shutdown_parallel()
+                ))
             }
         })
-
+        observeEvent(input$submit_selected_spectra, {
+            removeModal()
+            spectrums <- DATA$spectrums
+            spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
+            spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
+            DATA$spectrums <- spectrums
+            execute_analysis(input,DATA,DEBUGKEYS)
+        })
     }
     shinyApp(ui = ui, server = server)
 }
