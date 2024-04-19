@@ -13,4 +13,22 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     image_dimensions <- as.integer(duflor.get_image_dimensions(file))
     current_results$image_width <- image_dimensions[[1]]
     current_results$image_height <- image_dimensions[[2]]
+    ## LOAD IMAGE
+    if (input$do_crop_image) {
+        im <- load_image(
+            image.path = file,
+            subset_only = T,
+            return_hsv = T,
+            crop_left = input$crop_left,
+            crop_right = input$crop_right,
+            crop_top = input$crop_top,
+            crop_bottom = input$crop_bottom
+        )
+    } else {
+        im <- load_image(
+            image.path = file,
+            subset_only = F,
+            return_hsv = T
+        )
+    }
 }
