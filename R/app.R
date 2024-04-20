@@ -198,13 +198,29 @@ duflor_gui <- function() {
             folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
             req(folder_path) ## make sure the rest of this react is only executed if 'folder_path' is set
             if (dir.exists(folder_path)) {
-                images_ <- list.files(folder_path,pattern = paste0("*.",input$image_file_suffix),recursive = F,full.names = T)
                 images_ <- list.files(folder_path,pattern = paste0("*.(",str_to_lower(input$image_file_suffix),"|",str_to_upper(input$image_file_suffix),")"),recursive = F,full.names = T)
-                images_filtered <- images_[!str_count(basename(images_),"_")]
-                ret <- as.data.frame(images_filtered) # TODO: see here for paginated tables in shiny-apps https://stackoverflow.com/questions/50043152/r-shiny-how-to-add-pagination-in-dtrenderdatatable
-                ret$count <- c(1:1:dim(ret)[1])
-                DATA$r__tbl_dir_files <- ret
-                return(ret)
+                if (length(images_)>0) {
+                    images_filtered <- images_[!str_count(basename(images_),"_")]
+                    ret <- as.data.frame(images_filtered) # TODO: see here for paginated tables in shiny-apps https://stackoverflow.com/questions/50043152/r-shiny-how-to-add-pagination-in-dtrenderdatatable
+                    ret$count <- c(1:1:dim(ret)[1])
+                    DATA$r__tbl_dir_files <- ret
+                    return(ret)
+                } else {
+                    showNotification(
+                        ui = str_c(
+                            "No '.",
+                            input$image_file_suffix,
+                            "'-files found in folder '",
+                            folder_path,"'."
+                        ),
+                        duration = notification_duration * 5,
+                        type = "warning"
+                    )
+                    ret <- data.frame(images_filtered = character(),
+                                                  count = numeric(),
+                                                  stringsAsFactors = FALSE)
+                    return(ret)
+                }
             }
             return(df()) # return empty df in case no folder was selected (yet)
         })
