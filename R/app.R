@@ -39,6 +39,7 @@
 #' @importFrom shiny req
 #' @importFrom shiny renderText
 #' @importFrom shiny showNotification
+#' @importFrom shiny removeNotification
 #' @importFrom shiny isolate
 #' @importFrom shiny conditionalPanel
 #' @importFrom shiny a
@@ -81,8 +82,8 @@ duflor_gui <- function() {
             sidebarPanel(
                 ## FILES
                 h4("Select folder containing images"),
-                shinyDirButton(id = 'folder', 'Select a folder', 'Please select a folder', FALSE),
-                selectInput(inputId = "image_file_suffix",label = "Select filetype to import",choices = c("JPG","PNG")),
+                shinyDirButton(id = 'folder', label = 'Select a folder',title = 'Please select a folder',buttonType = FALSE),
+                selectInput(inputId = "image_file_suffix",label = "Select imagetype to process",choices = c("JPG","PNG")),
                 "Current Folder:",
                 textOutput(outputId = "ctrl_current_folder"),
                 ## ANALYSIS_TYPE
@@ -242,12 +243,23 @@ duflor_gui <- function() {
             for (each in Keys) {
                 if (each %in% Arr[[1]]) {
                     if (each=="-h") {
-                        showNotification(str_c("Available dev Keys (see documentation): ",str_flatten_comma(Arr[[1]][!str_count(Arr[[1]],"---")])), duration = notification_duration)
+                        showNotification(
+                            ui = str_c(
+                                "Available dev Keys (see documentation): ",
+                                str_flatten_comma(Arr[[1]][!str_count(Arr[[1]], "---")])
+                            ),
+                            duration = notification_duration,
+                            type = "message"
+                        )
                     } else {
                         key <- str_replace_all(str_replace_all(each,"---",""),"--","")
                         key <- str_replace_all(key,"-",".")
                         DEBUGKEYS[[key]] <- !DEBUGKEYS[[key]]
-                        showNotification(str_c("DEBUG KEY "," ",each, " set to ", DEBUGKEYS[[key]]), duration = notification_duration)
+                        showNotification(
+                            ui = str_c("DEBUG KEY ", " ", each, " set to ", DEBUGKEYS[[key]]),
+                            duration = notification_duration,
+                            type = "message"
+                        )
                     }
                 }
 
@@ -260,17 +272,25 @@ duflor_gui <- function() {
             if (input$open_parallelPanel) {
                 show("PARALLEL_PANEL")
                 showNotification(
-                    str_c(
-                        "Enabled parallelisation, please select the number of used cores."
-                        ,"\nThe system has ",detectCores(all.tests = T,logical = use_logical_cores)," available cores, of which up to ",detectCores(all.tests = T,logical = use_logical_cores) - 1," cores may be used by this program."
+                    ui = str_c(
+                        "Enabled parallelisation, please select the number of used cores.",
+                        "\nThe system has ",
+                        detectCores(all.tests = T, logical = use_logical_cores),
+                        " available cores, of which up to ",
+                        detectCores(all.tests = T, logical = use_logical_cores) - 1,
+                        " cores may be used by this program."
                     ),
-                    duration = notification_duration * 5
+                    duration = notification_duration * 5,
+                    type = "warning"
                 )
             } else {
                 hide("PARALLEL_PANEL")
                 updateNumericInput(session,inputId = "parallel_cores",value = 1)
-                showNotification(str_c("Disabled parallelisation, program will utilise 1 core."),
-                                 duration = notification_duration)
+                showNotification(
+                    ui = str_c("Disabled parallelisation, program will utilise 1 core."),
+                    duration = notification_duration,
+                    type = "warning"
+                )
             }
         })
         #### EDIT CROPPING ####
@@ -279,10 +299,21 @@ duflor_gui <- function() {
             print(input$do_crop_image)
             if (input$do_crop_image) {
                 show("CROPPING_PANEL")
-                showNotification(str_c("Enabled cropping. After being loaded, the image-matrix will be cropped by the values selected below before being processed."),a(href = "https://www.google.com","google"))
+                showNotification(
+                    ui = str_c(
+                        "Enabled cropping. After being loaded, the image-matrix will be cropped by the values selected below before being processed."
+                    ),
+                    action = a(href = "https://www.google.com", "google"),
+                    type = "message"
+                )
             } else {
                 hide("CROPPING_PANEL")
-                showNotification(str_c("Disabled cropping. After being loaded, the complete image-matrix will be processed."))
+                showNotification(
+                    ui = str_c(
+                        "Disabled cropping. After being loaded, the complete image-matrix will be processed."
+                    ),
+                    type = "message"
+                )
             }
         })
         observeEvent(input$reset_crops, {
@@ -297,7 +328,8 @@ duflor_gui <- function() {
         })
         observeEvent(input$submit_reset_crops, {
             removeModal()
-            showNotification(str_c("not implemented: reset crops to 0/0/0/0"))
+            showNotification(ui = str_c("not implemented: reset crops to 0/0/0/0"),
+                             type = "message")
             updateNumericInput(session,"x0",value = 0)
             updateNumericInput(session,"x1",value = 0)
             updateNumericInput(session,"y1",value = 0)
@@ -328,7 +360,14 @@ duflor_gui <- function() {
             hide("HSV_PANEL")
             DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]] <- c(input$lower_bound_H,input$lower_bound_S,input$lower_bound_V)
             DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]] <- c(input$upper_bound_H,input$upper_bound_S,input$upper_bound_V)
-            showNotification(str_c("Updated values for spectrum '",input$selected_HSV_spectrum,"'"))
+            showNotification(
+                ui = str_c(
+                    "Updated values for spectrum '",
+                    input$selected_HSV_spectrum,
+                    "'"
+                ),
+                type = "message"
+            )
 
         })
         #### RENDER PLOT ####
@@ -337,7 +376,11 @@ duflor_gui <- function() {
 
             selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
             DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
-            showNotification(str_c("loading "," ", selectedrow$images_filtered), duration = notification_duration)
+            showNotification(
+                ui = str_c("loading ", " ", selectedrow$images_filtered),
+                duration = notification_duration,
+                type = "message"
+            )
 
             im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
             dims <- dim(im)
@@ -358,13 +401,21 @@ duflor_gui <- function() {
             if (sum(rect)>0) {
                 # DATA$rect <- rect
                 showNotification(
-                    str_c("Only pixels within the rectange defined below will be analysed:",
-                        "\nx0: ",rect["x0"],
-                        " x1: ",rect["x1"],
-                        "\n","y0: ",rect["y0"],
-                        " y1: ",rect["y1"]
-                        ), duration = notification_duration * 5
-                    )
+                    ui = str_c(
+                        "Only pixels within the rectange defined below will be analysed:",
+                        "\nx0: ",
+                        rect["x0"],
+                        " x1: ",
+                        rect["x1"],
+                        "\n",
+                        "y0: ",
+                        rect["y0"],
+                        " y1: ",
+                        rect["y1"]
+                    ),
+                    duration = notification_duration * 5,
+                    type = "warning"
+                )
                 cl <- rect["x0"]
                 cr <- rect["x1"]
                 ct <- rect["y0"]
@@ -379,7 +430,13 @@ duflor_gui <- function() {
         observeEvent(input$execute_analysis_single, {
             isolate(FLAGS$analyse_single_image)
             FLAGS$analyse_single_image <- TRUE
-            showNotification(str_c("not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."), duration = notification_duration)
+            showNotification(
+                ui = str_c(
+                    "not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."
+                ),
+                duration = notification_duration,
+                type = "warning"
+            )
             select_spectra_gui_comp(input)
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
@@ -394,7 +451,14 @@ duflor_gui <- function() {
             spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             DATA$spectrums <- spectrums
             #TODO: add modal "analysis is ongoing, please wait"
+            showNotification(
+                ui = "Analysis ongoing.",
+                id = "analysis.ongoing",
+                duration = NULL,
+                type = "warning"
+            )
             results <- execute_analysis(input,DATA,DEBUGKEYS,FLAGS)
+            removeNotification(id = "analysis.ongoing")
             #TODO: remove modal "analysis is ongoing, please wait", add modal (analysis has finished, please inspect results)
             # RENDER RESULTS OBJECT
             output$tbl_results <- renderDataTable({
