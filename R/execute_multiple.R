@@ -10,6 +10,7 @@
 #'
 #' @return results_object, see [update_resultsObject()]
 #' @keywords internal
+#' @importFrom duflor extract_pixels_HSV
 #'
 execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
     #### INPUT VALIDATION ####
@@ -58,7 +59,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             )
         }
         ## EXTRACT RESULTS
-        hsv_results <- duflor::extract_pixels_HSV(
+        hsv_results <- extract_pixels_HSV(
             pixel.array = im,
             lower_bound = DATA$spectrums$lower_bound,
             upper_bound = DATA$spectrums$upper_bound,
