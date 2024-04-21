@@ -5,7 +5,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             ui =    "All images will be evaluated, even though only image '",
             DATA$r__tbl_dir_files_selectedrow,
             "' was selected.",
-            duration = notification_duration * 4,
+            duration = DATA$notification_duration * 4,
             type = "warning"
         )
     }
