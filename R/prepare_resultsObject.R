@@ -2,7 +2,7 @@
 #'
 #' results requires fields
 #' - full_path
-#' - date_of_analysis
+#' - image_date
 #' - image_name
 #' - image_width
 #' - image_height
@@ -23,7 +23,7 @@ prepare_resultsObject <- function(input,DATA,DEBUGKEYS) {
 
 
     # static fields - always present
-    column_names <- c("full_path", "date_of_analysis", "image_name", "image_width", "image_height")
+    column_names <- c("full_path", "image_date", "image_name", "image_width", "image_height")
 
     # Add dynamic fields for each spectrum
     for (spectrum in names(DATA$spectrums$lower_bound)) {
