@@ -8,7 +8,9 @@
 #' `XLSX`-files are the suggested output if any additional postprocessing is required.
 #' If the data will not be modified again, writing it to `csv` will save space.
 #'
-#' @return boolean indicating if file was successfully written-to
+#' @return list containing
+#' - boolean check whether or not file was written to disk successfully
+#' - complete path to the resulting file.
 #'
 #' @importFrom openxlsx write.xlsx
 #' @importFrom utils write.csv2
@@ -32,10 +34,11 @@ store_results_to_file <- function(results, results_path, save_to_xlsx=FALSE) {
             results,
             asTable = T,
             file = results_path,
-            creator = str_c("generated with 'duflor.gui', on user_machine ", Sys.getenv("USERNAME"))
+            creator = str_c("generated with 'duflor' via 'duflor.gui', on user_machine ", Sys.getenv("USERNAME"))
         ) ## sign the file with being created by this username on this machine.
     } else {
         results_path <- str_c(results_path,".csv")
         write.csv2(x = results,file = results_path,col.names = F,row.names = T,fileEncoding = "UTF-8")
     }
+    return(list(success = file.exists(results_path),results_path = results_path))
 }
