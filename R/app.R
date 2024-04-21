@@ -21,6 +21,8 @@
 #' @importFrom shiny removeModal
 #' @importFrom shiny numericInput
 #' @importFrom shiny updateNumericInput
+#' @importFrom shiny updateActionButton
+#' @importFrom shiny getDefaultReactiveDomain
 #' @importFrom shiny passwordInput
 #' @importFrom shiny checkboxInput
 #' @importFrom shiny checkboxGroupInput
@@ -64,7 +66,11 @@
 #' @importFrom stats df
 #' @importFrom imager draw_rect
 #' @importFrom imager grabRect
+#' @importFrom imager display
 #' @importFrom duflor load_image
+#' @importFrom duflor extract_pixels_HSV
+#' @importFrom duflor apply_HSV_color_by_mask
+#' @importFrom duflor HSVtoRGB
 #' @return .
 #' @export
 #'
@@ -138,14 +144,23 @@ duflor_gui <- function() {
                 h5("Misc"),
                 passwordInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
                 dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
-                checkboxInput(inputId = "save_as_xlsx",label = "Save results as xlsx?",value = FALSE)
             ),
 
             # Main panel for displaying outputs
             mainPanel(
                 tabsetPanel(id = "tabset_panel",
                   tabPanel("Image Files",verbatimTextOutput("Image Files"),dataTableOutput("tbl_dir_files")),
-                  tabPanel("Results",verbatimTextOutput("Analytics (red dot deviations?)"),dataTableOutput("tbl_results"))
+                  tabPanel("Results - complete",verbatimTextOutput("Analytics (red dot deviations?)")
+
+                           ,dataTableOutput("tbl_results")
+                           ,checkboxInput(inputId = "save_as_xlsx",label = "Save results as xlsx?",value = FALSE)
+                           ,actionButton(inputId = "save_results","Save results",disabled = TRUE)
+                           ),
+                  tabPanel("Results - inspect"
+                           ,selectInput(inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
+                           ,dataTableOutput("tbl_results_filtered")
+                           ,checkboxInput(inputId = "mask_extreme", label = "Do a high-contrast mask?", value = FALSE)
+                           ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE))
                   #tabPanel("Analytics (misc1)",verbatimTextOutput("TAB3")),
                   #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
                   #tabPanel("Analytics (misc3)",verbatimTextOutput("TAB5"))
@@ -165,7 +180,10 @@ duflor_gui <- function() {
             # r__render_plant = 0,
             preview_img = NA,
             spectrums = getOption("duflor.default_hsv_spectrums"),
-            notification_duration = 1.300
+            notification_duration = 1.300,
+            results = NA,
+            last_masked_image = NA,
+            last_im = NA
         )
         DEBUGKEYS <- reactiveValues(
             force.prints = FALSE,
@@ -228,6 +246,33 @@ duflor_gui <- function() {
         # images only.
         output$tbl_dir_files <- renderDataTable({
             image_files()},
+            server = TRUE,
+            selection = "single",
+            options = list(
+                paging = TRUE,
+                pageLength = 15,
+                autoWidth = TRUE
+            )
+        )
+        #### REACTIVE - RESULTS_TABLE, FILTERED BY SPECTRUM ####
+        filtered_results <- reactive({
+            req(input$reinspected_spectrums)
+            if (is.na(DATA$results)) { # handle empty DATA$results (this cannot be done via `req()` because `DATA$results` is initialised at startup)
+                ret <- data.frame(image_name = character(),
+                                  stringsAsFactors = FALSE)
+                return(ret)
+            }
+            RESULTS <- DATA$results
+            available_columns <- names(DATA$results$results)
+            static_columns <- c("image_name","date_of_analysis","image_width","image_height")
+            dynamic_columns_idx <- grep(input$reinspected_spectrums,available_columns)
+            dynamic_columns <- available_columns[dynamic_columns_idx]
+            total_columns <- c(static_columns,dynamic_columns)
+            filtered_table <- RESULTS$results[,total_columns]
+            return(filtered_table)
+        })
+        output$tbl_results_filtered <- renderDataTable({
+            filtered_results()},
             server = TRUE,
             selection = "single",
             options = list(
@@ -305,7 +350,6 @@ duflor_gui <- function() {
         #### EDIT CROPPING ####
         observeEvent(input$do_crop_image, {
             #TODO: edit HSV ranges loaded from duflor-package
-            print(input$do_crop_image)
             if (input$do_crop_image) {
                 show("CROPPING_PANEL")
                 showNotification(
@@ -468,24 +512,7 @@ duflor_gui <- function() {
             )
             results <- execute_analysis(input,DATA,DEBUGKEYS,FLAGS)
             removeNotification(id = "analysis.ongoing")
-            if (results$file_state$success) {
-                showNotification(
-                    ui = "Analysis completed. Results have been written to '",
-                    results$file_state$results_path,
-                    "'",
-                    duration = DATA$notification_duration,
-                    type = "message"
-                )
-            } else {
-                showNotification(
-                    ui = "Analysis could not be completed successfully, and results could not be successfully written to",
-                    results$file_state$results_path,
-                    "'",
-                    duration = DATA$notification_duration * 4,
-                    type = "warning"
-                )
-            }
-            #TODO: remove modal "analysis is ongoing, please wait", add modal (analysis has finished, please inspect results)
+            DATA$results <- results
             # RENDER RESULTS OBJECT
             output$tbl_results <- renderDataTable({
                 results$results},
@@ -497,6 +524,119 @@ duflor_gui <- function() {
                     autoWidth = TRUE
                 )
             )
+            if (isFALSE(FLAGS$analyse_single_image)) { ## disallow save-to-file when running single-analysis
+                updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
+            }
+            updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
+            ## TODO: check out the evaluation-functions outlined in the `dev`-folder of `duflor`-package
+            ## andeside which ones of those I want to display in the GUI.
+        })
+        #### RERUN ANALYSIS TO RENDER PLOTS ####
+        observeEvent(input$render_selected_mask, {
+            # requires tblresults_$...
+            # once we have the path, rerun the analysis and then keep the HSV-results
+            # then, we can offer a DDL for each spectrum. The user selects them, then confirms and imager::display(X)'s the DDL-selected spectrum.
+            req(input$reinspected_spectrums)
+            if (is.null(input$tbl_results_filtered_rows_selected)) {
+                showNotification(
+                    ui = "No row selected.",
+                    duration = DATA$notification_duration * 4,
+                    type = "warning"
+                )
+                return()
+            }
+            if (!(input$reinspected_spectrums %in% names(DATA$spectrums$lower_bound))) {
+                showNotification(
+                    ui = "This spectrum was not analysed for this image.",
+                    duration = DATA$notification_duration * 4,
+                    type = "warning"
+                )
+                return()
+            }
+            file <- DATA$r__tbl_dir_files$images_filtered[[input$tbl_results_filtered_rows_selected]]
+            image_dimensions <- as.integer(duflor.get_image_dimensions(file))
+            ## LOAD IMAGE
+            if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=file)) {
+                if (input$do_crop_image) {
+                    im <- load_image(
+                        image.path = file,
+                        subset_only = T,
+                        return_hsv = T,
+                        crop_left = input$x0,
+                        crop_right = image_dimensions[[1]] - input$x1,
+                        crop_top = input$y0,
+                        crop_bottom = image_dimensions[[2]] - input$y1
+                    )
+                    DATA$last_masked_image <- file
+                    DATA$last_im <- im
+                } else {
+                    im <- load_image(
+                        image.path = file,
+                        subset_only = F,
+                        return_hsv = T
+                    )
+                    DATA$last_masked_image <- file
+                    DATA$last_im <- im
+                }
+            } else {
+                im <- DATA$last_im
+            }
+            mask <- input$reinspected_spectrums
+
+            # get the spectrum's HSV scope
+            lower_bound <- DATA$spectrums$lower_bound[[mask]]
+            upper_bound <- DATA$spectrums$upper_bound[[mask]]
+
+            # extract the spectrum & get its coordinates
+            hsv_results <- extract_pixels_HSV(
+                pixel.array = im,
+                lower_bound = lower_bound,
+                upper_bound = upper_bound,
+                fast_eval = T,
+                bundle_pixelarray = F,
+                check_value = T,
+                use_single_iteration_cpp = T
+            )
+            # make a mask
+            mask <- apply_HSV_color_by_mask(
+                pixel.array = im,
+                pixel.idx = hsv_results[[1]]$pixel.idx,
+                target.color = "red",
+                mask_extreme = input$mask_extreme
+            )
+            # display the mask
+            display(HSVtoRGB(mask))
+        })
+        #### SAVE RESULTS BTN ####
+        observeEvent(input$save_results, {
+            req(DATA$results)
+            if (is.na(DATA$results)) {
+                #TODO: add warning: results are empty, could not save.
+                return()
+            } else {
+                # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
+
+                results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results")
+                out <- store_results_to_file(results = DATA$results,results_path = results_path,save_to_xlsx = input$save_as_xlsx)
+                ## verify save was successfull
+                if (out$success) {
+                    showNotification(
+                        ui = "Analysis completed. Results have been written to '",
+                        out$results_path,
+                        "'",
+                        duration = DATA$notification_duration,
+                        type = "message"
+                    )
+                } else {
+                    showNotification(
+                        ui = "Analysis could not be completed successfully, and results could not be successfully written to",
+                        out$results_path,
+                        "'",
+                        duration = DATA$notification_duration * 4,
+                        type = "warning"
+                    )
+                }
+            }
         })
     }
     shinyApp(ui = ui, server = server)
