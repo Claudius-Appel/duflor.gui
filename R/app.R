@@ -262,9 +262,6 @@ duflor_gui <- function() {
                                   stringsAsFactors = FALSE)
                 return(ret)
             }
-            print("SELECT DATA")
-            print("SELECT DATA")
-            print("SELECT DATA")
             RESULTS <- DATA$results
             available_columns <- names(DATA$results$results)
             static_columns <- c("image_name","date_of_analysis","image_width","image_height")
@@ -353,7 +350,6 @@ duflor_gui <- function() {
         #### EDIT CROPPING ####
         observeEvent(input$do_crop_image, {
             #TODO: edit HSV ranges loaded from duflor-package
-            print(input$do_crop_image)
             if (input$do_crop_image) {
                 show("CROPPING_PANEL")
                 showNotification(
@@ -610,9 +606,6 @@ duflor_gui <- function() {
             )
             # display the mask
             display(HSVtoRGB(mask))
-            print(T)
-            print(T)
-            print(T)
         })
         #### SAVE RESULTS BTN ####
         observeEvent(input$save_results, {
