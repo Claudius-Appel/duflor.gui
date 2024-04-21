@@ -41,4 +41,18 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
         check_value = T,
         use_single_iteration_cpp = T
     )
+    ## CALCULATE AREA FROM PIXEL_COUNTS
+    repackaged_pixel_counts <- list()
+    for (name in names(hsv_results)) {
+        repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
+    }
+    # we use the duflor.gui-version of this function because we need a different structure.
+    areas <- convert_pixels_to_area_gui(repackaged_pixel_counts)
+    for (name in names(hsv_results)) {
+        current_results[[str_c(name,"_area")]] <- areas[[name]]
+        current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
+        current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
+    }
+    ## UPDATE RESULTS_OBJECT
+    results_object <- update_resultsObject(results_object,current_results)
 }
