@@ -194,7 +194,7 @@ duflor_gui <- function() {
                 if (length(images_)>0) {
                     images_filtered <- images_[!str_count(basename(images_),"_")]
                     ret <- as.data.frame(images_filtered) # TODO: see here for paginated tables in shiny-apps https://stackoverflow.com/questions/50043152/r-shiny-how-to-add-pagination-in-dtrenderdatatable
-                    ret$count <- c(1:1:dim(ret)[1])
+                    ret$index <- c(1:1:dim(ret)[1])
                     DATA$r__tbl_dir_files <- ret
                     return(ret)
                 } else {
@@ -209,7 +209,7 @@ duflor_gui <- function() {
                         type = "warning"
                     )
                     ret <- data.frame(images_filtered = character(),
-                                                  count = numeric(),
+                                                  index = numeric(),
                                                   stringsAsFactors = FALSE)
                     return(ret)
                 }

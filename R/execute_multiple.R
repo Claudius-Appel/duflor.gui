@@ -12,7 +12,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
     #### INIT RESULTS-OBJECT ####
     results_object <- prepare_resultsObject(input,DATA,DEBUGKEYS)
     #### ITERATE OVER IMAGES ####
-    for (index in files$count) {
+    for (index in files$index) {
         # create a results-row to be merged into the `results_object`
         current_results <- data.frame(matrix(NA, nrow = 1, ncol = length(names(results_object))))
         colnames(current_results) <- names(results_object)
