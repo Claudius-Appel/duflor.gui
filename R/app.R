@@ -475,10 +475,27 @@ duflor_gui <- function() {
             )
             results <- execute_analysis(input,DATA,DEBUGKEYS,FLAGS)
             removeNotification(id = "analysis.ongoing")
+            if (results$file_state$success) {
+                showNotification(
+                    ui = "Analysis completed. Results have been written to '",
+                    results$file_state$results_path,
+                    "'",
+                    duration = DATA$notification_duration,
+                    type = "message"
+                )
+            } else {
+                showNotification(
+                    ui = "Analysis could not be completed successfully, and results could not be successfully written to",
+                    results$file_state$results_path,
+                    "'",
+                    duration = DATA$notification_duration * 4,
+                    type = "warning"
+                )
+            }
             #TODO: remove modal "analysis is ongoing, please wait", add modal (analysis has finished, please inspect results)
             # RENDER RESULTS OBJECT
             output$tbl_results <- renderDataTable({
-                results},
+                results$results},
                 server = TRUE,
                 selection = "single",
                 options = list(
