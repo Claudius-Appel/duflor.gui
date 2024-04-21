@@ -66,7 +66,11 @@
 #' @importFrom stats df
 #' @importFrom imager draw_rect
 #' @importFrom imager grabRect
+#' @importFrom imager display
 #' @importFrom duflor load_image
+#' @importFrom duflor extract_pixels_HSV
+#' @importFrom duflor apply_HSV_color_by_mask
+#' @importFrom duflor HSVtoRGB
 #' @return .
 #' @export
 #'
@@ -152,10 +156,11 @@ duflor_gui <- function() {
                            ,checkboxInput(inputId = "save_as_xlsx",label = "Save results as xlsx?",value = FALSE)
                            ,actionButton(inputId = "save_results","Save results",disabled = TRUE)
                            ),
-                  tabPanel("Results, inspect"
+                  tabPanel("Results - inspect"
                            ,selectInput(inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
                            ,dataTableOutput("tbl_results_filtered")
-                           ,actionButton(inputId = "rerun_as_singular_analysis",label = "Render masks for selected image",disabled = TRUE))
+                           ,checkboxInput(inputId = "mask_extreme", label = "Do a high-contrast mask?", value = FALSE)
+                           ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE))
                   #tabPanel("Analytics (misc1)",verbatimTextOutput("TAB3")),
                   #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
                   #tabPanel("Analytics (misc3)",verbatimTextOutput("TAB5"))
@@ -176,7 +181,9 @@ duflor_gui <- function() {
             preview_img = NA,
             spectrums = getOption("duflor.default_hsv_spectrums"),
             notification_duration = 1.300,
-            results = NA
+            results = NA,
+            last_masked_image = NA,
+            last_im = NA
         )
         DEBUGKEYS <- reactiveValues(
             force.prints = FALSE,
@@ -524,6 +531,89 @@ duflor_gui <- function() {
             if (isFALSE(FLAGS$analyse_single_image)) { ## disallow save-to-file when running single-analysis
                 updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
             }
+            updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
+            ## TODO: check out the evaluation-functions outlined in the `dev`-folder of `duflor`-package
+            ## andeside which ones of those I want to display in the GUI.
+        })
+        #### RERUN ANALYSIS TO RENDER PLOTS ####
+        observeEvent(input$render_selected_mask, {
+            # requires tblresults_$...
+            # once we have the path, rerun the analysis and then keep the HSV-results
+            # then, we can offer a DDL for each spectrum. The user selects them, then confirms and imager::display(X)'s the DDL-selected spectrum.
+            req(input$reinspected_spectrums)
+            if (is.null(input$tbl_results_filtered_rows_selected)) {
+                showNotification(
+                    ui = "No row selected.",
+                    duration = DATA$notification_duration * 4,
+                    type = "warning"
+                )
+                return()
+            }
+            if (!(input$reinspected_spectrums %in% names(DATA$spectrums$lower_bound))) {
+                showNotification(
+                    ui = "This spectrum was not analysed for this image.",
+                    duration = DATA$notification_duration * 4,
+                    type = "warning"
+                )
+                return()
+            }
+            file <- DATA$r__tbl_dir_files$images_filtered[[input$tbl_results_filtered_rows_selected]]
+            image_dimensions <- as.integer(duflor.get_image_dimensions(file))
+            ## LOAD IMAGE
+            if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=file)) {
+                if (input$do_crop_image) {
+                    im <- load_image(
+                        image.path = file,
+                        subset_only = T,
+                        return_hsv = T,
+                        crop_left = input$x0,
+                        crop_right = image_dimensions[[1]] - input$x1,
+                        crop_top = input$y0,
+                        crop_bottom = image_dimensions[[2]] - input$y1
+                    )
+                    DATA$last_masked_image <- file
+                    DATA$last_im <- im
+                } else {
+                    im <- load_image(
+                        image.path = file,
+                        subset_only = F,
+                        return_hsv = T
+                    )
+                    DATA$last_masked_image <- file
+                    DATA$last_im <- im
+                }
+            } else {
+                im <- DATA$last_im
+            }
+            mask <- input$reinspected_spectrums
+
+            # get the spectrum's HSV scope
+            lower_bound <- DATA$spectrums$lower_bound[[mask]]
+            upper_bound <- DATA$spectrums$upper_bound[[mask]]
+
+            # extract the spectrum & get its coordinates
+            hsv_results <- extract_pixels_HSV(
+                pixel.array = im,
+                lower_bound = lower_bound,
+                upper_bound = upper_bound,
+                fast_eval = T,
+                bundle_pixelarray = F,
+                check_value = T,
+                use_single_iteration_cpp = T
+            )
+            # make a mask
+            mask <- apply_HSV_color_by_mask(
+                pixel.array = im,
+                pixel.idx = hsv_results[[1]]$pixel.idx,
+                target.color = "red",
+                mask_extreme = input$mask_extreme
+            )
+            # display the mask
+            display(HSVtoRGB(mask))
+            print(T)
+            print(T)
+            print(T)
+        })
         #### SAVE RESULTS BTN ####
         observeEvent(input$save_results, {
             req(DATA$results)
