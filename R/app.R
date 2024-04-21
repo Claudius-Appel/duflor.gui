@@ -140,16 +140,21 @@ duflor_gui <- function() {
                 h5("Misc"),
                 passwordInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
                 dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
-                checkboxInput(inputId = "save_as_xlsx",label = "Save results as xlsx?",value = FALSE)
             ),
 
             # Main panel for displaying outputs
             mainPanel(
                 tabsetPanel(id = "tabset_panel",
                   tabPanel("Image Files",verbatimTextOutput("Image Files"),dataTableOutput("tbl_dir_files")),
-                  tabPanel("Results",verbatimTextOutput("Analytics (red dot deviations?)")
-                           ,selectInput(inputId = "rerun_plotted_spectrum",label = "Select spectrum to plot",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
+                  tabPanel("Results - complete",verbatimTextOutput("Analytics (red dot deviations?)")
+
                            ,dataTableOutput("tbl_results")
+                           ,checkboxInput(inputId = "save_as_xlsx",label = "Save results as xlsx?",value = FALSE)
+                           ,actionButton(inputId = "save_results","Save results",disabled = TRUE)
+                           ),
+                  tabPanel("Results, inspect"
+                           ,selectInput(inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
+                           ,dataTableOutput("tbl_results_filtered")
                            ,actionButton(inputId = "rerun_as_singular_analysis",label = "Render masks for selected image",disabled = TRUE))
                   #tabPanel("Analytics (misc1)",verbatimTextOutput("TAB3")),
                   #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
@@ -170,7 +175,8 @@ duflor_gui <- function() {
             # r__render_plant = 0,
             preview_img = NA,
             spectrums = getOption("duflor.default_hsv_spectrums"),
-            notification_duration = 1.300
+            notification_duration = 1.300,
+            results = NA
         )
         DEBUGKEYS <- reactiveValues(
             force.prints = FALSE,
@@ -233,6 +239,31 @@ duflor_gui <- function() {
         # images only.
         output$tbl_dir_files <- renderDataTable({
             image_files()},
+            server = TRUE,
+            selection = "single",
+            options = list(
+                paging = TRUE,
+                pageLength = 15,
+                autoWidth = TRUE
+            )
+        )
+        #### REACTIVE - RESULTS_TABLE, FILTERED BY SPECTRUM ####
+        filtered_results <- reactive({
+            req(input$reinspected_spectrums)
+            print("SELECT DATA")
+            print("SELECT DATA")
+            print("SELECT DATA")
+            RESULTS <- DATA$results
+            available_columns <- names(DATA$results$results)
+            static_columns <- c("image_name","date_of_analysis","image_width","image_height")
+            dynamic_columns_idx <- grep(input$reinspected_spectrums,available_columns)
+            dynamic_columns <- available_columns[dynamic_columns_idx]
+            total_columns <- c(static_columns,dynamic_columns)
+            filtered_table <- RESULTS$results[,total_columns]
+            return(filtered_table)
+        })
+        output$tbl_results_filtered <- renderDataTable({
+            filtered_results()},
             server = TRUE,
             selection = "single",
             options = list(
@@ -473,24 +504,7 @@ duflor_gui <- function() {
             )
             results <- execute_analysis(input,DATA,DEBUGKEYS,FLAGS)
             removeNotification(id = "analysis.ongoing")
-            if (results$file_state$success) {
-                showNotification(
-                    ui = "Analysis completed. Results have been written to '",
-                    results$file_state$results_path,
-                    "'",
-                    duration = DATA$notification_duration,
-                    type = "message"
-                )
-            } else {
-                showNotification(
-                    ui = "Analysis could not be completed successfully, and results could not be successfully written to",
-                    results$file_state$results_path,
-                    "'",
-                    duration = DATA$notification_duration * 4,
-                    type = "warning"
-                )
-            }
-            #TODO: remove modal "analysis is ongoing, please wait", add modal (analysis has finished, please inspect results)
+            DATA$results <- results
             # RENDER RESULTS OBJECT
             output$tbl_results <- renderDataTable({
                 results$results},
@@ -502,6 +516,39 @@ duflor_gui <- function() {
                     autoWidth = TRUE
                 )
             )
+            if (isFALSE(FLAGS$analyse_single_image)) { ## disallow save-to-file when running single-analysis
+                updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
+            }
+        #### SAVE RESULTS BTN ####
+        observeEvent(input$save_results, {
+            req(DATA$results)
+            if (is.na(DATA$results)) {
+                #TODO: add warning: results are empty, could not save.
+                return()
+            } else {
+                # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
+
+                results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results")
+                out <- store_results_to_file(results = DATA$results,results_path = results_path,save_to_xlsx = input$save_as_xlsx)
+                ## verify save was successfull
+                if (out$success) {
+                    showNotification(
+                        ui = "Analysis completed. Results have been written to '",
+                        out$results_path,
+                        "'",
+                        duration = DATA$notification_duration,
+                        type = "message"
+                    )
+                } else {
+                    showNotification(
+                        ui = "Analysis could not be completed successfully, and results could not be successfully written to",
+                        out$results_path,
+                        "'",
+                        duration = DATA$notification_duration * 4,
+                        type = "warning"
+                    )
+                }
+            }
         })
     }
     shinyApp(ui = ui, server = server)
