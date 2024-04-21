@@ -1,3 +1,16 @@
+#' execute analysis on a single image, and return its results
+#'
+#' For single-image analysis, see [execute_multiple()]
+#'
+#' @param file - file to analyse
+#' @param input - `input` respective shiny-component
+#' @param DATA - `DATA` respective shiny-component
+#' @param DEBUGKEYS - `DEBUGKEYS` respective shiny-component
+#' @param FLAGS - `FLAGS` respective shiny-component
+#'
+#' @return results_object, see [update_resultsObject()]
+#' @keywords internal
+#'
 execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     #### INIT RESULTS-OBJECT ####
     results_object <- prepare_resultsObject(input,DATA,DEBUGKEYS)

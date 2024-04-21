@@ -1,3 +1,14 @@
+#' wrapper-function facilitating single- and multi-image analysis.
+#'
+#' @param input - `input` respective shiny-component
+#' @param DATA - `DATA` respective shiny-component
+#' @param DEBUGKEYS - `DEBUGKEYS` respective shiny-component
+#' @param FLAGS - `FLAGS` respective shiny-component
+#'
+#' @return list with components
+#' - `results`: results-data passed-through from [execute_multiple()] or [execute_single()]
+#' @export
+#'
 execute_analysis <- function(input, DATA, DEBUGKEYS, FLAGS) {
     #### SETUP PARALLELISATION ####
     if (input$parallel_cores > 1) {
@@ -31,7 +42,6 @@ execute_analysis <- function(input, DATA, DEBUGKEYS, FLAGS) {
     out <- store_results_to_file(results = results,results_path = results_path,save_to_xlsx = input$save_as_xlsx)
     ## save the results
     if (isFALSE(out$success)) {
-        # TODO: throw error - file could not be saved. WHY?
         showNotification(
             ui = "The results could not be written to file.",
             results$file_state$results_path,

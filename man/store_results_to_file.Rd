@@ -14,7 +14,11 @@ store_results_to_file(results, results_path, save_to_xlsx = FALSE)
 \item{save_to_xlsx}{should results be written into a \code{.xlsx}-file? If false, it will be written into a \code{.csv}-file instead.}
 }
 \value{
-boolean indicating if file was successfully written-to
+list containing
+\itemize{
+\item boolean check whether or not file was written to disk successfully
+\item complete path to the resulting file.
+}
 }
 \description{
 write results of the analysis to file

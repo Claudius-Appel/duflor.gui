@@ -1,3 +1,16 @@
+#' execute analysis on multiple images, and return their results
+#'
+#' For single-image analysis, see [execute_single()]
+#'
+#' @param files - files to analyse
+#' @param input - `input` respective shiny-component
+#' @param DATA - `DATA` respective shiny-component
+#' @param DEBUGKEYS - `DEBUGKEYS` respective shiny-component
+#' @param FLAGS - `FLAGS` respective shiny-component
+#'
+#' @return results_object, see [update_resultsObject()]
+#' @keywords internal
+#'
 execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
     #### INPUT VALIDATION ####
     if (any(!is.na(DATA$r__tbl_dir_files_selectedrow))) {
