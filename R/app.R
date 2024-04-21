@@ -185,7 +185,7 @@ duflor_gui <- function() {
         volumes <- getVolumes()()
         #### DISPLAYING AND RENDERING FILES AND STUFF ####
         image_files <- reactive({ # image_files is a list of filepaths, which gets set reactively.
-            req(input$folder,input$image_file_suffix,input$radio_analysis_type)
+            req(input$folder,input$image_file_suffix)
             shinyDirChoose(input = input, 'folder', roots=volumes)
             folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
             req(folder_path) ## make sure the rest of this react is only executed if 'folder_path' is set
