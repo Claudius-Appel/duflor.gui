@@ -250,6 +250,11 @@ duflor_gui <- function() {
         #### REACTIVE - RESULTS_TABLE, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
             req(input$reinspected_spectrums)
+            if (is.na(DATA$results)) { # handle empty DATA$results (this cannot be done via `req()` because `DATA$results` is initialised at startup)
+                ret <- data.frame(image_name = character(),
+                                  stringsAsFactors = FALSE)
+                return(ret)
+            }
             print("SELECT DATA")
             print("SELECT DATA")
             print("SELECT DATA")
