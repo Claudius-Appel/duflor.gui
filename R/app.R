@@ -163,7 +163,6 @@ duflor_gui <- function() {
     )
     #### SERVER ####
     server <- function(input, output,session) {
-        notification_duration <- 1.300
         #### INIT VARIABLES ####
         DATA <- reactiveValues(          #  nomenclature: reactives start with "r__"
             r__tbl_dir_files  = NA,
@@ -172,7 +171,8 @@ duflor_gui <- function() {
             r__tbl_dir_files_selectedrow = NA,
             # r__render_plant = 0,
             preview_img = NA,
-            spectrums = getOption("duflor.default_hsv_spectrums")
+            spectrums = getOption("duflor.default_hsv_spectrums"),
+            notification_duration = 1.300
         )
         DEBUGKEYS <- reactiveValues(
             force.prints = FALSE,
@@ -213,7 +213,7 @@ duflor_gui <- function() {
                             "'-files found in folder '",
                             folder_path,"'."
                         ),
-                        duration = notification_duration * 5,
+                        duration = DATA$notification_duration * 5,
                         type = "warning"
                     )
                     ret <- data.frame(images_filtered = character(),
@@ -264,7 +264,7 @@ duflor_gui <- function() {
                                 "Available dev Keys (see documentation): ",
                                 str_flatten_comma(Arr[[1]][!str_count(Arr[[1]], "---")])
                             ),
-                            duration = notification_duration,
+                            duration = DATA$notification_duration,
                             type = "message"
                         )
                     } else {
@@ -273,7 +273,7 @@ duflor_gui <- function() {
                         DEBUGKEYS[[key]] <- !DEBUGKEYS[[key]]
                         showNotification(
                             ui = str_c("DEBUG KEY ", " ", each, " set to ", DEBUGKEYS[[key]]),
-                            duration = notification_duration,
+                            duration = DATA$notification_duration,
                             type = "message"
                         )
                     }
@@ -296,7 +296,7 @@ duflor_gui <- function() {
                         detectCores(all.tests = T, logical = use_logical_cores) - 1,
                         " cores may be used by this program."
                     ),
-                    duration = notification_duration * 5,
+                    duration = DATA$notification_duration * 5,
                     type = "warning"
                 )
             } else {
@@ -304,7 +304,7 @@ duflor_gui <- function() {
                 updateNumericInput(session,inputId = "parallel_cores",value = 1)
                 showNotification(
                     ui = str_c("Disabled parallelisation, program will utilise 1 core."),
-                    duration = notification_duration,
+                    duration = DATA$notification_duration,
                     type = "warning"
                 )
             }
@@ -394,7 +394,7 @@ duflor_gui <- function() {
             DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
             showNotification(
                 ui = str_c("loading ", " ", selectedrow$images_filtered),
-                duration = notification_duration,
+                duration = DATA$notification_duration,
                 type = "message"
             )
 
@@ -429,7 +429,7 @@ duflor_gui <- function() {
                         " y1: ",
                         rect["y1"]
                     ),
-                    duration = notification_duration * 5,
+                    duration = DATA$notification_duration * 5,
                     type = "warning"
                 )
                 cl <- rect["x0"]
@@ -450,7 +450,7 @@ duflor_gui <- function() {
                 ui = str_c(
                     "not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."
                 ),
-                duration = notification_duration,
+                duration = DATA$notification_duration,
                 type = "warning"
             )
             select_spectra_gui_comp(input)

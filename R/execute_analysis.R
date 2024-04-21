@@ -27,15 +27,23 @@ execute_analysis <- function(input, DATA, DEBUGKEYS, FLAGS) {
         files <- duflor.check(DATA$r__tbl_dir_files)
         results <- execute_multiple(files, input, DATA, DEBUGKEYS, FLAGS)
     }
+    results_path <- str_c(dirname(results$full_path[[1]]),"/results")
+    out <- store_results_to_file(results = results,results_path = results_path,save_to_xlsx = input$save_as_xlsx)
     ## save the results
-    if (isFALSE(store_results_to_file(results, input$save_to_xlsx))) {
+    if (isFALSE(out$success)) {
         # TODO: throw error - file could not be saved. WHY?
+        showNotification(
+            ui = "The results could not be written to file.",
+            results$file_state$results_path,
+            "'",
+            duration = DATA$notification_duration * 4,
+            type = "error"
+        )
     }
-
     #### TEAR DOWN PARALLELISATION ####
     if (getDoParRegistered()) {
         # finally, shutdown the cluster if work was performed in parallel
         shutdown_parallel()
     }
-    return(results)
+    return(list(results = results, file_state = out))
 }
