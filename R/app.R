@@ -137,7 +137,8 @@ duflor_gui <- function() {
                 ## MISCELLANEOUS STUFF
                 h5("Misc"),
                 passwordInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
-                dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T)
+                dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
+                checkboxInput(inputId = "save_as_xlsx",label = "Save results as xlsx?",value = FALSE)
             ),
 
             # Main panel for displaying outputs
