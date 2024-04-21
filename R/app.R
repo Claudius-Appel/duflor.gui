@@ -109,14 +109,6 @@ duflor_gui <- function() {
                     actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed HSV-spectra"),
                     useShinyjs() # Enable shinyjs inside the conditional panel
                 ),
-                ## works only post 'execute_analysis'
-                radioButtons(inputId = "KPI_type",
-                           h4("Select KPI to render"),
-                           choices = list("red-dot" = 1,
-                                          "TBD1" = 2,
-                                          "TBD2" = 3,
-                                          "TBD3" = 4),
-                           selected = 1),
                 ## CROPPING TO_BE_ANALYSED MATRIX
                 h4("Crop Image"),
                 checkboxInput(inputId = "do_crop_image",label = "Do you want to analyse only a cropped section?"),
