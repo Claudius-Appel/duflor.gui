@@ -21,6 +21,8 @@
 #' @importFrom shiny removeModal
 #' @importFrom shiny numericInput
 #' @importFrom shiny updateNumericInput
+#' @importFrom shiny updateActionButton
+#' @importFrom shiny getDefaultReactiveDomain
 #' @importFrom shiny passwordInput
 #' @importFrom shiny checkboxInput
 #' @importFrom shiny checkboxGroupInput
@@ -145,7 +147,10 @@ duflor_gui <- function() {
             mainPanel(
                 tabsetPanel(id = "tabset_panel",
                   tabPanel("Image Files",verbatimTextOutput("Image Files"),dataTableOutput("tbl_dir_files")),
-                  tabPanel("Results",verbatimTextOutput("Analytics (red dot deviations?)"),dataTableOutput("tbl_results"))
+                  tabPanel("Results",verbatimTextOutput("Analytics (red dot deviations?)")
+                           ,selectInput(inputId = "rerun_plotted_spectrum",label = "Select spectrum to plot",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
+                           ,dataTableOutput("tbl_results")
+                           ,actionButton(inputId = "rerun_as_singular_analysis",label = "Render masks for selected image",disabled = TRUE))
                   #tabPanel("Analytics (misc1)",verbatimTextOutput("TAB3")),
                   #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
                   #tabPanel("Analytics (misc3)",verbatimTextOutput("TAB5"))
