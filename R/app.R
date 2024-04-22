@@ -505,13 +505,21 @@ duflor_gui <- function() {
             DATA$spectrums <- spectrums
             #TODO: add modal "analysis is ongoing, please wait"
             showNotification(
-                ui = "Analysis ongoing.",
+                ui = "Analysis ongoing since ", Sys.time(), ".",
                 id = "analysis.ongoing",
                 duration = NULL,
                 type = "warning"
             )
-            results <- execute_analysis(input,DATA,DEBUGKEYS,FLAGS)
+            execution_time <-system.time(
+                results <-execute_analysis(input, DATA, DEBUGKEYS, FLAGS)
+                )
             removeNotification(id = "analysis.ongoing")
+            showNotification(
+                ui = str_c("Analysis finished in ",round(x = execution_time[[3]],digits = 4)," seconds."),
+                id = "analysis.completed",
+                duration = NULL,
+                type = "message"
+            )
             DATA$results <- results
             # RENDER RESULTS OBJECT
             output$tbl_results <- renderDataTable({
