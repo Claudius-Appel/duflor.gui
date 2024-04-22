@@ -23,7 +23,7 @@
 #' @importFrom shiny updateNumericInput
 #' @importFrom shiny updateActionButton
 #' @importFrom shiny getDefaultReactiveDomain
-#' @importFrom shiny passwordInput
+#' @importFrom shiny textInput
 #' @importFrom shiny checkboxInput
 #' @importFrom shiny checkboxGroupInput
 #' @importFrom shiny dateInput
@@ -143,7 +143,7 @@ duflor_gui <- function() {
                 actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
                 ## MISCELLANEOUS STUFF
                 h5("Misc"),
-                passwordInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
+                textInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
                 dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
             ),
 
