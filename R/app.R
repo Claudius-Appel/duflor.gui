@@ -590,7 +590,7 @@ duflor_gui <- function() {
                 return()
             }
             file <- DATA$r__tbl_dir_files$images_filtered[[input$tbl_results_filtered_rows_selected]]
-            image_dimensions <- as.integer(duflor.get_image_dimensions(file))
+            image_dimensions <- as.integer(get_image_dimensions(file))
             ## LOAD IMAGE
             if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=file)) {
                 if (input$do_crop_image) {

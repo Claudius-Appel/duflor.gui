@@ -24,7 +24,7 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     ## DATE_OF_ANALYSIS
     current_results$date_of_analysis <- input$date_of_image_shooting
     ## IMAGE DIMENSIONS
-    image_dimensions <- as.integer(duflor.get_image_dimensions(file))
+    image_dimensions <- as.integer(get_image_dimensions(file))
     current_results$image_width <- image_dimensions[[1]]
     current_results$image_height <- image_dimensions[[2]]
     ## LOAD IMAGE
