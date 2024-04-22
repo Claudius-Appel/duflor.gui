@@ -5,3 +5,5 @@
 ^\.Rproj\.user$
 ^duflor-gui-private$
 ^dev$
+^\.github$
+^README\.Rmd$
