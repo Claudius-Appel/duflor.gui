@@ -503,6 +503,34 @@ duflor_gui <- function() {
             spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             DATA$spectrums <- spectrums
+            #### SETUP PARALLELISATION ####
+            if (input$parallel_cores > 1) {
+                if (.Platform$OS.type == "windows") {
+                    cluster_type <- "PSOCK"
+                } else {
+                    cluster_type <- "FORK"
+                }
+                if (getDoParRegistered()) {
+                    # a cluster is already spun up, so check if it can be reused
+                    current_workers <- getDoParWorkers()
+                    if (current_workers!=input$parallel_cores) {
+                        # desired number of workers have changed, so we need to
+                        # shut down the old cluster and build a new one
+                        shutdown_parallel()
+                        setup_parallel(input$parallel_cores, cluster_type)
+                    }
+                } else {
+                    # no preexisting cluster, must init one
+                    setup_parallel(input$parallel_cores, cluster_type)
+
+                }
+            } else {
+                if (getDoParRegistered()) {
+                    # shut down existing cluster first (?)
+                    shutdown_parallel()
+                }
+            }
+            #### EXECUTE ANALYSIS ####
             #TODO: add modal "analysis is ongoing, please wait"
             showNotification(
                 ui = "Analysis ongoing since ", Sys.time(), ".",
@@ -510,9 +538,9 @@ duflor_gui <- function() {
                 duration = NULL,
                 type = "warning"
             )
-            execution_time <-system.time(
-                results <-execute_analysis(input, DATA, DEBUGKEYS, FLAGS)
-                )
+            execution_time <- system.time(
+                results <- execute_analysis(input, DATA, DEBUGKEYS, FLAGS)
+            )
             removeNotification(id = "analysis.ongoing")
             showNotification(
                 ui = str_c("Analysis finished in ",round(x = execution_time[[3]],digits = 4)," seconds."),
