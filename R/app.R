@@ -212,7 +212,7 @@ duflor_gui <- function() {
             if (dir.exists(folder_path)) {
                 images_ <- list.files(folder_path,pattern = paste0("*.(",str_to_lower(input$image_file_suffix),"|",str_to_upper(input$image_file_suffix),")"),recursive = F,full.names = T)
                 if (length(images_)>0) {
-                    images_filtered <- images_[!str_count(basename(images_),"_")]
+                    images_filtered <- images_ ##[!str_count(basename(images_),"_")]# BUG: WHY WAS THIS HERE?
                     ret <- as.data.frame(images_filtered) # TODO: see here for paginated tables in shiny-apps https://stackoverflow.com/questions/50043152/r-shiny-how-to-add-pagination-in-dtrenderdatatable
                     ret$index <- c(1:1:dim(ret)[1])
                     DATA$r__tbl_dir_files <- ret
