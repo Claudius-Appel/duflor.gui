@@ -63,6 +63,7 @@
 #' @importFrom DT dataTableOutput
 #' @importFrom parallel detectCores
 #' @importFrom foreach getDoParRegistered
+#' @importFrom foreach getDoParWorkers
 #' @importFrom stats df
 #' @importFrom imager draw_rect
 #' @importFrom imager grabRect
