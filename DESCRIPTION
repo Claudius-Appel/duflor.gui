@@ -22,3 +22,5 @@ Imports:
     imager,
     magrittr,
     openxlsx
+Remotes:
+    Claudius-Appel/duflor
