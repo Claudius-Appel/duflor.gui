@@ -653,7 +653,7 @@ duflor_gui <- function() {
             } else {
                 # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
 
-                results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results")
+                results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results_",input$date_of_image_shooting)
                 out <- store_results_to_file(results = DATA$results,results_path = results_path,save_to_xlsx = input$save_as_xlsx)
                 ## verify save was successfull
                 if (out$success) {
