@@ -21,6 +21,7 @@ Imports:
     stringr,
     imager,
     magrittr,
-    openxlsx
+    openxlsx,
+    dplyr
 Remotes:
     Claudius-Appel/duflor
