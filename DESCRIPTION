@@ -1,6 +1,6 @@
 Package: duflor.gui
 Title: Frontend for duflor-package
-Version: 0.0.0.9003
+Version: 0.0.1.9004
 Author: Claudius Appel
 Authors@R: c(
     person("Claudius", "Appel", email =   "claudius.appel@freenet.de" , role = c("aut", "cre"))
@@ -21,6 +21,7 @@ Imports:
     stringr,
     imager,
     magrittr,
-    openxlsx
+    openxlsx,
+    dplyr
 Remotes:
     Claudius-Appel/duflor

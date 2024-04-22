@@ -63,6 +63,7 @@
 #' @importFrom DT dataTableOutput
 #' @importFrom parallel detectCores
 #' @importFrom foreach getDoParRegistered
+#' @importFrom foreach getDoParWorkers
 #' @importFrom stats df
 #' @importFrom imager draw_rect
 #' @importFrom imager grabRect
@@ -503,15 +504,51 @@ duflor_gui <- function() {
             spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             DATA$spectrums <- spectrums
+            #### SETUP PARALLELISATION ####
+            if (input$parallel_cores > 1) {
+                if (.Platform$OS.type == "windows") {
+                    cluster_type <- "PSOCK"
+                } else {
+                    cluster_type <- "FORK"
+                }
+                if (getDoParRegistered()) {
+                    # a cluster is already spun up, so check if it can be reused
+                    current_workers <- getDoParWorkers()
+                    if (current_workers!=input$parallel_cores) {
+                        # desired number of workers have changed, so we need to
+                        # shut down the old cluster and build a new one
+                        shutdown_parallel()
+                        setup_parallel(input$parallel_cores, cluster_type)
+                    }
+                } else {
+                    # no preexisting cluster, must init one
+                    setup_parallel(input$parallel_cores, cluster_type)
+
+                }
+            } else {
+                if (getDoParRegistered()) {
+                    # shut down existing cluster first (?)
+                    shutdown_parallel()
+                }
+            }
+            #### EXECUTE ANALYSIS ####
             #TODO: add modal "analysis is ongoing, please wait"
             showNotification(
-                ui = "Analysis ongoing.",
+                ui = "Analysis ongoing since ", Sys.time(), ".",
                 id = "analysis.ongoing",
                 duration = NULL,
                 type = "warning"
             )
-            results <- execute_analysis(input,DATA,DEBUGKEYS,FLAGS)
+            execution_time <- system.time(
+                results <- execute_analysis(input, DATA, DEBUGKEYS, FLAGS)
+            )
             removeNotification(id = "analysis.ongoing")
+            showNotification(
+                ui = str_c("Analysis finished in ",round(x = execution_time[[3]],digits = 4)," seconds."),
+                id = "analysis.completed",
+                duration = NULL,
+                type = "message"
+            )
             DATA$results <- results
             # RENDER RESULTS OBJECT
             output$tbl_results <- renderDataTable({
@@ -554,7 +591,7 @@ duflor_gui <- function() {
                 return()
             }
             file <- DATA$r__tbl_dir_files$images_filtered[[input$tbl_results_filtered_rows_selected]]
-            image_dimensions <- as.integer(duflor.get_image_dimensions(file))
+            image_dimensions <- as.integer(get_image_dimensions(file))
             ## LOAD IMAGE
             if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=file)) {
                 if (input$do_crop_image) {

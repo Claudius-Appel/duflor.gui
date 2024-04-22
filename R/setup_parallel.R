@@ -12,6 +12,7 @@
 #' @importFrom foreach getDoParRegistered
 #' @importFrom parallel makeCluster
 #' @importFrom doParallel registerDoParallel
+#' @importFrom shiny showNotification
 #'
 setup_parallel <- function(used_cores, cluster_type) {
     print("THIS MUST SET UP THE PAR CLUST")
@@ -29,8 +30,20 @@ setup_parallel <- function(used_cores, cluster_type) {
         set_up_workers <- getDoParWorkers()
         if (set_up_workers == used_cores) {
             message("Successfully set up parallel '",cluster_type,"' back-end with ",set_up_workers," workers.")
+            showNotification(
+                ui = str_c("Successfully set up parallel '",cluster_type,"' back-end with ",set_up_workers," workers."),
+                id = "backend.setup",
+                duration = NULL,
+                type = "message"
+            )
         } else {
-            stop("Failed to set up ",set_up_workers," workers on a parallel '",cluster_type,"' back-end with ",used_cores," assigned cores.")
+            showNotification(
+                ui = str_c("Failed to set up ",set_up_workers," workers on a parallel '",cluster_type,"' back-end with ",used_cores," assigned cores."),
+                id = "backend.setup",
+                duration = NULL,
+                type = "error"
+            )
+            # stop("Failed to set up ",set_up_workers," workers on a parallel '",cluster_type,"' back-end with ",used_cores," assigned cores.")
         }
     } else {
         stop("Parallel '",cluster_type,"' back-end could not be set up.")
