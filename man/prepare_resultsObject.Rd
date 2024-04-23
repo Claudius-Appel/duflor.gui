@@ -28,8 +28,8 @@ results requires fields
 \item full_path
 \item image_date
 \item image_name
-\item image_width
-\item image_height
+\item processed_width
+\item processed_height
 \item for each in  \code{names(DATA$spectrums$lower_bound)}:
 \itemize{
 \item \%spectrum\%_count
