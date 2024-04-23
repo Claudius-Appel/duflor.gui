@@ -22,6 +22,7 @@ Imports:
     imager,
     magrittr,
     openxlsx,
-    dplyr
+    dplyr,
+    ggplot2
 Remotes:
     Claudius-Appel/duflor
