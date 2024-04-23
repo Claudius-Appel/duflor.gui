@@ -14,6 +14,8 @@
 #' @importFrom foreach foreach
 #' @importFrom foreach %dopar%
 #' @importFrom dplyr bind_rows
+#' @importFrom imager width
+#' @importFrom imager height
 #'
 execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
     #### INPUT VALIDATION ####
@@ -51,8 +53,6 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             current_results$date_of_analysis <- date_of_image_shooting
             ## IMAGE DIMENSIONS
             image_dimensions <- as.integer(get_image_dimensions(file))
-            current_results$image_width <- image_dimensions[[1]]
-            current_results$image_height <- image_dimensions[[2]]
             ## LOAD IMAGE
             if (do_crop_image) {
                 im <- load_image(
@@ -60,9 +60,9 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                     subset_only = T,
                     return_hsv = T,
                     crop_left = x0,
-                    crop_right = current_results$image_width - x1,
+                    crop_right = image_dimensions[[1]] - x1,
                     crop_top = y0,
-                    crop_bottom = current_results$image_height - y1
+                    crop_bottom = image_dimensions[[2]] - y1
                 )
             } else {
                 im <- load_image(
@@ -71,6 +71,8 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                     return_hsv = T
                 )
             }
+            current_results$processed_width <- width(im)
+            current_results$processed_height <- height(im)
             ## EXTRACT RESULTS
             hsv_results <- extract_pixels_HSV(
                 pixel.array = im,
@@ -98,9 +100,6 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             return(current_results)
         }
         results_object <- bind_rows(foreach_result,.id = NULL)
-        print("DD")
-        print("DD")
-        print("DD")
     } else {
         for (index in files$index) {
             # create a results-row to be merged into the `results_object`
@@ -114,8 +113,6 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             current_results$date_of_analysis <- input$date_of_image_shooting
             ## IMAGE DIMENSIONS
             image_dimensions <- as.integer(get_image_dimensions(file))
-            current_results$image_width <- image_dimensions[[1]]
-            current_results$image_height <- image_dimensions[[2]]
             ## LOAD IMAGE
             if (input$do_crop_image) {
                 im <- load_image(
@@ -123,9 +120,9 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                     subset_only = T,
                     return_hsv = T,
                     crop_left = input$x0,
-                    crop_right = current_results$image_width - input$x1,
+                    crop_right = image_dimensions[[1]] - input$x1,
                     crop_top = input$y0,
-                    crop_bottom = current_results$image_height - input$y1
+                    crop_bottom = image_dimensions[[2]] - input$y1
                 )
             } else {
                 im <- load_image(
@@ -134,6 +131,8 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                     return_hsv = T
                 )
             }
+            current_results$processed_width <- width(im)
+            current_results$processed_height <- height(im)
             ## EXTRACT RESULTS
             hsv_results <- extract_pixels_HSV(
                 pixel.array = im,

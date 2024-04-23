@@ -4,8 +4,8 @@
 #' - full_path
 #' - image_date
 #' - image_name
-#' - image_width
-#' - image_height
+#' - processed_width
+#' - processed_height
 #' - for each in  `names(DATA$spectrums$lower_bound)`:
 #'     - %spectrum%_count
 #'     - img.fraction (maybe not that valuable?)
@@ -21,7 +21,7 @@
 #'
 prepare_resultsObject <- function(input, DATA, DEBUGKEYS) {
     # static fields - always present
-    column_names <- c("full_path", "image_date", "image_name", "image_width", "image_height")
+    column_names <- c("full_path", "image_date", "image_name", "processed_width", "processed_height")
 
     # Add dynamic fields for each spectrum
     for (spectrum in names(DATA$spectrums$lower_bound)) {
