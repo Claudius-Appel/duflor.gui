@@ -67,6 +67,7 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
         current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
         current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
     }
+    current_results$area_per_pixel <- areas$area_per_pixel
     ## UPDATE RESULTS_OBJECT
     results_object <- update_resultsObject(results_object,current_results)
 }
