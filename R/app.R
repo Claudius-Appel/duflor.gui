@@ -41,6 +41,7 @@
 #' @importFrom shiny tags
 #' @importFrom shiny req
 #' @importFrom shiny renderText
+#' @importFrom shiny renderPlot
 #' @importFrom shiny showNotification
 #' @importFrom shiny removeNotification
 #' @importFrom shiny isolate
@@ -73,6 +74,7 @@
 #' @importFrom duflor extract_pixels_HSV
 #' @importFrom duflor apply_HSV_color_by_mask
 #' @importFrom duflor HSVtoRGB
+#' @importFrom utils packageDescription
 #' @return .
 #' @export
 #'
