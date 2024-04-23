@@ -45,8 +45,8 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
             return_hsv = T
         )
     }
-    current_results$image_width <- width(im)
-    current_results$image_height <- height(im)
+    current_results$processed_width <- width(im)
+    current_results$processed_height <- height(im)
     ## EXTRACT RESULTS
     hsv_results <- extract_pixels_HSV(
         pixel.array = im,

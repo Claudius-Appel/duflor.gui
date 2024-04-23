@@ -71,8 +71,8 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                     return_hsv = T
                 )
             }
-            current_results$image_width <- width(im)
-            current_results$image_height <- height(im)
+            current_results$processed_width <- width(im)
+            current_results$processed_height <- height(im)
             ## EXTRACT RESULTS
             hsv_results <- extract_pixels_HSV(
                 pixel.array = im,
@@ -112,9 +112,6 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             ## DATE_OF_ANALYSIS
             current_results$date_of_analysis <- input$date_of_image_shooting
             ## IMAGE DIMENSIONS
-            # image_dimensions <- as.integer(get_image_dimensions(file))
-            # current_results$image_width <- image_dimensions[[1]]
-            # current_results$image_height <- image_dimensions[[2]]
             image_dimensions <- as.integer(get_image_dimensions(file))
             ## LOAD IMAGE
             if (input$do_crop_image) {
@@ -134,8 +131,8 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                     return_hsv = T
                 )
             }
-            current_results$image_width <- width(im)
-            current_results$image_height <- height(im)
+            current_results$processed_width <- width(im)
+            current_results$processed_height <- height(im)
             ## EXTRACT RESULTS
             hsv_results <- extract_pixels_HSV(
                 pixel.array = im,
