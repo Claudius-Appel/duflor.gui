@@ -11,6 +11,8 @@
 #' @return results_object, see [update_resultsObject()]
 #' @keywords internal
 #' @importFrom duflor extract_pixels_HSV
+#' @importFrom imager width
+#' @importFrom imager height
 #'
 execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     #### INIT RESULTS-OBJECT ####
@@ -25,8 +27,6 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     current_results$date_of_analysis <- input$date_of_image_shooting
     ## IMAGE DIMENSIONS
     image_dimensions <- as.integer(get_image_dimensions(file))
-    current_results$image_width <- image_dimensions[[1]]
-    current_results$image_height <- image_dimensions[[2]]
     ## LOAD IMAGE
     if (input$do_crop_image) {
         im <- load_image(
@@ -34,9 +34,9 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
             subset_only = T,
             return_hsv = T,
             crop_left = input$x0,
-            crop_right = input$x1,
+            crop_right = image_dimensions[[1]] - input$x1,
             crop_top = input$y0,
-            crop_bottom = input$y1
+            crop_bottom = image_dimensions[[2]] - input$y1
         )
     } else {
         im <- load_image(
@@ -45,6 +45,8 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
             return_hsv = T
         )
     }
+    current_results$image_width <- width(im)
+    current_results$image_height <- height(im)
     ## EXTRACT RESULTS
     hsv_results <- extract_pixels_HSV(
         pixel.array = im,
