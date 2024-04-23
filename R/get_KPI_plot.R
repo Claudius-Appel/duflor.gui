@@ -10,6 +10,7 @@
 #' @importFrom ggplot2 guides
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 element_text
+#' @importFrom utils hasName
 #'
 get_KPI_plot <- function(input, DATA) {
     key <- str_c(input$reinspected_spectrums2, input$reinspected_type2)
