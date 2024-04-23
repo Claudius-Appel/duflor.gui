@@ -134,8 +134,8 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                     return_hsv = T
                 )
             }
-            current_results$image_width <- imager::width(im)
-            current_results$image_height <- imager::height(im)
+            current_results$image_width <- width(im)
+            current_results$image_height <- height(im)
             ## EXTRACT RESULTS
             hsv_results <- extract_pixels_HSV(
                 pixel.array = im,
