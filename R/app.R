@@ -32,6 +32,7 @@
 #' @importFrom shiny tabsetPanel
 #' @importFrom shiny tabPanel
 #' @importFrom shiny verbatimTextOutput
+#' @importFrom shiny plotOutput
 #' @importFrom shiny reactiveValues
 #' @importFrom shiny reactive
 #' @importFrom shiny observeEvent
@@ -40,6 +41,7 @@
 #' @importFrom shiny tags
 #' @importFrom shiny req
 #' @importFrom shiny renderText
+#' @importFrom shiny renderPlot
 #' @importFrom shiny showNotification
 #' @importFrom shiny removeNotification
 #' @importFrom shiny isolate
@@ -72,6 +74,7 @@
 #' @importFrom duflor extract_pixels_HSV
 #' @importFrom duflor apply_HSV_color_by_mask
 #' @importFrom duflor HSVtoRGB
+#' @importFrom utils packageDescription
 #' @return .
 #' @export
 #'
@@ -161,8 +164,12 @@ duflor_gui <- function() {
                            ,selectInput(inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
                            ,dataTableOutput("tbl_results_filtered")
                            ,checkboxInput(inputId = "mask_extreme", label = "Do a high-contrast mask?", value = FALSE)
-                           ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE))
-                  #tabPanel("Analytics (misc1)",verbatimTextOutput("TAB3")),
+                           ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE)),
+                  tabPanel("Results - plots"
+                           ,selectInput(inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
+                           ,selectInput(inputId = "reinspected_type2",label = "Select KPI to inspect",choices = c("_fraction","_count","_area"))
+                           ,plotOutput("results_visualisation_plot")
+                           ,)
                   #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
                   #tabPanel("Analytics (misc3)",verbatimTextOutput("TAB5"))
                 )
@@ -255,7 +262,7 @@ duflor_gui <- function() {
                 autoWidth = TRUE
             )
         )
-        #### REACTIVE - RESULTS_TABLE, FILTERED BY SPECTRUM ####
+        #### REACTIVE - RESULTS_TABLE/BARPLOT, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
             req(input$reinspected_spectrums)
             if (is.na(DATA$results)) { # handle empty DATA$results (this cannot be done via `req()` because `DATA$results` is initialised at startup)
@@ -282,6 +289,16 @@ duflor_gui <- function() {
                 autoWidth = TRUE
             )
         )
+        #### PLOT OUTPUT RESULTS ####
+        filtered_plot <- reactive({
+            req(input$reinspected_spectrums2,input$reinspected_type2)
+            plt <- get_KPI_plot(input, DATA)
+            return(plt)
+        })
+        output$results_visualisation_plot <- renderPlot({
+            filtered_plot()
+        })
+
         ### selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
 
         #### HIDE_PANELS_BY_DEFAULT ####
