@@ -289,6 +289,14 @@ duflor_gui <- function() {
         )
         #### PLOT OUTPUT RESULTS ####
         filtered_plot <- reactive({
+            req(input$reinspected_spectrums2,input$reinspected_type2)
+            plt <- get_KPI_plot(input, DATA)
+            return(plt)
+        })
+        output$results_visualisation_plot <- renderPlot({
+            filtered_plot()
+        })
+
         ### selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
 
         #### HIDE_PANELS_BY_DEFAULT ####
