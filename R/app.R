@@ -272,7 +272,7 @@ duflor_gui <- function() {
             }
             RESULTS <- DATA$results
             available_columns <- names(DATA$results$results)
-            static_columns <- c("image_name","date_of_analysis","processed_width","processed_height")
+            static_columns <- c("image_name","date_of_analysis","processed_width","processed_height","area_per_pixel")
             dynamic_columns_idx <- grep(input$reinspected_spectrums,available_columns)
             dynamic_columns <- available_columns[dynamic_columns_idx]
             total_columns <- c(static_columns,dynamic_columns)

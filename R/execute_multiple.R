@@ -97,6 +97,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             }
             ## UPDATE RESULTS_OBJECT
             # results_object <- update_resultsObject(results_object,current_results)
+            current_results$area_per_pixel <- areas$area_per_pixel
             return(current_results)
         }
         results_object <- bind_rows(foreach_result,.id = NULL)
@@ -156,6 +157,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
             }
             ## UPDATE RESULTS_OBJECT
+            current_results$area_per_pixel <- areas$area_per_pixel
             results_object <- update_resultsObject(results_object,current_results)
         }
     }
