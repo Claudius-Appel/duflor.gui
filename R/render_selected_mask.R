@@ -2,9 +2,10 @@
 #'
 #' @param input - `input` respective shiny-component
 #' @param DATA - `DATA` respective shiny-component
+#' @param FLAGS - `FLAGS` respective shiny-component
 #'
 #' @keywords internal
-render_selected_mask <- function(input, DATA) {
+render_selected_mask <- function(input, DATA, FLAGS) {
     if (is.null(input$tbl_results_filtered_rows_selected)) {
         showNotification(
             ui = "No row selected.",

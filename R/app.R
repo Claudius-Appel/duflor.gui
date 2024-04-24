@@ -740,7 +740,7 @@ duflor_gui <- function() {
         #### RERUN ANALYSIS TO RENDER PLOTS ####
         observeEvent(input$render_selected_mask, {
             req(input$reinspected_spectrums)
-            render_selected_mask(input, DATA)
+            render_selected_mask(input, DATA, FLAGS)
         })
         #### SAVE RESULTS BTN ####
         observeEvent(input$save_results, {

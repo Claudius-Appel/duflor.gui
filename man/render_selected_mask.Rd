@@ -4,7 +4,7 @@
 \alias{render_selected_mask}
 \title{render mask based on input data}
 \usage{
-render_selected_mask(input, DATA)
+render_selected_mask(input, DATA, FLAGS)
 }
 \arguments{
 \item{input}{\itemize{
@@ -13,6 +13,10 @@ render_selected_mask(input, DATA)
 
 \item{DATA}{\itemize{
 \item \code{DATA} respective shiny-component
+}}
+
+\item{FLAGS}{\itemize{
+\item \code{FLAGS} respective shiny-component
 }}
 }
 \description{
