@@ -32,3 +32,4 @@ list with components
 \description{
 wrapper-function facilitating single- and multi-image analysis.
 }
+\keyword{internal}

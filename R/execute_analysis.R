@@ -7,7 +7,7 @@
 #'
 #' @return list with components
 #' - `results`: results-data passed-through from [execute_multiple()] or [execute_single()]
-#' @export
+#' @keywords internal
 #'
 execute_analysis <- function(input, DATA, DEBUGKEYS, FLAGS) {
 
