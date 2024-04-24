@@ -39,3 +39,4 @@ convert pixel counts to an area based on the known area of an identifier-dot.
 \note{
 This is a restructured version of \link[duflor:convert_pixels_to_area]{duflor::convert_pixels_to_area}, to be more suitable to the needs of this specific app.
 }
+\keyword{internal}

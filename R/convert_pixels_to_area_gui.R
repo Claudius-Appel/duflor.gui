@@ -24,7 +24,7 @@
 #'   All values are in \[cm^2\]
 #' @note
 #' This is a restructured version of [duflor::convert_pixels_to_area], to be more suitable to the needs of this specific app.
-#' @export
+#' @keywords internal
 convert_pixels_to_area_gui <- function(pixel.counts)
 {
     default_identifier_area <- getOption("duflor.default_identifier_area")

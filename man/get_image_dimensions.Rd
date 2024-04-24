@@ -15,3 +15,4 @@ get_image_dimensions(path)
 \description{
 retrieves image dimension via call to system interface
 }
+\keyword{internal}

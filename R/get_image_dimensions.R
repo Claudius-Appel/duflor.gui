@@ -3,7 +3,7 @@
 #' @param path path to file to measure
 #'
 #' @return `list(width=dbl,height=dbl)`
-#' @export
+#' @keywords internal
 #'
 get_image_dimensions <- function(path) {
     # get image dimensions.
