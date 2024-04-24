@@ -297,7 +297,7 @@ duflor_gui <- function() {
         )
         #### PLOT OUTPUT RESULTS ####
         filtered_plot <- reactive({
-            req(input$reinspected_spectrums2,input$reinspected_type2)
+            req(input$reinspected_spectrums2,input$reinspected_type2,hasName(DATA$results,"results"))
             plt <- get_KPI_plot(input, DATA)
             return(plt)
         })
