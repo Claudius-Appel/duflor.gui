@@ -807,6 +807,20 @@ duflor_gui <- function() {
                 check_value = T,
                 use_single_iteration_cpp = T
             )
+            # LIMIT RANGE OF IDENTIFIER-HITS FROM CROPPED SEARCH REGION FOR ID-DOT
+            if (input$do_crop_identifier_range) {
+                hsv_results <- limit_identifier_coordinates(
+                    spectrums_object = hsv_results,
+                    image_dimensions = image_dimensions,
+                    identifiersearch_x0 = input$identifiersearch_x0,
+                    identifiersearch_x1 = input$identifiersearch_x1,
+                    identifiersearch_y0 = input$identifiersearch_y0,
+                    identifiersearch_y1 = input$identifiersearch_y1
+                )
+                # # update the repackaged pixel.counts, so that the area's are updated properly
+                # repackaged_pixel_counts[[idx]] <- sum(condition)
+                # repackaged_pixel_counts[[idx]] <- current_identifier_idx[condition,]
+            }
             # make a mask
             mask <- apply_HSV_color_by_mask(
                 pixel.array = im,
