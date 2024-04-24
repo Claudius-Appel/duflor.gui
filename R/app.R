@@ -355,6 +355,7 @@ duflor_gui <- function() {
                     duration = DATA$notification_duration * 5,
                     type = "warning"
                 )
+                updateNumericInput(session,inputId = "parallel_cores",value = 2)
             } else {
                 hide("PARALLEL_PANEL")
                 updateNumericInput(session,inputId = "parallel_cores",value = 1)
