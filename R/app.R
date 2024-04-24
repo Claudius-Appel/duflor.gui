@@ -179,6 +179,12 @@ duflor_gui <- function() {
     )
     #### SERVER ####
     server <- function(input, output,session) {
+        #### STARTUP MESSAGE ####
+        showNotification(
+            ui = "App startup",
+            id = "startup.notice",
+            type = "message"
+        )
         #### INIT VARIABLES ####
         DATA <- reactiveValues(          #  nomenclature: reactives start with "r__"
             r__tbl_dir_files  = NA,
@@ -716,6 +722,14 @@ duflor_gui <- function() {
                 }
             }
         })
+        #### FINISH STARTUP ####
+        STARTUP <- reactiveValues(startup = TRUE)
+        showNotification(
+            ui = "Finished startup",
+            id = "startup.notice",
+            type = "message",
+            duration = 1.3
+        )
     }
     shinyApp(ui = ui, server = server)
 }
