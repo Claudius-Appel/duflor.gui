@@ -359,16 +359,26 @@ duflor_gui <- function() {
             } else {
                 hide("PARALLEL_PANEL")
                 updateNumericInput(session,inputId = "parallel_cores",value = 1)
-                showNotification(
-                    ui = str_c("Disabled parallelisation, program will utilise 1 core."),
-                    duration = DATA$notification_duration,
-                    type = "warning"
-                )
+                # I am terribly sorry for you, that you are reading this.
+                # It's a horrible solution that _WILL_ bite me/you in the ass
+                # if this app is extended at some point. Sadly, this conditional
+                # was the only way I could figure out how do resolve this
+                # properly.
+                # For the full details, checkout the Event-callback for
+                # `input%do_crop_image`, which must remain the last
+                # event-callback to contain a message which should not show on
+                # startup.
+                if (isFALSE(STARTUP$startup)) {
+                    showNotification(
+                        ui = str_c("Disabled parallelisation, program will utilise 1 core."),
+                        duration = DATA$notification_duration,
+                        type = "warning"
+                    )
+                }
             }
         })
         #### EDIT CROPPING ####
         observeEvent(input$do_crop_image, {
-            #TODO: edit HSV ranges loaded from duflor-package
             if (input$do_crop_image) {
                 show("CROPPING_PANEL")
                 showNotification(
@@ -380,12 +390,21 @@ duflor_gui <- function() {
                 )
             } else {
                 hide("CROPPING_PANEL")
-                showNotification(
-                    ui = str_c(
-                        "Disabled cropping. After being loaded, the complete image-matrix will be processed."
-                    ),
-                    type = "message"
-                )
+                if (isTRUE(STARTUP$startup)) {
+                    STARTUP$startup <- FALSE
+                    # this line must be executed instead of the *last* message
+                    # which you want to suppress on startup. To be more precise,
+                    # if another `conditionalPanel` is added, the event-callback
+                    # for its notifications should be placed _above_ this
+                    # event-callback.
+                } else {
+                    showNotification(
+                        ui = str_c(
+                            "Disabled cropping. After being loaded, the complete image-matrix will be processed."
+                        ),
+                        type = "message"
+                    )
+                }
             }
         })
         observeEvent(input$reset_crops, {
