@@ -103,7 +103,7 @@ duflor_gui <- function() {
                                           "WFA" = 2),
                            selected = 1),
                 ## BUTTONS_1
-                actionButton(inputId = "render_plant",label = "Render Plant/Select subset area"),
+                actionButton(inputId = "render_plant",label = "Render Plant"),
                 actionButton(inputId = "open_edit_HSV_ranges_conditionalPanel",label = "Edit HSV Ranges"),
                 ## CONFIGURE_HSV_BOUNDS
                 conditionalPanel(
@@ -125,11 +125,25 @@ duflor_gui <- function() {
                 conditionalPanel(
                     condition = "input.do_crop_image %% 2 == 1",
                     id = "CROPPING_PANEL",
+                    actionButton(inputId = "select_crops",label = "Select area to analyse"),
                     actionButton(inputId = "reset_crops", label = "Reset"),
                     numericInput(inputId = "x0",label = "x0",value = 0,min = 0),
                     numericInput(inputId = "x1",label = "x1",value = 0,min = 0),
                     numericInput(inputId = "y0",label = "y0",value = 0,min = 0),
                     numericInput(inputId = "y1",label = "y1",value = 0,min = 0),
+                ),
+                ## LIMIT SEARCH-RANGE FOR IDENTIFIER_DOT
+                h4("Limit area searched for identifier-dot"),
+                checkboxInput(inputId = "do_crop_identifier_range",label = "Do you want to limit the area in which to search for the identifier-dot?"),
+                conditionalPanel(
+                    condition = "input.do_crop_identifier_range %% 2 == 1",
+                    id = "IDENTIFIERCROPPING_PANEL",
+                    actionButton(inputId = "select_identifiercrops",label = "Select area to analyse"),
+                    actionButton(inputId = "reset_identifiercrops", label = "Reset"),
+                    numericInput(inputId = "identifiersearch_x0",label = "x0",value = 0,min = 0),
+                    numericInput(inputId = "identifiersearch_x1",label = "x1",value = 0,min = 0),
+                    numericInput(inputId = "identifiersearch_y0",label = "y0",value = 0,min = 0),
+                    numericInput(inputId = "identifiersearch_y1",label = "y1",value = 0,min = 0),
                 ),
 
 
