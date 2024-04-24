@@ -38,8 +38,12 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
         x1 <- input$x1
         y1 <- input$y1
         do_crop_image <- input$do_crop_image
-        do_crop_image <- input$do_crop_image
+        do_crop_identifier_range <- input$do_crop_identifier_range
         spectrums <- DATA$spectrums
+        identifiersearch_x0 = input$identifiersearch_x0
+        identifiersearch_x1 = input$identifiersearch_x1
+        identifiersearch_y0 = input$identifiersearch_y0
+        identifiersearch_y1 = input$identifiersearch_y1
         foreach_result <- foreach(index = 1:length(files$index),.packages = c("duflor","duflor.gui"), .verbose = T,.inorder = T) %dopar% {
         # stop(simpleError("parallelisation is not implemented yet. figure out how to do so!!"))
             # TODO: figure out how to parallelise this code?!
@@ -83,6 +87,17 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 check_value = T,
                 use_single_iteration_cpp = T
             )
+            ## LIMIT RANGE OF IDENTIFIER-HITS FROM CROPPED SEARCH REGION FOR ID-DOT
+            if (do_crop_identifier_range) {
+                hsv_results <- limit_identifier_coordinates(
+                    spectrums_object = hsv_results,
+                    image_dimensions = image_dimensions,
+                    identifiersearch_x0 = identifiersearch_x0,
+                    identifiersearch_x1 = identifiersearch_x1,
+                    identifiersearch_y0 = identifiersearch_y0,
+                    identifiersearch_y1 = identifiersearch_y1
+                )
+            }
             ## CALCULATE AREA FROM PIXEL_COUNTS
             repackaged_pixel_counts <- list()
             for (name in names(hsv_results)) {
@@ -144,6 +159,17 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 check_value = T,
                 use_single_iteration_cpp = T
             )
+            ## LIMIT RANGE OF IDENTIFIER-HITS FROM CROPPED SEARCH REGION FOR ID-DOT
+            if (input$do_crop_identifier_range) {
+                hsv_results <- limit_identifier_coordinates(
+                    spectrums_object = hsv_results,
+                    image_dimensions = image_dimensions,
+                    identifiersearch_x0 = input$identifiersearch_x0,
+                    identifiersearch_x1 = input$identifiersearch_x1,
+                    identifiersearch_y0 = input$identifiersearch_y0,
+                    identifiersearch_y1 = input$identifiersearch_y1
+                )
+            }
             ## CALCULATE AREA FROM PIXEL_COUNTS
             repackaged_pixel_counts <- list()
             for (name in names(hsv_results)) {

@@ -103,7 +103,7 @@ duflor_gui <- function() {
                                           "WFA" = 2),
                            selected = 1),
                 ## BUTTONS_1
-                actionButton(inputId = "render_plant",label = "Render Plant/Select subset area"),
+                actionButton(inputId = "render_plant",label = "Render Plant"),
                 actionButton(inputId = "open_edit_HSV_ranges_conditionalPanel",label = "Edit HSV Ranges"),
                 ## CONFIGURE_HSV_BOUNDS
                 conditionalPanel(
@@ -125,11 +125,25 @@ duflor_gui <- function() {
                 conditionalPanel(
                     condition = "input.do_crop_image %% 2 == 1",
                     id = "CROPPING_PANEL",
+                    actionButton(inputId = "select_crops",label = "Select area to analyse"),
                     actionButton(inputId = "reset_crops", label = "Reset"),
                     numericInput(inputId = "x0",label = "x0",value = 0,min = 0),
                     numericInput(inputId = "x1",label = "x1",value = 0,min = 0),
                     numericInput(inputId = "y0",label = "y0",value = 0,min = 0),
                     numericInput(inputId = "y1",label = "y1",value = 0,min = 0),
+                ),
+                ## LIMIT SEARCH-RANGE FOR IDENTIFIER_DOT
+                h4("Limit area searched for identifier-dot"),
+                checkboxInput(inputId = "do_crop_identifier_range",label = "Do you want to limit the area in which to search for the identifier-dot?"),
+                conditionalPanel(
+                    condition = "input.do_crop_identifier_range %% 2 == 1",
+                    id = "IDENTIFIERCROPPING_PANEL",
+                    actionButton(inputId = "select_identifiercrops",label = "Select area to analyse"),
+                    actionButton(inputId = "reset_identifiercrops", label = "Reset"),
+                    numericInput(inputId = "identifiersearch_x0",label = "x0",value = 0,min = 0),
+                    numericInput(inputId = "identifiersearch_x1",label = "x1",value = 0,min = 0),
+                    numericInput(inputId = "identifiersearch_y0",label = "y0",value = 0,min = 0),
+                    numericInput(inputId = "identifiersearch_y1",label = "y1",value = 0,min = 0),
                 ),
 
 
@@ -396,14 +410,7 @@ duflor_gui <- function() {
                 )
             } else {
                 hide("CROPPING_PANEL")
-                if (isTRUE(STARTUP$startup)) {
-                    STARTUP$startup <- FALSE
-                    # this line must be executed instead of the *last* message
-                    # which you want to suppress on startup. To be more precise,
-                    # if another `conditionalPanel` is added, the event-callback
-                    # for its notifications should be placed _above_ this
-                    # event-callback.
-                } else {
+                if (isFALSE(STARTUP$startup)) {
                     showNotification(
                         ui = str_c(
                             "Disabled cropping. After being loaded, the complete image-matrix will be processed."
@@ -411,6 +418,48 @@ duflor_gui <- function() {
                         type = "message"
                     )
                 }
+            }
+        })
+        observeEvent(input$select_crops, {
+            req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
+
+            selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
+            DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
+            showNotification(
+                ui = str_c("loading ", " ", selectedrow$images_filtered),
+                duration = DATA$notification_duration,
+                type = "message"
+            )
+
+            im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+            dims <- dim(im)
+            rect <- grabRect(im)
+            if (sum(rect)>0) {
+                # DATA$rect <- rect
+                showNotification(
+                    ui = str_c(
+                        "Only pixels within the rectange defined below will be analysed:",
+                        "\nx0: ",
+                        rect["x0"],
+                        " x1: ",
+                        rect["x1"],
+                        "\n",
+                        "y0: ",
+                        rect["y0"],
+                        " y1: ",
+                        rect["y1"]
+                    ),
+                    duration = DATA$notification_duration * 5,
+                    type = "warning"
+                )
+                cl <- rect["x0"]
+                cr <- rect["x1"]
+                ct <- rect["y0"]
+                cb <- rect["y1"]
+                updateNumericInput(session,"x0",value = as.integer(cl))
+                updateNumericInput(session,"x1",value = as.integer(cr))
+                updateNumericInput(session,"y1",value = as.integer(cb))
+                updateNumericInput(session,"y0",value = as.integer(ct))
             }
         })
         observeEvent(input$reset_crops, {
@@ -431,6 +480,97 @@ duflor_gui <- function() {
             updateNumericInput(session,"x1",value = 0)
             updateNumericInput(session,"y1",value = 0)
             updateNumericInput(session,"y0",value = 0)
+        })
+        #### EDIT CROPPING OF SEARCHRANGE FOR IDENTIFIER-DOT ####
+        observeEvent(input$do_crop_identifier_range, {
+            if (input$do_crop_identifier_range) {
+                show("IDENTIFIERCROPPING_PANEL")
+                showNotification(
+                    ui = str_c(
+                        "Limited search-range for the identifier-dot. After being loaded, only pixels within this range may be checked for the HSV-ranges of the identifier-dot. All other spectrums are unaffected."
+                    ),
+                    action = a(href = "https://www.google.com", "google"),
+                    type = "message"
+                )
+            } else {
+                hide("IDENTIFIERCROPPING_PANEL")
+                if (isTRUE(STARTUP$startup)) {
+                    STARTUP$startup <- FALSE
+                    # this line must be executed instead of the *last* message
+                    # which you want to suppress on startup. To be more precise,
+                    # if another `conditionalPanel` is added, the event-callback
+                    # for its notifications should be placed _above_ this
+                    # event-callback.
+                } else {
+                    showNotification(
+                        ui = str_c(
+                            "Disabled cropping. All pixels will be considered for the size of the identifier."
+                        ),
+                        type = "message"
+                    )
+                }
+            }
+        })
+        observeEvent(input$select_identifiercrops, {
+            req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
+
+            selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
+            DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
+            showNotification(
+                ui = str_c("loading ", " ", selectedrow$images_filtered),
+                duration = DATA$notification_duration,
+                type = "message"
+            )
+
+            im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+            dims <- dim(im)
+            rect <- grabRect(im)
+            if (sum(rect)>0) {
+                # DATA$rect <- rect
+                showNotification(
+                    ui = str_c(
+                        "Only pixels within the rectange defined below will be analysed:",
+                        "\nx0: ",
+                        rect["x0"],
+                        " x1: ",
+                        rect["x1"],
+                        "\n",
+                        "y0: ",
+                        rect["y0"],
+                        " y1: ",
+                        rect["y1"]
+                    ),
+                    duration = DATA$notification_duration * 5,
+                    type = "warning"
+                )
+                cl <- rect["x0"]
+                cr <- rect["x1"]
+                ct <- rect["y0"]
+                cb <- rect["y1"]
+                updateNumericInput(session,"identifiersearch_x0",value = as.integer(cl))
+                updateNumericInput(session,"identifiersearch_x1",value = as.integer(cr))
+                updateNumericInput(session,"identifiersearch_y1",value = as.integer(cb))
+                updateNumericInput(session,"identifiersearch_y0",value = as.integer(ct))
+            }
+        })
+        observeEvent(input$reset_identifiercrops, {
+            showModal(modalDialog(
+                tags$h3('Do you want to reset the search-range for the identifier-range?'),
+                tags$h5('As a result, the entire image will be processed at full resolution. Pi'),
+                footer=tagList(
+                    actionButton('submit_reset_identifiercrops', 'Reset'),
+                    modalButton('cancel')
+                )
+            ))
+        })
+        observeEvent(input$submit_reset_identifiercrops, {
+            removeModal()
+            showNotification(ui = str_c("not implemented: reset crops to 0/0/0/0"),
+                             type = "message")
+            updateNumericInput(session,"identifiersearch_x0",value = 0)
+            updateNumericInput(session,"identifiersearch_x1",value = 0)
+            updateNumericInput(session,"identifiersearch_y0",value = 0)
+            updateNumericInput(session,"identifiersearch_y1",value = 0)
         })
         #### EDIT HSV RANGES ####
         observeEvent(input$open_edit_HSV_ranges_conditionalPanel, {
@@ -489,39 +629,25 @@ duflor_gui <- function() {
                     x1 = input$x1,
                     y0 = input$y0,
                     y1 = input$y1,
-                    color = "red",
+                    color = "lightblue",
                     opacity = 0.25,
                     filled = T
                 )
             }
-            rect <- grabRect(im)
-            if (sum(rect)>0) {
-                # DATA$rect <- rect
-                showNotification(
-                    ui = str_c(
-                        "Only pixels within the rectange defined below will be analysed:",
-                        "\nx0: ",
-                        rect["x0"],
-                        " x1: ",
-                        rect["x1"],
-                        "\n",
-                        "y0: ",
-                        rect["y0"],
-                        " y1: ",
-                        rect["y1"]
-                    ),
-                    duration = DATA$notification_duration * 5,
-                    type = "warning"
+            if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add previously selected rect to new image
+
+                im <- draw_rect(
+                    im,
+                    x0 = input$identifiersearch_x0,
+                    x1 = input$identifiersearch_x1,
+                    y0 = input$identifiersearch_y0,
+                    y1 = input$identifiersearch_y1,
+                    color = "yellow",
+                    opacity = 0.25,
+                    filled = T
                 )
-                cl <- rect["x0"]
-                cr <- rect["x1"]
-                ct <- rect["y0"]
-                cb <- rect["y1"]
-                updateNumericInput(session,"x0",value = as.integer(cl))
-                updateNumericInput(session,"x1",value = as.integer(cr))
-                updateNumericInput(session,"y1",value = as.integer(cb))
-                updateNumericInput(session,"y0",value = as.integer(ct))
             }
+            display(im)
         })
         #### MAIN CALLBACK>EXECUTE DUFLOR_PACKAGE HERE ####
         observeEvent(input$execute_analysis_single, {
@@ -613,83 +739,8 @@ duflor_gui <- function() {
         })
         #### RERUN ANALYSIS TO RENDER PLOTS ####
         observeEvent(input$render_selected_mask, {
-            # requires tblresults_$...
-            # once we have the path, rerun the analysis and then keep the HSV-results
-            # then, we can offer a DDL for each spectrum. The user selects them, then confirms and imager::display(X)'s the DDL-selected spectrum.
             req(input$reinspected_spectrums)
-            if (is.null(input$tbl_results_filtered_rows_selected)) {
-                showNotification(
-                    ui = "No row selected.",
-                    duration = DATA$notification_duration * 4,
-                    type = "warning"
-                )
-                return()
-            }
-            if (!(input$reinspected_spectrums %in% names(DATA$spectrums$lower_bound))) {
-                showNotification(
-                    ui = "This spectrum was not analysed for this image.",
-                    duration = DATA$notification_duration * 4,
-                    type = "warning"
-                )
-                return()
-            }
-            if (FLAGS$analyse_single_image) {
-                file <- DATA$results$results$full_path
-            } else {
-                file <- DATA$r__tbl_dir_files$images_filtered[[input$tbl_results_filtered_rows_selected]]
-            }
-            image_dimensions <- as.integer(get_image_dimensions(file))
-            ## LOAD IMAGE
-            if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=file)) {
-                if (input$do_crop_image) {
-                    im <- load_image(
-                        image.path = file,
-                        subset_only = T,
-                        return_hsv = T,
-                        crop_left = input$x0,
-                        crop_right = image_dimensions[[1]] - input$x1,
-                        crop_top = input$y0,
-                        crop_bottom = image_dimensions[[2]] - input$y1
-                    )
-                    DATA$last_masked_image <- file
-                    DATA$last_im <- im
-                } else {
-                    im <- load_image(
-                        image.path = file,
-                        subset_only = F,
-                        return_hsv = T
-                    )
-                    DATA$last_masked_image <- file
-                    DATA$last_im <- im
-                }
-            } else {
-                im <- DATA$last_im
-            }
-            mask <- input$reinspected_spectrums
-
-            # get the spectrum's HSV scope
-            lower_bound <- DATA$spectrums$lower_bound[[mask]]
-            upper_bound <- DATA$spectrums$upper_bound[[mask]]
-
-            # extract the spectrum & get its coordinates
-            hsv_results <- extract_pixels_HSV(
-                pixel.array = im,
-                lower_bound = lower_bound,
-                upper_bound = upper_bound,
-                fast_eval = T,
-                bundle_pixelarray = F,
-                check_value = T,
-                use_single_iteration_cpp = T
-            )
-            # make a mask
-            mask <- apply_HSV_color_by_mask(
-                pixel.array = im,
-                pixel.idx = hsv_results[[1]]$pixel.idx,
-                target.color = "red",
-                mask_extreme = input$mask_extreme
-            )
-            # display the mask
-            display(HSVtoRGB(mask))
+            render_selected_mask(input, DATA, FLAGS)
         })
         #### SAVE RESULTS BTN ####
         observeEvent(input$save_results, {
