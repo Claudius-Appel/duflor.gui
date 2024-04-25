@@ -89,13 +89,26 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             )
             ## LIMIT RANGE OF IDENTIFIER-HITS FROM CROPPED SEARCH REGION FOR ID-DOT
             if (do_crop_identifier_range) {
+                if (do_crop_image) {
+                    # coordinates of the identifier-dot has "moved" because the image
+                    # got cropped
+                    identifiersearch_x0_ <- identifiersearch_x0 - x0
+                    identifiersearch_x1_ <- identifiersearch_x1 - x0
+                    identifiersearch_y0_ <- identifiersearch_y0 - y0
+                    identifiersearch_y1_ <- identifiersearch_y1 - y0
+                } else {
+                    identifiersearch_x0_ <- identifiersearch_x0
+                    identifiersearch_x1_ <- identifiersearch_x1
+                    identifiersearch_y0_ <- identifiersearch_y0
+                    identifiersearch_y1_ <- identifiersearch_y1
+                }
                 hsv_results <- limit_identifier_coordinates(
                     spectrums_object = hsv_results,
                     image_dimensions = image_dimensions,
-                    identifiersearch_x0 = identifiersearch_x0,
-                    identifiersearch_x1 = identifiersearch_x1,
-                    identifiersearch_y0 = identifiersearch_y0,
-                    identifiersearch_y1 = identifiersearch_y1
+                    identifiersearch_x0 = identifiersearch_x0_,
+                    identifiersearch_x1 = identifiersearch_x1_,
+                    identifiersearch_y0 = identifiersearch_y0_,
+                    identifiersearch_y1 = identifiersearch_y1_
                 )
             }
             ## CALCULATE AREA FROM PIXEL_COUNTS
@@ -161,13 +174,26 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             )
             ## LIMIT RANGE OF IDENTIFIER-HITS FROM CROPPED SEARCH REGION FOR ID-DOT
             if (input$do_crop_identifier_range) {
+                if (input$do_crop_image) {
+                    # coordinates of the identifier-dot has "moved" because the image
+                    # got cropped
+                    identifiersearch_x0 <- input$identifiersearch_x0 - input$x0
+                    identifiersearch_x1 <- input$identifiersearch_x1 - input$x0
+                    identifiersearch_y0 <- input$identifiersearch_y0 - input$y0
+                    identifiersearch_y1 <- input$identifiersearch_y1 - input$y0
+                } else {
+                    identifiersearch_x0 = input$identifiersearch_x0
+                    identifiersearch_x1 = input$identifiersearch_x1
+                    identifiersearch_y0 = input$identifiersearch_y0
+                    identifiersearch_y1 = input$identifiersearch_y1
+                }
                 hsv_results <- limit_identifier_coordinates(
                     spectrums_object = hsv_results,
                     image_dimensions = image_dimensions,
-                    identifiersearch_x0 = input$identifiersearch_x0,
-                    identifiersearch_x1 = input$identifiersearch_x1,
-                    identifiersearch_y0 = input$identifiersearch_y0,
-                    identifiersearch_y1 = input$identifiersearch_y1
+                    identifiersearch_x0 = identifiersearch_x0,
+                    identifiersearch_x1 = identifiersearch_x1,
+                    identifiersearch_y0 = identifiersearch_y0,
+                    identifiersearch_y1 = identifiersearch_y1
                 )
             }
             ## CALCULATE AREA FROM PIXEL_COUNTS
