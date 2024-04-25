@@ -182,9 +182,10 @@ duflor_gui <- function() {
                            ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE)
                            ),
                   tabPanel("Results - plots"
-                           ,selectInput(inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
+                           ,selectInput(inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = c(names(getOption("duflor.default_hsv_spectrums")$upper_bound),"area_per_pixel"))
                            ,selectInput(inputId = "reinspected_type2",label = "Select KPI to inspect",choices = c("_fraction","_count","_area"))
                            ,plotOutput("results_visualisation_plot")
+                           ,actionButton(inputId = "save_visualisation_plot", label = "Save plot", disabled = TRUE)
                            ,)
                   #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
                   #tabPanel("Analytics (misc3)",verbatimTextOutput("TAB5"))
@@ -317,13 +318,18 @@ duflor_gui <- function() {
         #### PLOT OUTPUT RESULTS ####
         filtered_plot <- reactive({
             req(input$reinspected_spectrums2,input$reinspected_type2,hasName(DATA$results,"results"))
-            plt <- get_KPI_plot(input, DATA)
-            return(plt)
+            KPI <- get_KPI_plot(input, DATA)
+            DATA$current_KPI_key <- KPI$key
+            DATA$current_KPI_plot <- KPI$plt
+            return(KPI$plt)
         })
         output$results_visualisation_plot <- renderPlot({
             filtered_plot()
         })
-
+        observeEvent(input$save_visualisation_plot, {
+            req(DATA$current_KPI_plot)
+            store_KPI_plot_to_file(input, DATA)
+        })
         ### selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
 
         #### HIDE_PANELS_BY_DEFAULT ####

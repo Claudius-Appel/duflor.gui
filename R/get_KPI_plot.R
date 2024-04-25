@@ -33,6 +33,7 @@ get_KPI_plot <- function(input, DATA) {
             duration = NA,
             type = "warning"
         )
+        updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_visualisation_plot",disabled = TRUE)
         return(ggplot())
     }
     names <- DATA$results$results$image_name
@@ -47,5 +48,6 @@ get_KPI_plot <- function(input, DATA) {
         labs(x = "Names", y = "Filtered Datra") +
         theme_minimal() +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_visualisation_plot",disabled = FALSE)
     return(list(plt = plt, key = key))
 }
