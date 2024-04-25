@@ -22,6 +22,7 @@
 #' @importFrom shiny numericInput
 #' @importFrom shiny updateNumericInput
 #' @importFrom shiny updateActionButton
+#' @importFrom shiny updateSelectInput
 #' @importFrom shiny getDefaultReactiveDomain
 #' @importFrom shiny textInput
 #' @importFrom shiny checkboxInput
@@ -176,13 +177,13 @@ duflor_gui <- function() {
                            ,actionButton(inputId = "save_results","Save results",disabled = TRUE)
                            ),
                   tabPanel("Results - inspect"
-                           ,selectInput(inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
+                           ,selectInput(inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = c())
                            ,dataTableOutput("tbl_results_filtered")
                            ,checkboxInput(inputId = "mask_extreme", label = "Do a high-contrast mask?", value = FALSE)
                            ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE)
                            ),
                   tabPanel("Results - plots"
-                           ,selectInput(inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = c(names(getOption("duflor.default_hsv_spectrums")$upper_bound),"area_per_pixel"))
+                           ,selectInput(inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = c())
                            ,selectInput(inputId = "reinspected_type2",label = "Select KPI to inspect",choices = c("_fraction","_count","_area"))
                            ,plotOutput("results_visualisation_plot")
                            ,actionButton(inputId = "save_visualisation_plot", label = "Save plot", disabled = TRUE)
@@ -683,6 +684,10 @@ duflor_gui <- function() {
             spectrums <- DATA$spectrums
             spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
+
+            # update the spectrum-selection DDLs in tabs `Results - inspect` and `Results - plots`
+            updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
+            updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = c(names(spectrums$lower_bound),"area_per_pixel"))
             DATA$spectrums <- spectrums
             #### SETUP PARALLELISATION ####
             if (input$parallel_cores > 1) {
