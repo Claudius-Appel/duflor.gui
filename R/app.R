@@ -103,7 +103,6 @@ duflor_gui <- function() {
                                           "WFA" = 2),
                            selected = 1),
                 ## BUTTONS_1
-                actionButton(inputId = "render_plant",label = "Render Plant"),
                 actionButton(inputId = "open_edit_HSV_ranges_conditionalPanel",label = "Edit HSV Ranges"),
                 ## CONFIGURE_HSV_BOUNDS
                 conditionalPanel(
@@ -167,9 +166,11 @@ duflor_gui <- function() {
             # Main panel for displaying outputs
             mainPanel(
                 tabsetPanel(id = "tabset_panel",
-                  tabPanel("Image Files",verbatimTextOutput("Image Files"),dataTableOutput("tbl_dir_files")),
-                  tabPanel("Results - complete",verbatimTextOutput("Analytics (red dot deviations?)")
-
+                  tabPanel("Image Files"
+                           ,dataTableOutput("tbl_dir_files")
+                           ,actionButton(inputId = "render_plant",label = "Render Plant",disabled = TRUE)
+                           ),
+                  tabPanel("Results - complete"
                            ,dataTableOutput("tbl_results")
                            ,checkboxInput(inputId = "save_as_xlsx",label = "Save results as xlsx?",value = FALSE)
                            ,actionButton(inputId = "save_results","Save results",disabled = TRUE)
@@ -178,7 +179,8 @@ duflor_gui <- function() {
                            ,selectInput(inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
                            ,dataTableOutput("tbl_results_filtered")
                            ,checkboxInput(inputId = "mask_extreme", label = "Do a high-contrast mask?", value = FALSE)
-                           ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE)),
+                           ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE)
+                           ),
                   tabPanel("Results - plots"
                            ,selectInput(inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(getOption("duflor.default_hsv_spectrums")$upper_bound))
                            ,selectInput(inputId = "reinspected_type2",label = "Select KPI to inspect",choices = c("_fraction","_count","_area"))
@@ -235,6 +237,7 @@ duflor_gui <- function() {
             req(input$folder[[1]],input$image_file_suffix)
             shinyDirChoose(input = input, 'folder', roots=volumes)
             folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+            updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = TRUE)
             req(folder_path) ## make sure the rest of this react is only executed if 'folder_path' is set
             if (dir.exists(folder_path)) {
                 images_ <- list.files(folder_path,pattern = paste0("*.(",str_to_lower(input$image_file_suffix),"|",str_to_upper(input$image_file_suffix),")"),recursive = F,full.names = T)
@@ -243,6 +246,7 @@ duflor_gui <- function() {
                     ret <- as.data.frame(images_filtered) # TODO: see here for paginated tables in shiny-apps https://stackoverflow.com/questions/50043152/r-shiny-how-to-add-pagination-in-dtrenderdatatable
                     ret$index <- c(1:1:dim(ret)[1])
                     DATA$r__tbl_dir_files <- ret
+                    updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = FALSE)
                     return(ret)
                 } else {
                     showNotification(
@@ -258,6 +262,7 @@ duflor_gui <- function() {
                     ret <- data.frame(images_filtered = character(),
                                                   index = numeric(),
                                                   stringsAsFactors = FALSE)
+                    updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = TRUE)
                     return(ret)
                 }
             }
