@@ -11,9 +11,17 @@
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 element_text
 #' @importFrom utils hasName
+#' @importFrom shiny updateActionButton
+#' @importFrom shiny getDefaultReactiveDomain
+#' @importFrom shiny removeNotification
+#' @importFrom shiny showNotification
 #'
 get_KPI_plot <- function(input, DATA) {
-    key <- str_c(input$reinspected_spectrums2, input$reinspected_type2)
+    if (input$reinspected_spectrums2=="area_per_pixel") {
+        key <- input$reinspected_spectrums2
+    } else {
+        key <- str_c(input$reinspected_spectrums2, input$reinspected_type2)
+    }
     if (hasName(DATA$results$results, key)) {
         removeNotification("spectrum.not.found.ggplot")
         filtered_data <- DATA$results$results[[key]]
@@ -25,6 +33,7 @@ get_KPI_plot <- function(input, DATA) {
             duration = NA,
             type = "warning"
         )
+        updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_visualisation_plot",disabled = TRUE)
         return(ggplot())
     }
     names <- DATA$results$results$image_name
@@ -39,5 +48,6 @@ get_KPI_plot <- function(input, DATA) {
         labs(x = "Names", y = "Filtered Datra") +
         theme_minimal() +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    return(plt)
+    updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_visualisation_plot",disabled = FALSE)
+    return(list(plt = plt, key = key))
 }
