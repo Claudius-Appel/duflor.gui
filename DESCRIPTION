@@ -5,7 +5,8 @@ Author: Claudius Appel
 Authors@R: c(
     person("Claudius", "Appel", email =   "claudius.appel@freenet.de" , role = c("aut", "cre"))
   )
-Description: What the package does (one paragraph).
+Description: This package provides a shiny-based front-end GUI interface to the
+  duflor-package.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
