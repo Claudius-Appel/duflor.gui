@@ -44,7 +44,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
         identifiersearch_x1 = input$identifiersearch_x1
         identifiersearch_y0 = input$identifiersearch_y0
         identifiersearch_y1 = input$identifiersearch_y1
-        foreach_result <- foreach(index = 1:length(files$index),.packages = c("duflor","duflor.gui"), .verbose = T,.inorder = T) %dopar% {
+        foreach_result <- foreach(index = 1:length(files$index),.packages = c("duflor","duflor.gui"), .verbose = T,.inorder = F) %dopar% {
         # stop(simpleError("parallelisation is not implemented yet. figure out how to do so!!"))
             # TODO: figure out how to parallelise this code?!
             current_results <- data.frame(matrix(NA, nrow = 1, ncol = length(names(results_object))))
