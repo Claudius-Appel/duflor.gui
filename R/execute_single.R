@@ -87,7 +87,7 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
         repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
     }
     # we use the duflor.gui-version of this function because we need a different structure.
-    areas <- convert_pixels_to_area_gui(repackaged_pixel_counts)
+    areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, input)
     for (name in names(hsv_results)) {
         current_results[[str_c(name,"_area")]] <- areas[[name]]
         current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count

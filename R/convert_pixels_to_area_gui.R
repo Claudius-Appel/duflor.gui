@@ -1,6 +1,7 @@
 
 #' convert pixel counts to an area based on the known area of an identifier-dot.
 #'
+#' @param input - `input` respective shiny-component
 #' @param pixel.counts list containing any of the following pixel-counts:
 #'
 #' - "bex_green_HSV"
@@ -25,17 +26,16 @@
 #' @note
 #' This is a restructured version of [duflor::convert_pixels_to_area], to be more suitable to the needs of this specific app.
 #' @keywords internal
-convert_pixels_to_area_gui <- function(pixel.counts)
+convert_pixels_to_area_gui <- function(pixel.counts, input)
 {
-    default_identifier_area <- getOption("duflor.default_identifier_area")
     if (!any(grep("identifier",names(pixel.counts)))) {
         stop(simpleError("FATAL: Unknown identifier count. Is the identifier missing?"))
     }
-    area_per_pixel = default_identifier_area/pixel.counts[[grep("identifier",names(pixel.counts))]]
+    area_per_pixel = input$identifier_area/pixel.counts[[grep("identifier",names(pixel.counts))]]
     ret <- list(area_per_pixel = area_per_pixel)
     if (any(grep("identifier",names(pixel.counts)))) {
         idx <- grep("identifier",names(pixel.counts))
-        ret[[names(pixel.counts)[idx]]] = default_identifier_area
+        ret[[names(pixel.counts)[idx]]] = input$identifier_area
     }
     for (each in c("green","drought","complete","root")) {
         if (any(grep(each,names(pixel.counts)))) {
