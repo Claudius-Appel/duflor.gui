@@ -22,8 +22,8 @@
 #' @importFrom shiny showNotification
 #'
 get_KPI_plot <- function(input, DATA) {
-    if (input$reinspected_spectrums2=="area_per_pixel") {
-        key <- input$reinspected_spectrums2
+    if (input$reinspected_type2=="area_per_pixel") {
+        key <- input$reinspected_type2
     } else {
         key <- str_c(input$reinspected_spectrums2, input$reinspected_type2)
     }
