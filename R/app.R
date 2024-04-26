@@ -446,6 +446,17 @@ duflor_gui <- function() {
             }
         })
         observeEvent(input$select_crops, {
+            if (is.null(input$tbl_dir_files_rows_selected)) {
+                showNotification(
+                    ui = str_c(
+                        "Please select an image in the 'Image Files'-Tab first."
+                    ),
+                    duration = DATA$notification_duration * 5,
+                    type = "warning"
+
+                )
+                return()
+            }
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
 
             selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
@@ -537,6 +548,17 @@ duflor_gui <- function() {
             }
         })
         observeEvent(input$select_identifiercrops, {
+            if (is.null(input$tbl_dir_files_rows_selected)) {
+                showNotification(
+                    ui = str_c(
+                        "Please select an image in the 'Image Files'-Tab first."
+                    ),
+                    duration = DATA$notification_duration * 5,
+                    type = "warning"
+
+                )
+                return()
+            }
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
 
             selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
