@@ -1,0 +1,14 @@
+---
+title: "Measures to speed reduce execution-time"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(duflor.gui)
+```

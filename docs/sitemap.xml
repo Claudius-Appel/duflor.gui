@@ -4,6 +4,21 @@
     <loc>https://Claudius-Appel.github.io/duflor.gui/404.html</loc>
   </url>
   <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/articles/general-user-manual.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/articles/optimising-speed.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/general-user-manual.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/optimising-speed.html</loc>
+  </url>
+  <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/authors.html</loc>
   </url>
   <url>
@@ -31,10 +46,25 @@
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/execute_single.html</loc>
   </url>
   <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/get_group.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/get_image_dimensions.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/get_KPI_plot.html</loc>
+  </url>
+  <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/limit_identifier_coordinates.html</loc>
+  </url>
+  <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/prepare_resultsObject.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/render_selected_mask.html</loc>
   </url>
   <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/select_spectra_gui_comp.html</loc>
@@ -44,6 +74,9 @@
   </url>
   <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/shutdown_parallel.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/store_KPI_plot_to_file.html</loc>
   </url>
   <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/store_results_to_file.html</loc>
