@@ -2,14 +2,23 @@
 % Please edit documentation in R/get_KPI_plot.R
 \name{get_KPI_plot}
 \alias{get_KPI_plot}
-\title{Title}
+\title{generate a ggplot for a given KPI}
 \usage{
 get_KPI_plot(input, DATA)
+}
+\arguments{
+\item{input}{\itemize{
+\item \code{input} respective shiny-component
+}}
+
+\item{DATA}{\itemize{
+\item \code{DATA} respective shiny-component
+}}
 }
 \value{
 ggplot-object for the respective KPI
 }
 \description{
-Title
+Function generates a ggplot-object base on the selected choices in the DDLs
 }
 \keyword{internal}

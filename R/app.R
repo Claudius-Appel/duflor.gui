@@ -159,6 +159,7 @@ duflor_gui <- function() {
                 h5("Misc"),
                 textInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
                 dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
+                numericInput(inputId = "identifier_area", label = "insert area of identifier-dot in cm^2", value = 0.503,min = 0,step = 0.00001),
                 ## BUTTONS_2
                 actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
                 actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
@@ -239,7 +240,18 @@ duflor_gui <- function() {
             req(input$folder[[1]],input$image_file_suffix)
             shinyDirChoose(input = input, 'folder', roots=volumes)
             folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
-            updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = TRUE)
+            # all buttons listed here must be disabled by default
+            # they will be enabled if the `list.files()` returns a non-empty vector of files.
+            buttons_to_toggle <- c(
+                    "render_plant",
+                    "select_crops",
+                    "select_identifiercrops",
+                    "execute_analysis",
+                    "execute_analysis_single"
+                )
+            for (each in buttons_to_toggle) {
+                updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = TRUE)
+            }
             req(folder_path) ## make sure the rest of this react is only executed if 'folder_path' is set
             if (dir.exists(folder_path)) {
                 ## we do not recurse to force all input-files to be in the same level
@@ -249,7 +261,9 @@ duflor_gui <- function() {
                     ret <- as.data.frame(images_filtered) # TODO: see here for paginated tables in shiny-apps https://stackoverflow.com/questions/50043152/r-shiny-how-to-add-pagination-in-dtrenderdatatable
                     ret$index <- c(1:1:dim(ret)[1])
                     DATA$r__tbl_dir_files <- ret
-                    updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = FALSE)
+                    for (each in buttons_to_toggle) {
+                        updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = FALSE)
+                    }
                     return(ret)
                 } else {
                     showNotification(
@@ -265,7 +279,6 @@ duflor_gui <- function() {
                     ret <- data.frame(images_filtered = character(),
                                                   index = numeric(),
                                                   stringsAsFactors = FALSE)
-                    updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = TRUE)
                     return(ret)
                 }
             }
@@ -434,6 +447,17 @@ duflor_gui <- function() {
             }
         })
         observeEvent(input$select_crops, {
+            if (is.null(input$tbl_dir_files_rows_selected)) {
+                showNotification(
+                    ui = str_c(
+                        "Please select an image in the 'Image Files'-Tab first."
+                    ),
+                    duration = DATA$notification_duration * 5,
+                    type = "warning"
+
+                )
+                return()
+            }
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
 
             selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
@@ -525,6 +549,17 @@ duflor_gui <- function() {
             }
         })
         observeEvent(input$select_identifiercrops, {
+            if (is.null(input$tbl_dir_files_rows_selected)) {
+                showNotification(
+                    ui = str_c(
+                        "Please select an image in the 'Image Files'-Tab first."
+                    ),
+                    duration = DATA$notification_duration * 5,
+                    type = "warning"
+
+                )
+                return()
+            }
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
 
             selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
@@ -681,6 +716,17 @@ duflor_gui <- function() {
             select_spectra_gui_comp(input)
         })
         observeEvent(input$submit_selected_spectra, {
+            if (is.null(input$selected_spectra)) {
+                showNotification(
+                    ui = str_c(
+                        "Please select at least one option."
+                    ),
+                    duration = DATA$notification_duration * 5,
+                    type = "warning"
+
+                )
+            }
+            req(input$selected_spectra)
             removeModal()
             spectrums <- DATA$spectrums
             spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])

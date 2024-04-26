@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9025</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9028</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +49,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">convert_pixels_to_area_gui</span><span class="op">(</span><span class="va">pixel.counts</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">convert_pixels_to_area_gui</span><span class="op">(</span><span class="va">pixel.counts</span>, <span class="va">input</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -65,6 +65,11 @@ The calculated area is internally unit-less. However, as the default value for
 function is also in [cm^2].</p>
 <p>The assumed area of the identifier can be modified by excuting
 <code>options(duflor.default_identifier_area = &lt;value_in_square_centimeters&gt;)</code> <em>prior</em> to calling this function</p></dd>
+
+
+<dt>input</dt>
+<dd><ul><li><p><code>input</code> respective shiny-component</p></li>
+</ul></dd>
 
 </dl></div>
     <div class="section level2">
