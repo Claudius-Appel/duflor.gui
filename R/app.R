@@ -185,7 +185,7 @@ duflor_gui <- function() {
                            ),
                   tabPanel("Results - plots"
                            ,selectInput(inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = c())
-                           ,selectInput(inputId = "reinspected_type2",label = "Select KPI to inspect",choices = c("_fraction","_count","_area"))
+                           ,selectInput(inputId = "reinspected_type2",label = "Select KPI to inspect",choices = c("_fraction","_count","_area","area_per_pixel"))
                            ,plotOutput("results_visualisation_plot")
                            ,actionButton(inputId = "save_visualisation_plot", label = "Save plot", disabled = TRUE)
                            ,)
@@ -734,7 +734,7 @@ duflor_gui <- function() {
 
             # update the spectrum-selection DDLs in tabs `Results - inspect` and `Results - plots`
             updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
-            updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = c(names(spectrums$lower_bound),"area_per_pixel"))
+            updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
             DATA$spectrums <- spectrums
             #### SETUP PARALLELISATION ####
             if (input$parallel_cores > 1) {
