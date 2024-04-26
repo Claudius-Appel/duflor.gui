@@ -84,7 +84,7 @@ duflor_gui <- function() {
     ##### UI ####
         ui <- fluidPage(
         # App title
-        titlePanel("Hello Shiny!"),
+        titlePanel(str_c("duflor frontend v.",packageDescription("duflor.gui")$Version),windowTitle = str_c("duflor_gui v.",packageDescription("duflor.gui")$Version)),
         useShinyjs(),
         # Sidebar layout with input and output definitions
         sidebarLayout(
@@ -110,12 +110,12 @@ duflor_gui <- function() {
                     condition = "input.open_edit_HSV_ranges_conditionalPanel %% 2 == 1", # Condition to open the panel
                     id = "HSV_PANEL",
                     selectInput("selected_HSV_spectrum", "Select spectrum to edit.", choices = names(getOption("duflor.default_hsv_spectrums")$lower_bound)),
-                    numericInput(inputId = "lower_bound_H",label = "Lower Bound (H)", value = 0, min = 0, max = 360, step = 0.01),
-                    numericInput(inputId = "lower_bound_S",label = "Lower Bound (S)", value = 0, min = 0, max = 1, step = 0.01),
-                    numericInput(inputId = "lower_bound_V",label = "Lower Bound (V)", value = 0, min = 0, max = 1, step = 0.0001),
-                    numericInput(inputId = "upper_bound_H",label = "Upper Bound (H)", value = 0, min = 0, max = 360, step = 0.01),
-                    numericInput(inputId = "upper_bound_S",label = "Upper Bound (S)", value = 0, min = 0, max = 1, step = 0.01),
-                    numericInput(inputId = "upper_bound_V",label = "Upper Bound (V)", value = 0, min = 0, max = 1, step = 0.0001),
+                    numericInput(inputId = "lower_bound_H",label = "Lower Bound (H_0)", value = 0, min = 0, max = 360, step = 0.01),
+                    numericInput(inputId = "lower_bound_S",label = "Lower Bound (S_0)", value = 0, min = 0, max = 1, step = 0.01),
+                    numericInput(inputId = "lower_bound_V",label = "Lower Bound (V_0)", value = 0, min = 0, max = 1, step = 0.0001),
+                    numericInput(inputId = "upper_bound_H",label = "Upper Bound (H_1)", value = 0, min = 0, max = 360, step = 0.01),
+                    numericInput(inputId = "upper_bound_S",label = "Upper Bound (S_1)", value = 0, min = 0, max = 1, step = 0.01),
+                    numericInput(inputId = "upper_bound_V",label = "Upper Bound (V_1)", value = 0, min = 0, max = 1, step = 0.0001),
                     actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed HSV-spectra"),
                     useShinyjs() # Enable shinyjs inside the conditional panel
                 ),
@@ -155,13 +155,13 @@ duflor_gui <- function() {
                     id = "PARALLEL_PANEL",
                     numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores(logical = use_logical_cores) - 1)),
                 ),
-                ## BUTTONS_2
-                actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
-                actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
                 ## MISCELLANEOUS STUFF
                 h5("Misc"),
                 textInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
                 dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
+                ## BUTTONS_2
+                actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
+                actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
             ),
 
             # Main panel for displaying outputs
