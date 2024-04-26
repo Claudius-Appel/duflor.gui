@@ -110,12 +110,12 @@ duflor_gui <- function() {
                     condition = "input.open_edit_HSV_ranges_conditionalPanel %% 2 == 1", # Condition to open the panel
                     id = "HSV_PANEL",
                     selectInput("selected_HSV_spectrum", "Select spectrum to edit.", choices = names(getOption("duflor.default_hsv_spectrums")$lower_bound)),
-                    numericInput(inputId = "lower_bound_H",label = "Lower Bound (H)", value = 0, min = 0, max = 360, step = 0.01),
-                    numericInput(inputId = "lower_bound_S",label = "Lower Bound (S)", value = 0, min = 0, max = 1, step = 0.01),
-                    numericInput(inputId = "lower_bound_V",label = "Lower Bound (V)", value = 0, min = 0, max = 1, step = 0.0001),
-                    numericInput(inputId = "upper_bound_H",label = "Upper Bound (H)", value = 0, min = 0, max = 360, step = 0.01),
-                    numericInput(inputId = "upper_bound_S",label = "Upper Bound (S)", value = 0, min = 0, max = 1, step = 0.01),
-                    numericInput(inputId = "upper_bound_V",label = "Upper Bound (V)", value = 0, min = 0, max = 1, step = 0.0001),
+                    numericInput(inputId = "lower_bound_H",label = "Lower Bound (H_0)", value = 0, min = 0, max = 360, step = 0.01),
+                    numericInput(inputId = "lower_bound_S",label = "Lower Bound (S_0)", value = 0, min = 0, max = 1, step = 0.01),
+                    numericInput(inputId = "lower_bound_V",label = "Lower Bound (V_0)", value = 0, min = 0, max = 1, step = 0.0001),
+                    numericInput(inputId = "upper_bound_H",label = "Upper Bound (H_1)", value = 0, min = 0, max = 360, step = 0.01),
+                    numericInput(inputId = "upper_bound_S",label = "Upper Bound (S_1)", value = 0, min = 0, max = 1, step = 0.01),
+                    numericInput(inputId = "upper_bound_V",label = "Upper Bound (V_1)", value = 0, min = 0, max = 1, step = 0.0001),
                     actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed HSV-spectra"),
                     useShinyjs() # Enable shinyjs inside the conditional panel
                 ),
