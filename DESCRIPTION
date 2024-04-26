@@ -27,3 +27,7 @@ Imports:
     ggplot2
 Remotes:
     Claudius-Appel/duflor
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
