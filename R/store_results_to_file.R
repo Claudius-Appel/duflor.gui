@@ -30,6 +30,10 @@ store_results_to_file <- function(results, results_path, save_to_xlsx=FALSE) {
     }
     if (isTRUE(save_to_xlsx)) {
         results_path <- str_c(results_path,".xlsx")
+        dir <- dirname(results_path)
+        if (isFALSE(dir.exists(dir))) {
+            dir.create(dir)
+        }
         write.xlsx(
             results,
             asTable = T,
@@ -38,6 +42,10 @@ store_results_to_file <- function(results, results_path, save_to_xlsx=FALSE) {
         ) ## sign the file with being created by this username on this machine.
     } else {
         results_path <- str_c(results_path,".csv")
+        dir <- dirname(results_path)
+        if (isFALSE(dir.exists(dir))) {
+            dir.create(dir)
+        }
         write.csv2(x = results,file = results_path,col.names = F,row.names = T,fileEncoding = "UTF-8")
     }
     return(list(success = file.exists(results_path),results_path = results_path))
