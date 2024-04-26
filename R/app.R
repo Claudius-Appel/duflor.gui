@@ -716,6 +716,17 @@ duflor_gui <- function() {
             select_spectra_gui_comp(input)
         })
         observeEvent(input$submit_selected_spectra, {
+            if (is.null(input$selected_spectra)) {
+                showNotification(
+                    ui = str_c(
+                        "Please select at least one option."
+                    ),
+                    duration = DATA$notification_duration * 5,
+                    type = "warning"
+
+                )
+            }
+            req(input$selected_spectra)
             removeModal()
             spectrums <- DATA$spectrums
             spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
