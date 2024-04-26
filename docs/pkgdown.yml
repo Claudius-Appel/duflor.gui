@@ -1,10 +1,8 @@
 pandoc: 3.1.11
 pkgdown: 2.0.9
 pkgdown_sha: ~
-articles:
-  general-user-manual: general-user-manual.html
-  optimising-speed: optimising-speed.html
-last_built: 2024-04-26T17:09Z
+articles: {}
+last_built: 2024-04-26T17:51Z
 urls:
   reference: https://Claudius-Appel.github.io/duflor.gui/reference
   article: https://Claudius-Appel.github.io/duflor.gui/articles
