@@ -239,7 +239,18 @@ duflor_gui <- function() {
             req(input$folder[[1]],input$image_file_suffix)
             shinyDirChoose(input = input, 'folder', roots=volumes)
             folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
-            updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = TRUE)
+            # all buttons listed here must be disabled by default
+            # they will be enabled if the `list.files()` returns a non-empty vector of files.
+            buttons_to_toggle <- c(
+                    "render_plant",
+                    "select_crops",
+                    "select_identifiercrops",
+                    "execute_analysis",
+                    "execute_analysis_single"
+                )
+            for (each in buttons_to_toggle) {
+                updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = TRUE)
+            }
             req(folder_path) ## make sure the rest of this react is only executed if 'folder_path' is set
             if (dir.exists(folder_path)) {
                 ## we do not recurse to force all input-files to be in the same level
@@ -249,7 +260,9 @@ duflor_gui <- function() {
                     ret <- as.data.frame(images_filtered) # TODO: see here for paginated tables in shiny-apps https://stackoverflow.com/questions/50043152/r-shiny-how-to-add-pagination-in-dtrenderdatatable
                     ret$index <- c(1:1:dim(ret)[1])
                     DATA$r__tbl_dir_files <- ret
-                    updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = FALSE)
+                    for (each in buttons_to_toggle) {
+                        updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = FALSE)
+                    }
                     return(ret)
                 } else {
                     showNotification(
@@ -265,7 +278,6 @@ duflor_gui <- function() {
                     ret <- data.frame(images_filtered = character(),
                                                   index = numeric(),
                                                   stringsAsFactors = FALSE)
-                    updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = TRUE)
                     return(ret)
                 }
             }
