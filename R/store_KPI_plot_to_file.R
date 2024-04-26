@@ -9,8 +9,11 @@
 #' @importFrom stringr str_c
 #'
 store_KPI_plot_to_file <- function(input, DATA) {
-    results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/")
-
+    results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results/")
+    dir <- dirname(results_path)
+    if (isFALSE(dir.exists(dir))) {
+        dir.create(dir)
+    }
     if (input$reinspected_spectrums2=="area_per_pixel") {
         filename <- str_c(DATA$current_KPI_key,".png")
     } else {
