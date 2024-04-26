@@ -159,6 +159,7 @@ duflor_gui <- function() {
                 h5("Misc"),
                 textInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
                 dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
+                numericInput(inputId = "identifier_area", label = "insert area of identifier-dot in cm^2", value = 0.503,min = 0,step = 0.00001),
                 ## BUTTONS_2
                 actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
                 actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
