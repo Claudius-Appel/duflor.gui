@@ -84,7 +84,7 @@ duflor_gui <- function() {
     ##### UI ####
         ui <- fluidPage(
         # App title
-        titlePanel("Hello Shiny!"),
+        titlePanel(str_c("duflor frontend v.",packageDescription("duflor.gui")$Version),windowTitle = str_c("duflor_gui v.",packageDescription("duflor.gui")$Version)),
         useShinyjs(),
         # Sidebar layout with input and output definitions
         sidebarLayout(
