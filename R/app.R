@@ -242,6 +242,7 @@ duflor_gui <- function() {
             updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_plant",disabled = TRUE)
             req(folder_path) ## make sure the rest of this react is only executed if 'folder_path' is set
             if (dir.exists(folder_path)) {
+                ## we do not recurse to force all input-files to be in the same level
                 images_ <- list.files(folder_path,pattern = paste0("*.(",str_to_lower(input$image_file_suffix),"|",str_to_upper(input$image_file_suffix),")"),recursive = F,full.names = T)
                 if (length(images_)>0) {
                     images_filtered <- images_ ##[!str_count(basename(images_),"_")]# BUG: WHY WAS THIS HERE?
@@ -768,7 +769,7 @@ duflor_gui <- function() {
             } else {
                 # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
 
-                results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results_",input$date_of_image_shooting)
+                results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results/results_",input$date_of_image_shooting)
                 out <- store_results_to_file(results = DATA$results,results_path = results_path,save_to_xlsx = input$save_as_xlsx)
                 ## verify save was successfull
                 if (out$success) {
