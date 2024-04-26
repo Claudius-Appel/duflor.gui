@@ -1,4 +1,9 @@
-#' Title
+#' generate a ggplot for a given KPI
+#'
+#' Function generates a ggplot-object base on the selected choices in the DDLs
+#'
+#' @param input - `input` respective shiny-component
+#' @param DATA - `DATA` respective shiny-component
 #'
 #' @return ggplot-object for the respective KPI
 #' @keywords internal
