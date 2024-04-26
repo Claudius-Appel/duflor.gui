@@ -1,0 +1,183 @@
+---
+title: "General user manual for 'duflor.gui'"
+resource_files:
+  - images/gui_main.png
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(duflor.gui)
+```
+
+The GUI provided by this package is a front-end to the [duflor](https://Claudius-Appel.github.io/duflor)-package. It follows that the analysis-functions used under the hood will not be documented in this package's documentation.
+
+# General Structure
+
+In figure 1, the general overview of the GUI can be seen.
+
+![Fig. 1: Overview over the main GUI, with some files already pre-selected.](../man/figures/gui_main.png)
+
+In general, the GUI is split into two regions. The grey panel on the left side contains all input-controls which are relevant for the setup and configuration of an analysis. That is, all steps which must be done to *get the results* are located here.
+
+Consequently, all buttons/drop-down-menus/tables/other controls which are on the *right* side of the app are pertaining to the results. It should be noted that several of these controls won't do anything until the results have been computed[^1].
+
+[^1]: Buttons may be deactivated, drop-down-menus may not show all relevant options or no options at all, tables might be empty or completely invisible.
+
+## Steps required to run an analysis / Input Controls
+
+This section will deal in detail with the controls in the grey panel.
+
+Generally, the steps are designed to be done in order, from top to bottom[^2]:
+
+[^2]: Obviously they don't *have* to be done in order, they just *should*.
+
+1.  Selecting the folder containing the input images.\
+    **Note:** This folder must not contain any images which are not intended to be evaluated, and this extends to subfolders. If you select folder `foo` to be analysed, then image `foo/bar.png` will be evaluated. However, the images `foo/baz/bar.png` and `foo/baz/another/ridiculous/nesting/plant.png` will also be evaluated.
+2.  Selecting the type of analysis to be performed[^3]. Select `GFA` for a `Leaf Area Analysis`/`Grünflächenanalyse`, and `WFA` if you intend to perform a `Root Area Analysis/Wurzelflächenanalyse`.
+3.  Optionally, temporarily[^4] modify the HSV-boundaries used for a respective type of analysis. Values must be provided in HSV-color space and in accordance to the following rules:
+    1.  $0 \le H_0 \le 359$, $0 \le H_1 \le 359$, $H_0 \lt H_1$
+    2.  $0 \le S_0 \le 1$, $0 \le S_1 \le 1$, $S_0 \lt S_1$
+    3.  $0 \le V_0 \le 1$, $0 \le V_1 \le 1$, $V_0 \lt V_1$\
+        Experience suggests that especially the $V_0$-parameter should be adjusted *very carefully*.
+4.  Decide whether or not the image should be cropped. Cropping is explained in more detail in "[Cropping Images]".
+5.  Decide whether or not to restrict the area within which the identifier-dot truely lies. For more information, see "[Restricting area within which the identifier-dot is quantified]". **Taking this precaution is heavily suggested**.
+6.  Decide whether or not the execution should be run in parallel. Parallelisation can significantly reduce execution-time, *particularly for larger image-sets*. It's use is **strongly advised** when the number of images gets above \~40. Below that, it might still be sensible, but the author is not comfortable giving a blanket recommendation. For more information, see "[Parallelised execution]".
+7.  Select the date at which the images were shot.
+8.  Decide whether or not to analyse all images listed in the tab `Image Files`, or a single one of that set. Pressing either of these buttons will render the GUI unresponsive while executing the respective workflow, until it has been completed and the various results on the right side of the app are being updated.
+
+[^3]: This is technically optional, as all spectrums can be selected at will before the analysis-routine is initiated.
+
+[^4]: These changes will be discarded and not saved once the app is shut down or the R-process in which it was spawned is shut down in any manner.
+
+## Post-Execution Steps
+
+After the analysis has finished, the controls of tabs 2-4 on the right side of the app will be updated.
+
+### Tab 2: `Results - complete`
+
+The table in this tab renders the results which will be written to file $1:1$. At the bottom, you may decide whether or not the results will be saved as a `.csv`-file, or as a `.xlsx`-file. Generally the use of `.csv` is suggested for its smaller file-size; but sometimes the output data must be processed afterwards, and then saving the data as an `.xlsx`-file may be advantageous.
+
+### Tab 3: `Results - inspect`
+
+The third tab lets you inspect the results based on a specific spectrum. This table exists for two simple reasons:
+
+1.  The "complete" table is frequently too crowded to be easily digestible, particularly on lower-DPI screens.
+2.  By selecting a spectrum and a file, the results of applying said spectrum to the selected file can be viewed (see Figure 2). Optionally, the contrast between "hits" and other pixels can be increased. This can be particularly helpful when trying to identify false positive pixels for a given spectrum (see figure 3)
+
+![Fig.2: Image of a plant, with the 'green' spectrum highlighted in dark-red.](../man/figures/inspect_green_mask_on_hsaba1.PNG)
+
+![Fig.3: High-contrast mask of pixels which are considered part of the identifier-dot. Notice the collection of pixels in the vicinity of the pot which were matched, even though they are obviously false-positives. To counteract this, see "[Restricting area within which the identifier-dot is quantified]". Note that **this step is heavily recommended**.](../man/figures/inspect_green_mask_extreme.PNG)
+
+### Tab 4: `Results - plots`
+
+The fourth tab allows you to view a basic plot for the different KPIs determined.\
+Currently, the following KPIs are available:
+
+1.  `area_per_pixel`: This value denotes "how much area"[^5] is equivalent to a single pixel.
+2.  For every spectrum analysed, the following KPIs can be viewed and saved as a `.png`-file:
+    1.  the resulting `area`[^6],
+    2.  the number of matching pixels,
+    3.  and the fraction of matching pixels relative to all potential hits\
+
+[^5]: Both the GUI `duflor.gui::duflor_gui()` , as well as the underlying analysis-package `duflor` can calculate the area unit-less. However, the default defined area of the identifier-dot is defined as `r getOption("duflor.default_identifier_area")` $cm^2$
+
+[^6]: assumed to be in $cm^2$
+
+## Edge-cases / special controls
+
+### Tab 1: `Image Files`
+
+This tab contains the image files which *will* be analysed. However, it also allows you to view an image. This is *particularly* useful for verifying that you correctly cropped the image, and/or correctly selected the area for the identifier-dot (if you did any of these suggested extra steps).
+
+An example of how the application of both would look like can be seen in figure 4.
+
+![Fig.4: The blue-tainted area denotes the area which will be considered for analysis. Everything outside of this area will not be analysed. The yellow-tainted area denotes the area within which pixels matching the identifier-criteria will be valid. When compared to figure 3, this would meant that the rogue pixels in the vicinity of the pot will be excluded from further processing.](../man/figures/inspect_combined_crop_and_ident.PNG)
+
+# I HAVE NO IDEA WHAT TO CALL THIS HEADING
+
+## Measures for optimising execution speed
+
+### Cropping Images
+
+A very effective way of increasing execution time is to reduce the size of the data- set which is being analysed.
+
+After the desired area has been selected as described above, it can be optionally reviewed on the same (or another) image by pressing the `Render plant`-button on the tab `Image Files`.
+
+An in-depth description can be found in this **`vignette`**
+
+### Parallelised execution
+
+## Measures for maximising accuracy
+
+### Restricting area within which the identifier-dot is quantified
+
+Typically, the largest error-source has been a bad or inconsistent determination of the identifier used to calculate the area of spectrums extracted. This issue can be observed in figure 3.
+
+To counteract this, the GUI allows you to limit the range within which matches for the identifier-spectrum will be considered "valid". All matches *outside* of this area will be ignored.
+
+To select the area, follow the steps outlined below. Each step corresponds to a number within figures 5 and 6:
+
+1.  Select an image to inspect. You may select any *one* image within the `Image Files`-Tab
+2.  Check the check-box to enable this feature. This will expand a previously-hidden panel.
+3.  Next, press the button `Select area to analyse` to launch the window shown in figure 6.
+4.  Finally, left-click-and-drag over the area within which the identifier-dot resides. The selection may contain anything, and may be of any size. When you let go, the selection-GUI will close, and the bounding coordinates will be inserted into the respective numeric input controls.
+
+You might be tempted to make it as small as possible. However, while it is certainly advantageous to minimise the area as much as possible, a certain buffer-zone should be kept. As the position of the identifier-dot might differ subtly across all images, a too-strict selection might suddenly exclude pixels which are actually part of the identifier-dot.
+
+The difference this step can make can be observed in tables 1 and 2. Note that this is a small example, the influence
+
+| bex_identifier_dot_count | bex_drought_HSV_count | bex_drought_HSV_area |
+|--------------------------|-----------------------|----------------------|
+| 833                      | 297798                | 179.8228019207683    |
+| 796                      | 260776                | 164.7868442211055    |
+| 870                      | 262390                | 151.7036436781609    |
+
+: Table 1: Number of pixels for the 'identifer_dot', as well as the resulting area for an example-drought spectrum based on a given number of matched pixels. In this case, all qualified "identifier"-pixels were used to determine areas.
+
+| bex_identifier_dot_count | bex_drought_HSV_count | bex_drought_HSV_area |
+|--------------------------|-----------------------|----------------------|
+| 824                      | 297798                | 181.7868859223301    |
+| 783                      | 260776                | 167.5227688378033    |
+| 822                      | 262390                | 160.5622506082725    |
+
+: Table 2: Restricting the area in which the identifier-dot lies changes a given spectrum's calculated area.
+
+![Fig.5: First three steps required to restrict search-range for the quantification of the identifier-dot.](../man/figures/limit_identifier_workflow_steps.png)
+
+![Fig.6: Final step required to restrict search-range for the quantification of the identifier-dot](../man/figures/selecting_area_of_identifier_dot.png)
+
+### Fine-tuning HSV-boundaries
+
+Determining the HSV-boundaries can be an arduous and time-consuming process. It is *not* recommended to frequently do this via the GUI, but instead to create a small script calling the relevant functions of the `duflor`-package itself.
+
+However, on occasion a spectrum's HSV-boundaries must be modified - and in this case, a spectrum can be altered. To do so, follow the steps outlined below. Each step corresponds to
+
+## (Advanced) Debugging
+
+Generally, the app tries to give reasonable warnings and status-messages via small red/yellow/blue message boxes. These should be fairly self-explanatory, and will pop up where the author thought them sensible or necessary.
+
+### Dev-consoler
+
+# Development, Modifications, Issues
+
+To keep development efficient and reasonable, there are a certain number of requirements for reporting problems or requesting features.
+
+-   If problems arise which are to be fixed, they must be raised in the `issues`-section of the respective package's Github-Repository. Issues should be detailed, provide errors output to the console, a step-by-step guide to reproduce the issue and supply test files which trigger the issue (if applicable/required/sensible).
+
+-   Similarly, additional features/changes are to be raised there as well, with a clear outline of the desired feature.
+
+Aside from these fundamental requirements, TODO
+
+## Reporting issues
+
+This app, and its underlying code can be reviewed with minimal upfront work by opening the source-code from GitHub - either by manually downloading it, or by cloning it via `git`. To do either, navigate to the [duflor](https://github.com/Claudius-Appel/duflor)- or [duflor.gui](https://github.com/Claudius-Appel/duflor.gui)-repository.
+
+## Further development
+
+You are free to take up either of these packages and continue development on them, while abiding to the licensing terms declared.
