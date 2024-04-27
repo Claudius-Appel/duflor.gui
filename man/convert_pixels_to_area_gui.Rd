@@ -4,7 +4,7 @@
 \alias{convert_pixels_to_area_gui}
 \title{convert pixel counts to an area based on the known area of an identifier-dot.}
 \usage{
-convert_pixels_to_area_gui(pixel.counts, input)
+convert_pixels_to_area_gui(pixel.counts, identifier_area)
 }
 \arguments{
 \item{pixel.counts}{list containing any of the following pixel-counts:
@@ -23,8 +23,8 @@ function is also in [cm^2].
 The assumed area of the identifier can be modified by excuting
 \verb{options(duflor.default_identifier_area = <value_in_square_centimeters>)} \emph{prior} to calling this function}
 
-\item{input}{\itemize{
-\item \code{input} respective shiny-component
+\item{identifier_area}{\itemize{
+\item declared size of the identifier area, in \verb{[cm^2]}
 }}
 }
 \value{
