@@ -20,6 +20,8 @@
 #' @importFrom shiny getDefaultReactiveDomain
 #' @importFrom shiny removeNotification
 #' @importFrom shiny showNotification
+#' @importFrom stringr str_c
+#' @importFrom stringr str_count
 #'
 get_KPI_plot <- function(input, DATA) {
     if (input$reinspected_type2=="area_per_pixel") {
@@ -43,6 +45,17 @@ get_KPI_plot <- function(input, DATA) {
     }
     names <- DATA$results$results$image_name
     group <- get_group(names)
+    x_label <- "Files"
+    if (str_count(key,"_count")>0) {
+        y_label <- str_c(key," [/]")
+    } else if (str_count(key,"_fraction")>0) {
+        y_label <- str_c(key," [%]")
+        filtered_data <- filtered_data * 100
+    } else if (str_count(key,"_area")>0) {
+        y_label <- str_c(key," [cm^2]")
+    } else if (str_count(key,"_per_pixel")>0) {
+        y_label <- str_c(key," [cm^2]")
+    }
     # construct data
     data <-
         data.frame(filtered_data = filtered_data,
@@ -50,7 +63,7 @@ get_KPI_plot <- function(input, DATA) {
                    group = group)
     plt <- ggplot(data, aes(x = names, y = filtered_data, fill = group)) +
         geom_bar(stat = "identity", position = "dodge") +
-        labs(x = "Names", y = "Filtered Datra") +
+        labs(x = x_label, y = y_label) +
         theme_minimal() +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
     updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_visualisation_plot",disabled = FALSE)
