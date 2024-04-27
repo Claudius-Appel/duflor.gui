@@ -44,6 +44,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
         identifiersearch_x1 = input$identifiersearch_x1
         identifiersearch_y0 = input$identifiersearch_y0
         identifiersearch_y1 = input$identifiersearch_y1
+        identifier_area <- input$identifier_area
         foreach_result <- foreach(index = 1:length(files$index),.packages = c("duflor","duflor.gui"), .verbose = T,.inorder = F) %dopar% {
         # stop(simpleError("parallelisation is not implemented yet. figure out how to do so!!"))
             # TODO: figure out how to parallelise this code?!
@@ -117,7 +118,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
             }
             # we use the duflor.gui-version of this function because we need a different structure.
-            areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, input)
+            areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, identifier_area)
             for (name in names(hsv_results)) {
                 current_results[[str_c(name,"_area")]] <- areas[[name]]
                 current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
@@ -202,7 +203,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
             }
             # we use the duflor.gui-version of this function because we need a different structure.
-            areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, input)
+            areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, input$identifier_area)
             for (name in names(hsv_results)) {
                 current_results[[str_c(name,"_area")]] <- areas[[name]]
                 current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
