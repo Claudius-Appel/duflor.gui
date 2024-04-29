@@ -116,7 +116,8 @@ duflor_gui <- function() {
                     numericInput(inputId = "upper_bound_H",label = "Upper Bound (H_1)", value = 0, min = 0, max = 360, step = 0.01),
                     numericInput(inputId = "upper_bound_S",label = "Upper Bound (S_1)", value = 0, min = 0, max = 1, step = 0.01),
                     numericInput(inputId = "upper_bound_V",label = "Upper Bound (V_1)", value = 0, min = 0, max = 1, step = 0.0001),
-                    actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed HSV-spectra"),
+                    actionButton(inputId = "reset_HSV_ranges", label = "Reset"),
+                    actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed spectra"),
                     useShinyjs() # Enable shinyjs inside the conditional panel
                 ),
                 ## CROPPING TO_BE_ANALYSED MATRIX
@@ -639,7 +640,22 @@ duflor_gui <- function() {
             updateNumericInput(session, inputId = "upper_bound_V", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
         })
         observeEvent(input$reset_HSV_ranges, {
-
+            default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
+            updateNumericInput(session, inputId = "lower_bound_H", value = default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
+            updateNumericInput(session, inputId = "lower_bound_S", value = default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
+            updateNumericInput(session, inputId = "lower_bound_V", value = default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][3])
+            updateNumericInput(session, inputId = "upper_bound_H", value = default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][1])
+            updateNumericInput(session, inputId = "upper_bound_S", value = default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
+            updateNumericInput(session, inputId = "upper_bound_V", value = default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
+            showNotification(
+                ui = str_c(
+                    "Reset values for spectrum '",
+                    input$selected_HSV_spectrum,
+                    "'"
+                ),
+                type = "message"
+            )
+            hide("HSV_PANEL")
         })
         observeEvent(input$close_edit_HSV_ranges_conditionalPanel, {
             hide("HSV_PANEL")
