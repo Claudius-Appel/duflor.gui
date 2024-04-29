@@ -31,3 +31,5 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+URL: https://Claudius-Appel.github.io/duflor.gui/
+BugReports: https://github.com/Claudius-Appel/duflor.gui/issues
