@@ -177,6 +177,7 @@ Aside from these fundamental requirements, TODO
 ## Reporting issues
 
 This app, and its underlying code can be reviewed with minimal upfront work by opening the source-code from GitHub - either by manually downloading it, or by cloning it via `git`. To do either, navigate to the [duflor](https://github.com/Claudius-Appel/duflor)- or [duflor.gui](https://github.com/Claudius-Appel/duflor.gui)-repository.
+For details on doing so see `r vignette("raising-issues", package = "duflor.gui")`.
 
 ## Further development
 
