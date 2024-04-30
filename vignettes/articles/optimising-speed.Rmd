@@ -1,5 +1,10 @@
 ---
-title: "Measures to speed reduce execution-time"
+title: "Measures to reduce execution time"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Measures to reduce execution time}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -9,6 +14,4 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(duflor.gui)
-```
+For a detailed breakdown of performance-related issues in the computational backend-package `duflor`, see `vignette("optimising_for_speed", package = "duflor")`.
