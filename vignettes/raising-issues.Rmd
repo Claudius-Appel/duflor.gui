@@ -23,7 +23,7 @@ This article mostly deals with using
 
 When issues arise, they **must be tracked on the package's GitHub page**, under "`r utils::packageDescription("duflor.gui")$BugReports`".
 
-# General etiquette and different tyoes of 'issues'
+# General etiquette and different types of 'issues'
 
 Although they are all conglomerated under the same name "issues", generally reports are differentiated into two categories:
 
@@ -50,6 +50,7 @@ The more information is available, the easier it becomes to identify the actual 
 
 ## Feature Requests
 
+To keep development efficient and reasonable, there are a certain number of requirements for reporting problems or requesting features.
 A feature request should clearly define what additional feature should be implemented. As with bug-reports, the more information provided, the easier it's viability and ease of implementation can be assessed.
 
-It should clearly describe _what_ should be implemented, and _why_ it should.
+It should clearly describe _what_ should be implemented, as well as _why_ (and in broad strokes _how_) it should be implemented.

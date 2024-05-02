@@ -2,6 +2,10 @@
 title: "General user manual for 'duflor.gui'"
 resource_files:
   - images/gui_main.png
+vignette: >
+  %\VignetteIndexEntry{General user manual for 'duflor.gui'}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -44,14 +48,14 @@ Generally, the steps are designed to be done in order, from top to bottom[^2]:
     1.  $0 \le H_0 \le 359$, $0 \le H_1 \le 359$, $H_0 \lt H_1$
     2.  $0 \le S_0 \le 1$, $0 \le S_1 \le 1$, $S_0 \lt S_1$
     3.  $0 \le V_0 \le 1$, $0 \le V_1 \le 1$, $V_0 \lt V_1$\
-        Experience suggests that especially the $V_0$-parameter should be adjusted *very carefully*.
+        Experience suggests that especially the $V_0$-parameter should be adjusted *very carefully*. This step is explained in further detail in "[Fine-tuning HSV-boundaries]".
 4.  Decide whether or not the image should be cropped. Cropping is explained in more detail in "[Cropping Images]".
 5.  Decide whether or not to restrict the area within which the identifier-dot truely lies. For more information, see "[Restricting area within which the identifier-dot is quantified]". **Taking this precaution is heavily suggested**.
 6.  Decide whether or not the execution should be run in parallel. Parallelisation can significantly reduce execution-time, *particularly for larger image-sets*. It's use is **strongly advised** when the number of images gets above \~40. Below that, it might still be sensible, but the author is not comfortable giving a blanket recommendation. For more information, see "[Parallelised execution]".
 7.  Select the date at which the images were shot.
 8.  Decide whether or not to analyse all images listed in the tab `Image Files`, or a single one of that set. Pressing either of these buttons will render the GUI unresponsive while executing the respective workflow, until it has been completed and the various results on the right side of the app are being updated.
 
-[^3]: This is technically optional, as all spectrums can be selected at will before the analysis-routine is initiated.
+[^3]: This is technically optional, as all spectra can be selected at will before the analysis-routine is initiated.
 
 [^4]: These changes will be discarded and not saved once the app is shut down or the R-process in which it was spawned is shut down in any manner.
 
@@ -99,85 +103,44 @@ An example of how the application of both would look like can be seen in figure 
 
 ![Fig.4: The blue-tainted area denotes the area which will be considered for analysis. Everything outside of this area will not be analysed. The yellow-tainted area denotes the area within which pixels matching the identifier-criteria will be valid. When compared to figure 3, this would meant that the rogue pixels in the vicinity of the pot will be excluded from further processing.](../man/figures/inspect_combined_crop_and_ident.PNG)
 
-# I HAVE NO IDEA WHAT TO CALL THIS HEADING
+# Measures for optimising execution speed
 
-## Measures for optimising execution speed
-
-### Cropping Images
+## Cropping Images
 
 A very effective way of increasing execution time is to reduce the size of the data- set which is being analysed.
 
 After the desired area has been selected as described above, it can be optionally reviewed on the same (or another) image by pressing the `Render plant`-button on the tab `Image Files`.
 
-An in-depth description can be found in this **`vignette`**
+An in-depth description can be found in `vignette("image-cropping", package = "duflor.gui")`.
 
-### Parallelised execution
+## Parallelised execution
 
-## Measures for maximising accuracy
+Based on the power of the system running the app, one might consider parallelising the evaluation of images to further reduce computation time. However, its effectiveness depends heavily on the resources available.
 
-### Restricting area within which the identifier-dot is quantified
+An in-depth description can be found in `vignette("parallelisation", package = "duflor.gui")`.
 
-Typically, the largest error-source has been a bad or inconsistent determination of the identifier used to calculate the area of spectrums extracted. This issue can be observed in figure 3.
+# Measures for maximising accuracy
 
-To counteract this, the GUI allows you to limit the range within which matches for the identifier-spectrum will be considered "valid". All matches *outside* of this area will be ignored.
+## Restricting area within which the identifier-dot is quantified
 
-To select the area, follow the steps outlined below. Each step corresponds to a number within figures 5 and 6:
+Typically, the largest error-source has been a bad or inconsistent determination of the identifier used to calculate the area of extracted spectra. For information on how to counter this issue, an in-depth description can be found in `vignette("identifier-cropping", package = "duflor.gui")`.
 
-1.  Select an image to inspect. You may select any *one* image within the `Image Files`-Tab
-2.  Check the check-box to enable this feature. This will expand a previously-hidden panel.
-3.  Next, press the button `Select area to analyse` to launch the window shown in figure 6.
-4.  Finally, left-click-and-drag over the area within which the identifier-dot resides. The selection may contain anything, and may be of any size. When you let go, the selection-GUI will close, and the bounding coordinates will be inserted into the respective numeric input controls.
+## Fine-tuning HSV-boundaries
 
-You might be tempted to make it as small as possible. However, while it is certainly advantageous to minimise the area as much as possible, a certain buffer-zone should be kept. As the position of the identifier-dot might differ subtly across all images, a too-strict selection might suddenly exclude pixels which are actually part of the identifier-dot.
+Determining the HSV-boundaries can be an arduous and time-consuming process. It is *not* recommended to frequently do this via the GUI, but instead to create a small script calling the relevant functions of the `duflor`-package itself.\
+An in-depth guide and further details can be found in `vignette("modifying-hsv-bounds", package = "duflor.gui")`.
 
-The difference this step can make can be observed in tables 1 and 2. Note that this is a small example, the influence
-
-| bex_identifier_dot_count | bex_drought_HSV_count | bex_drought_HSV_area |
-|--------------------------|-----------------------|----------------------|
-| 833                      | 297798                | 179.8228019207683    |
-| 796                      | 260776                | 164.7868442211055    |
-| 870                      | 262390                | 151.7036436781609    |
-
-: Table 1: Number of pixels for the 'identifer_dot', as well as the resulting area for an example-drought spectrum based on a given number of matched pixels. In this case, all qualified "identifier"-pixels were used to determine areas.
-
-| bex_identifier_dot_count | bex_drought_HSV_count | bex_drought_HSV_area |
-|--------------------------|-----------------------|----------------------|
-| 824                      | 297798                | 181.7868859223301    |
-| 783                      | 260776                | 167.5227688378033    |
-| 822                      | 262390                | 160.5622506082725    |
-
-: Table 2: Restricting the area in which the identifier-dot lies changes a given spectrum's calculated area.
-
-![Fig.5: First three steps required to restrict search-range for the quantification of the identifier-dot.](../man/figures/limit_identifier_workflow_steps.png)
-
-![Fig.6: Final step required to restrict search-range for the quantification of the identifier-dot](../man/figures/selecting_area_of_identifier_dot.png)
-
-### Fine-tuning HSV-boundaries
-
-Determining the HSV-boundaries can be an arduous and time-consuming process. It is *not* recommended to frequently do this via the GUI, but instead to create a small script calling the relevant functions of the `duflor`-package itself.
-
-However, on occasion a spectrum's HSV-boundaries must be modified - and in this case, a spectrum can be altered. To do so, follow the steps outlined below. Each step corresponds to
-
-## (Advanced) Debugging
+# (Advanced) Debugging
 
 Generally, the app tries to give reasonable warnings and status-messages via small red/yellow/blue message boxes. These should be fairly self-explanatory, and will pop up where the author thought them sensible or necessary.
 
-### Dev-consoler
-
 # Development, Modifications, Issues
 
-To keep development efficient and reasonable, there are a certain number of requirements for reporting problems or requesting features.
-
--   If problems arise which are to be fixed, they must be raised in the `issues`-section of the respective package's Github-Repository. Issues should be detailed, provide errors output to the console, a step-by-step guide to reproduce the issue and supply test files which trigger the issue (if applicable/required/sensible).
-
--   Similarly, additional features/changes are to be raised there as well, with a clear outline of the desired feature.
-
-Aside from these fundamental requirements, TODO
+For details on how to raise new feature-requests, please refer to `vignette("raising-issues", package = "duflor.gui")`.
 
 ## Reporting issues
 
-This app, and its underlying code can be reviewed with minimal upfront work by opening the source-code from GitHub - either by manually downloading it, or by cloning it via `git`. To do either, navigate to the [duflor](https://github.com/Claudius-Appel/duflor)- or [duflor.gui](https://github.com/Claudius-Appel/duflor.gui)-repository.
-For details on doing so see `r vignette("raising-issues", package = "duflor.gui")`.
+This app, and its underlying code can be reviewed with minimal upfront work by opening the source-code from GitHub - either by manually downloading it, or by cloning it via `git`. To do either, navigate to the [duflor](https://github.com/Claudius-Appel/duflor)- or [duflor.gui](https://github.com/Claudius-Appel/duflor.gui)-repository. For details on doing so see `vignette("raising-issues", package = "duflor.gui")`.
 
 ## Further development
 

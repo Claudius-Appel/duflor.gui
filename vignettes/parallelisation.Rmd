@@ -1,0 +1,106 @@
+---
+title: "Parallelised computing as a method for increased performance"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Parallelised computing as a method for increased performance}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(duflor.gui)
+```
+
+# Introduction
+
+Executing the analysis can takes varying amounts of time. There are 4 factors which influence the required time of analysis in a linearly proportional manner:
+
+-   Number of checked pixels
+-   Number of checked images
+-   Number of spectra checked-for.
+-   Image dimensions
+
+For each spectrum one wants to identify, every pixel must be checked to fall within or outside the respectively defined HSV-boundaries.
+
+It follows that in general, the following calculation yields the total number of iterations required to calculate the results:
+
+$\text{Iterations}_{total} = \text{Checked pixels}_\text{total} = N_{Images}\times({Width}_{Image}\times{Height}_{Image})\times N_{spectra}$
+
+This step is not particularly complicated, nor is it particularly resource-intensive. However,the sheer volume of iterations make this operation rather slow.
+
+Additionally, the process of *loading* an image into an R-object to work on seems to be much more time-consuming than the analysis described above itself. Unfortunately, this steps is cannot be performed any faster currently. It is a bottle-neck that lies outside the scope of the project.
+
+## The general steps
+
+The following steps **must be performed** to obtain the results for a single image:
+
+1.  Load the image into an R-object
+2.  For each declared spectrum, check all pixels of the image against the respective upper and lower bounds, and save the coordinates of pixels fulfilling the condition
+3.  Insert the results into an object persistent across spectrum-iterations
+4.  Convert all results into a results-object
+
+If multiple images are evaluated, the steps above must be performed the corresponding number of times.
+
+## A reasonable worst-case scenario
+
+Let's model a reasonable likely worst-case scenario:
+
+-   250 images
+-   2 spectra
+-   Image-width: 6000 pixels
+-   Image-height: 4000 pixels
+
+To obtain all results, 250 images must be loaded. Without parallelisation (i.e. in sequential execution mode), every subsequent step requires its previous step to have concluded. Using the formula above, a total of
+
+$$
+\text{Iterations}_{total} = \text{Checked pixels}_\text{total} = N_{Images}\times({Width}_{Image}\times{Height}_{Image})\times N_{spectra}\\
+ = 250\times(6000\times4000)\times2=1.2\times 10^{10}
+$$ comparisons between a pixel's HSV-triplet and a lower- and upper-bound's HSV-triplet must be performed. Note: the above calculation is for a hypothetical root-area analysis of 250 images, where two spectra must be quantified (roots and the identifier-area itself).
+
+While performing a single such check is performed basically instantaneously, it still takes *some* time.
+
+# How a parallelised setup can help
+
+R itself is a single-threaded language, and thus will utilise exactly *one* thread of *one* CPU-core to perform the iterations calculated above - by default.\
+Thankfully, R has packages which allow the parallelised use of multiple available CPU-cores to work on operations simultaneously.
+
+Thus, this app allows the user to run the entire analysis-pipeline in parallel, leveraging the `{foreach}`-package. It should be stressed that the *entire* pipeline is parallelised, **including** the loading-step.
+
+## Advantages
+
+Speed. By processing multiple images in parallel, the total time can be (roughly) divided by the number of available workers.
+
+## Limitations
+
+-   Setup-time: The process of setting up the parallel back-end takes a certain amount of time[^1]
+-   RAM-usage: The amount of required RAM scales based on the number of used workers, the size of the images which are analysed, and the operating system.
+-   Operating system: Without getting into the low-level details, there is a significant difference between "Windows"-systems and "Linux"/"MacOS" when it comes to managing back-ends for parallel-computing. Apple- and Linux-machines have access to the so-called `fork`-back-end. All three have access to the `socket`-back-end.
+
+[^1]: Typically on the scale of single-digit seconds
+
+### back-ends: `socket` vs `fork`
+
+A so-called **`socket`**-back-end can be run on Windows, MacOS and Linux.\
+It works by separately exporting the required environment (variables, functions, hidden objects, loaded packages, etc.) from the master-process to every designated worker, which work secluded from each other.\
+When a worker finishes its workload, it must signal back to the master-process that it has finished. Once all workers are done, their results can be collected by the master, combined into a collective output format, and used as a "normal" variable from there.
+
+The major disadvantage is the significant overhead accumulating by this back-and-forth, and thus a `socket`-cluster is **slow** (compared to the `fork`-back-end described below). For the reasons described above, a `socket`-back-end also heavily increases RAM-usage (linearly with the number of workers).
+
+On the other hand, the **`fork`**-back-end runs significantly faster.\
+Instead of duplicating all data and providing a unique copy to each worker-process, each worker gains access to the master's environment. As a consequence, the significant overhead of duplicating the environment can be ignored, and workers instead just return their respective results to the master process.\
+Unfortunately, **this back-end is not available on windows**. As an additional side note, machine-clusters cannot use `fork`-back-ends.\
+\
+
+## Suggestions
+
+When setting up a parallel backend via the app, you should consider the specifications of your machine as described above:
+
+1.  You might be tempted to create a parallel back.end using all available cores of a system. **DO NOT DO SO.** Simply don't. Assigning all available cores to your cluster will leave no core freely-available for other programs on the machine to do their job. This can and most certainly **will** cause havoc. Thus, leave at least a single core available. When setting up parallelisation via the shiny-GUI, it is not possible to use all cores available.
+2.  If you have a limited amount of available RAM, there comes a point at which adding additional workers will deteriorate the performance of the entire backend. If your machine has e.g. 8 GB of available RAM, 2 workers might work efficiently, and 3 might work just as fast as a sequential backend. There is no clear guide to determine this tipping-point. In general, if your cluster comes close to consuming all available system RAM, adding more workers is likely to deteriorate overall performance, and slightly reducing the number of workers might even be beneficial.\
