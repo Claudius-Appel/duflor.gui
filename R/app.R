@@ -110,10 +110,10 @@ duflor_gui <- function() {
                     condition = "input.open_edit_HSV_ranges_conditionalPanel %% 2 == 1", # Condition to open the panel
                     id = "HSV_PANEL",
                     selectInput("selected_HSV_spectrum", "Select spectrum to edit.", choices = names(getOption("duflor.default_hsv_spectrums")$lower_bound)),
-                    numericInput(inputId = "lower_bound_H",label = "Lower Bound (H_0)", value = 0, min = 0, max = 360, step = 0.01),
+                    numericInput(inputId = "lower_bound_H",label = "Lower Bound (H_0)", value = 0, min = 0, max = 359, step = 0.01),
                     numericInput(inputId = "lower_bound_S",label = "Lower Bound (S_0)", value = 0, min = 0, max = 1, step = 0.01),
                     numericInput(inputId = "lower_bound_V",label = "Lower Bound (V_0)", value = 0, min = 0, max = 1, step = 0.0001),
-                    numericInput(inputId = "upper_bound_H",label = "Upper Bound (H_1)", value = 0, min = 0, max = 360, step = 0.01),
+                    numericInput(inputId = "upper_bound_H",label = "Upper Bound (H_1)", value = 0, min = 0, max = 359, step = 0.01),
                     numericInput(inputId = "upper_bound_S",label = "Upper Bound (S_1)", value = 0, min = 0, max = 1, step = 0.01),
                     numericInput(inputId = "upper_bound_V",label = "Upper Bound (V_1)", value = 0, min = 0, max = 1, step = 0.0001),
                     actionButton(inputId = "reset_HSV_ranges", label = "Reset"),
@@ -623,14 +623,10 @@ duflor_gui <- function() {
         })
         #### EDIT HSV RANGES ####
         observeEvent(input$open_edit_HSV_ranges_conditionalPanel, {
-            #TODO: edit HSV ranges loaded from duflor-package
             show("HSV_PANEL")
-            default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
-            # 1. create a modal for each of these spectrums
-            # 2.
         })
         observeEvent(input$selected_HSV_spectrum, {
-            ## load spectrums in
+            ## render selected spectrum's current values
             spectrums <- DATA$spectrums
             updateNumericInput(session, inputId = "lower_bound_H", value = spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
             updateNumericInput(session, inputId = "lower_bound_S", value = spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
@@ -640,6 +636,7 @@ duflor_gui <- function() {
             updateNumericInput(session, inputId = "upper_bound_V", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
         })
         observeEvent(input$reset_HSV_ranges, {
+            ## reset selected spectrum's values to default settings in `duflor.default_hsv_spectrums`
             default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
             updateNumericInput(session, inputId = "lower_bound_H", value = default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
             updateNumericInput(session, inputId = "lower_bound_S", value = default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
@@ -647,6 +644,13 @@ duflor_gui <- function() {
             updateNumericInput(session, inputId = "upper_bound_H", value = default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][1])
             updateNumericInput(session, inputId = "upper_bound_S", value = default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
             updateNumericInput(session, inputId = "upper_bound_V", value = default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
+            ## and reset the changes for that specific spectrum in the DATA-object
+            DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][1] <- default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][1]
+            DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][2] <- default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][2]
+            DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][3] <- default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][3]
+            DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][1] <- default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][1]
+            DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][2] <- default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][2]
+            DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][3] <- default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][3]
             showNotification(
                 ui = str_c(
                     "Reset values for spectrum '",
@@ -658,9 +662,64 @@ duflor_gui <- function() {
             hide("HSV_PANEL")
         })
         observeEvent(input$close_edit_HSV_ranges_conditionalPanel, {
+            ## check if submitted values are valid (i.e. do they exceed boundaries by being inputted as numbers manually?)
+            changes <- validate_custom_HSV_values(input, DATA, getDefaultReactiveDomain())
+            DATA$spectrum_changes <- changes
+            ## assemble the vectors of updated HSV-bounds
+            adjustments_lower <- c(input$lower_bound_H,input$lower_bound_S,input$lower_bound_V)
+            adjustments_upper <- c(input$upper_bound_H,input$upper_bound_S,input$upper_bound_V)
+            if (length(changes$return_obj)==0) { # just commit the changes (no infringing values were found - all changes were within valid range-limits)
+                DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
+                DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
+                showNotification(
+                    ui = str_c(
+                        "Updated values for spectrum '",
+                        input$selected_HSV_spectrum,
+                        "'"
+                    ),
+                    type = "message"
+                )
             hide("HSV_PANEL")
-            DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]] <- c(input$lower_bound_H,input$lower_bound_S,input$lower_bound_V)
-            DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]] <- c(input$upper_bound_H,input$upper_bound_S,input$upper_bound_V)
+            } else { ## ask the user if the changes are okay?
+                ## set values which exceed their bounds to the respective bound
+                for (each in names(changes$return_obj)) {
+                    if (str_count(each,str_c("lower_bound"))) {
+                        if (str_count(each,str_c("bound_H"))) {
+                            adjustments_lower[[1]] <- changes$return_obj[[each]]
+                        }
+                        if (str_count(each,str_c("bound_S"))) {
+                            adjustments_lower[[2]] <- changes$return_obj[[each]]
+                        }
+                        if (str_count(each,str_c("bound_V"))) {
+                            adjustments_lower[[3]] <- changes$return_obj[[each]]
+                        }
+                    }
+                    if (str_count(each,str_c("upper_bound"))) {
+                        if (str_count(each,str_c("bound_H"))) {
+                            adjustments_upper[[1]] <- changes$return_obj[[each]]
+                        }
+                        if (str_count(each,str_c("bound_S"))) {
+                            adjustments_upper[[2]] <- changes$return_obj[[each]]
+                        }
+                        if (str_count(each,str_c("bound_V"))) {
+                            adjustments_upper[[3]] <- changes$return_obj[[each]]
+                        }
+                    }
+                }
+                # make a copy to use when confirming the modalDialogue
+                DATA$coerced_spectrums <- DATA$spectrums
+                DATA$coerced_spectrums <- DATA$spectrums
+                # then modify it, so that the changes may be applied.
+                DATA$coerced_spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
+                DATA$coerced_spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
+                show_infringing_spectrum_elements_gui_comp(input, DATA, changes)
+            }
+        })
+        observeEvent(input$confirm_coerced_HSV_values_modal, {
+            ## user wants to use the range-limits for the respective HSV-parameters as their respective bounds
+            DATA$spectrums$lower_bound <- DATA$coerced_spectrums$lower_bound
+            DATA$spectrums$upper_bound <- DATA$coerced_spectrums$upper_bound
+            removeModal()
             showNotification(
                 ui = str_c(
                     "Updated values for spectrum '",
@@ -669,7 +728,38 @@ duflor_gui <- function() {
                 ),
                 type = "message"
             )
-
+            hide("HSV_PANEL")
+        })
+        observeEvent(input$discard_coerced_HSV_values_modal, {
+            ## user wants to use the default values for the respective HSV-spectrum
+            default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
+            current_lower <- DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]]
+            current_upper <- DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]]
+            map <- c("H","S","V")
+            for (each in names(DATA$spectrum_changes$return_obj)) {
+                index_of_change <- which(map == sub(".*_(.)$", "\\1", each))
+                if (str_count(each,"lower_bound")>0) {
+                    DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_lower[[index_of_change]]
+                } else {
+                    DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_upper[[index_of_change]]
+                }
+            }
+            updateNumericInput(session, inputId = "lower_bound_H", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
+            updateNumericInput(session, inputId = "lower_bound_S", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
+            updateNumericInput(session, inputId = "lower_bound_V", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][3])
+            updateNumericInput(session, inputId = "upper_bound_H", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][1])
+            updateNumericInput(session, inputId = "upper_bound_S", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
+            updateNumericInput(session, inputId = "upper_bound_V", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
+            showNotification(
+                ui = str_c(
+                    "Reset values for spectrum '",
+                    input$selected_HSV_spectrum,
+                    "'"
+                ),
+                type = "message"
+            )
+            removeModal()
+            hide("HSV_PANEL")
         })
         #### RENDER PLOT ####
         observeEvent(input$render_plant, {
