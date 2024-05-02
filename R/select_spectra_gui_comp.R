@@ -6,6 +6,13 @@
 #'
 #' @return .
 #' @keywords internal
+#' @importFrom shiny showModal
+#' @importFrom shiny modalDialog
+#' @importFrom shiny h3
+#' @importFrom shiny tagList
+#' @importFrom shiny checkboxGroupInput
+#' @importFrom shiny actionButton
+#' @importFrom shiny modalButton
 #'
 select_spectra_gui_comp <- function(input) {
     all_choices <- names(getOption("duflor.default_hsv_spectrums")$upper_bound)
