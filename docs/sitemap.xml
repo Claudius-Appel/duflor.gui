@@ -73,6 +73,9 @@
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/setup_parallel.html</loc>
   </url>
   <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/show_infringing_spectrum_elements_gui_comp.html</loc>
+  </url>
+  <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/shutdown_parallel.html</loc>
   </url>
   <url>
@@ -83,5 +86,8 @@
   </url>
   <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/update_resultsObject.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/validate_custom_HSV_values.html</loc>
   </url>
 </urlset>
