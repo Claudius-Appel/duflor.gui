@@ -636,6 +636,7 @@ duflor_gui <- function() {
             updateNumericInput(session, inputId = "upper_bound_V", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
         })
         observeEvent(input$reset_HSV_ranges, {
+            ## reset selected spectrum's values to default settings in `duflor.default_hsv_spectrums`
             default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
             updateNumericInput(session, inputId = "lower_bound_H", value = default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
             updateNumericInput(session, inputId = "lower_bound_S", value = default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
@@ -643,6 +644,13 @@ duflor_gui <- function() {
             updateNumericInput(session, inputId = "upper_bound_H", value = default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][1])
             updateNumericInput(session, inputId = "upper_bound_S", value = default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
             updateNumericInput(session, inputId = "upper_bound_V", value = default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
+            ## and reset the changes for that specific spectrum in the DATA-object
+            DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][1] <- default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][1]
+            DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][2] <- default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][2]
+            DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][3] <- default_HSV_spectrums$lower_bound[[input$selected_HSV_spectrum]][3]
+            DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][1] <- default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][1]
+            DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][2] <- default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][2]
+            DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][3] <- default_HSV_spectrums$upper_bound[[input$selected_HSV_spectrum]][3]
             showNotification(
                 ui = str_c(
                     "Reset values for spectrum '",
