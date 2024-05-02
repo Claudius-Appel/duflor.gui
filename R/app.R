@@ -623,11 +623,7 @@ duflor_gui <- function() {
         })
         #### EDIT HSV RANGES ####
         observeEvent(input$open_edit_HSV_ranges_conditionalPanel, {
-            #TODO: edit HSV ranges loaded from duflor-package
             show("HSV_PANEL")
-            default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
-            # 1. create a modal for each of these spectrums
-            # 2.
         })
         observeEvent(input$selected_HSV_spectrum, {
             ## load spectrums in
