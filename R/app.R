@@ -62,6 +62,7 @@
 #' @importFrom stringr str_to_lower
 #' @importFrom stringr str_to_upper
 #' @importFrom stringr str_replace_all
+#' @importFrom stringr str_remove_all
 #' @importFrom DT renderDataTable
 #' @importFrom DT dataTableOutput
 #' @importFrom parallel detectCores
@@ -358,9 +359,11 @@ duflor_gui <- function() {
             # private, undocumentable keys must be prefixed with 3 `-`
             Arr <- str_split("--force-prints,--force-log,---set-author,-h",",")
             # then add them to the reactive 'DEBUGKEYS' so that it can be accessed elsewhere as well.
-            Keys <- str_split(input$dev_pass,",")
+            Keys <- unlist(str_split(input$dev_pass,","))
             for (each in Keys) {
-                if (each %in% Arr[[1]]) {
+                each_ <- str_remove_all(each,"=(1|0|FALSE|TRUE)")
+                each_ <- str_remove_all(each,"=(F|T)")
+                if ((each %in% Arr[[1]]) || (each_ %in% Arr[[1]])) { # BUG: this bool returns an array if `each` is a char-vector itself.
                     if (each=="-h") {
                         showNotification(
                             ui = str_c(
