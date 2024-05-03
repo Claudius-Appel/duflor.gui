@@ -61,8 +61,6 @@
 #' @importFrom stringr str_flatten_comma
 #' @importFrom stringr str_to_lower
 #' @importFrom stringr str_to_upper
-#' @importFrom stringr str_replace_all
-#' @importFrom stringr str_remove_all
 #' @importFrom DT renderDataTable
 #' @importFrom DT dataTableOutput
 #' @importFrom parallel detectCores
@@ -351,7 +349,7 @@ duflor_gui <- function() {
         hide("PARALLEL_PANEL")
         #### DEV TOGGLES ####
         observeEvent(input$dev_pass, {
-            DEBUGKEYS <- dev_key_handler(input, DATA, DEBUGKEYS)
+            DEBUGKEYS <- dev_key_handler(input, DATA, DEBUGKEYS, session, use_logical_cores)
         })
         #### SETUP PARALLELISATION ####
         observeEvent(input$open_parallelPanel, {
