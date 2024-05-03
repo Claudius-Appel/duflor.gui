@@ -351,37 +351,7 @@ duflor_gui <- function() {
         hide("PARALLEL_PANEL")
         #### DEV TOGGLES ####
         observeEvent(input$dev_pass, {
-            # add valid keys here
-            # private, undocumentable keys must be prefixed with 3 `-`
-            Arr <- str_split("--force-prints,--force-log,---set-author,-h",",")
-            # then add them to the reactive 'DEBUGKEYS' so that it can be accessed elsewhere as well.
-            Keys <- unlist(str_split(input$dev_pass,","))
-            for (each in Keys) {
-                each_ <- str_remove_all(each,"=(1|0|FALSE|TRUE)")
-                each_ <- str_remove_all(each,"=(F|T)")
-                if ((each %in% Arr[[1]]) || (each_ %in% Arr[[1]])) { # BUG: this bool returns an array if `each` is a char-vector itself.
-                    if (each=="-h") {
-                        showNotification(
-                            ui = str_c(
-                                "Available dev Keys (see documentation): ",
-                                str_flatten_comma(Arr[[1]][!str_count(Arr[[1]], "---")])
-                            ),
-                            duration = DATA$notification_duration,
-                            type = "message"
-                        )
-                    } else {
-                        key <- str_replace_all(str_replace_all(each,"---",""),"--","")
-                        key <- str_replace_all(key,"-",".")
-                        DEBUGKEYS[[key]] <- !DEBUGKEYS[[key]]
-                        showNotification(
-                            ui = str_c("DEBUG KEY ", " ", each, " set to ", DEBUGKEYS[[key]]),
-                            duration = DATA$notification_duration,
-                            type = "message"
-                        )
-                    }
-                }
-
-            }
+            DEBUGKEYS <- dev_key_handler(input, DATA, DEBUGKEYS)
         })
         #### SETUP PARALLELISATION ####
         observeEvent(input$open_parallelPanel, {
