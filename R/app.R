@@ -223,7 +223,7 @@ duflor_gui <- function() {
         DEBUGKEYS <- reactiveValues(
             force.prints = FALSE,
             force.log = FALSE,
-            set.author = FALSE
+            set.author = TRUE
 
         )
         FLAGS <- reactiveValues(
@@ -837,8 +837,6 @@ duflor_gui <- function() {
                 updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
             }
             updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
-            ## TODO: check out the evaluation-functions outlined in the `dev`-folder of `duflor`-package
-            ## andeside which ones of those I want to display in the GUI.
         })
         #### RERUN ANALYSIS TO RENDER PLOTS ####
         observeEvent(input$render_selected_mask, {
@@ -854,8 +852,17 @@ duflor_gui <- function() {
             } else {
                 # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
 
-                results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results/results_",input$date_of_image_shooting)
-                out <- store_results_to_file(results = DATA$results,results_path = results_path,save_to_xlsx = input$save_as_xlsx)
+                results_path <- str_c(
+                    dirname(DATA$results$results$full_path[[1]]),
+                    "/results/results_",
+                    input$date_of_image_shooting
+                )
+                out <- store_results_to_file(
+                    results = DATA$results,
+                    results_path = results_path,
+                    save_to_xlsx = input$save_as_xlsx,
+                    set_author_xlsx =  DEBUGKEYS$set.author
+                )
                 ## verify save was successfull
                 if (out$success) {
                     showNotification(

@@ -49,7 +49,12 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">store_results_to_file</span><span class="op">(</span><span class="va">results</span>, <span class="va">results_path</span>, save_to_xlsx <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">store_results_to_file</span><span class="op">(</span></span>
+<span>  <span class="va">results</span>,</span>
+<span>  <span class="va">results_path</span>,</span>
+<span>  save_to_xlsx <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  set_author_xlsx <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -64,6 +69,10 @@
 
 <dt>save_to_xlsx</dt>
 <dd><p>should results be written into a <code>.xlsx</code>-file? If false, it will be written into a <code>.csv</code>-file instead.</p></dd>
+
+
+<dt>set_author_xlsx</dt>
+<dd><p>when writing to an xlsx-file, should the author be set to <code>generated with 'duflor' via 'duflor.gui', on user_machine XX</code>?</p></dd>
 
 </dl></div>
     <div class="section level2">
