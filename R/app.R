@@ -229,10 +229,6 @@ duflor_gui <- function() {
         FLAGS <- reactiveValues(
             analyse_single_image = FALSE
         )
-        ranges <- reactiveValues(
-            x = NULL,
-            y = NULL
-        )
         # to make values only trigger reactives after x seconds of non-interaction, first assign them reactive.
         # next, assign a debounce-expression with a set timout after which the value is hnaded onwards to the reactive-pipeline
         # finally, refer to the debounce-expression via `expression()` instead of the input-value `input$value` in callbacks.
