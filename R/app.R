@@ -311,6 +311,14 @@ duflor_gui <- function() {
         observeEvent(input$image_file_suffix, {
             image_files_()
         })
+        observeEvent(input$folder, {
+            req(input$folder[[1]],input$image_file_suffix)
+            shinyDirChoose(input = input, 'folder', roots=volumes)
+            folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+            req(dir.exists(folder_path))
+            DATA$folder_path <- folder_path
+            image_files_()
+        })
         #### REACTIVE - RESULTS_TABLE/BARPLOT, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
             req(input$reinspected_spectrums)
