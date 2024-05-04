@@ -23,6 +23,8 @@
 #' @importFrom shiny updateNumericInput
 #' @importFrom shiny updateActionButton
 #' @importFrom shiny updateSelectInput
+#' @importFrom shiny onBookmark
+#' @importFrom shiny fileInput
 #' @importFrom shiny getDefaultReactiveDomain
 #' @importFrom shiny textInput
 #' @importFrom shiny checkboxInput
@@ -48,6 +50,7 @@
 #' @importFrom shiny isolate
 #' @importFrom shiny conditionalPanel
 #' @importFrom shiny a
+#' @importFrom shiny setBookmarkExclude
 #' @importFrom shinyFiles shinyDirButton
 #' @importFrom shinyFiles shinyDirChoose
 #' @importFrom shinyFiles parseDirPath
@@ -164,6 +167,10 @@ duflor_gui <- function() {
                 ## BUTTONS_2
                 actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
                 actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
+                        ## BOOKMARKING
+                        h5("BOOKMARKING"),
+                        fileInput(inputId = "restore_state",label = "Load State", multiple = F, accept = c(".rds",".RDS")),
+                        shinyDirButton(id = "save_state", label = "Select Save-directory",title = "Save Directory",FALSE)
             ),
 
             # Main panel for displaying outputs
@@ -913,6 +920,45 @@ duflor_gui <- function() {
             type = "message",
             duration = 1.3
         )
+        #### MANUAL BOOKMARKING ####
+        # the input-folder is relative to the system, and thush shouldn't be
+        # bookmarked.
+        setBookmarkExclude(
+            c(
+                "folder",
+                "folder_modal",
+                "folder-modal",
+                "restore_folder",
+                "restore_folder-modal",
+                "restore_folder_modal"
+            )
+        )
+        onBookmark(function(state) {
+
+        })
+        # Load button action
+        observeEvent(input$restore_state, {
+            state_file <- input$restore_state$datapath
+            loaded_path <- restore_state(input, output, DATA, FLAGS, DEBUGKEYS, getDefaultReactiveDomain(), getVolumes(), state_file)
+            DATA$folder_path <- loaded_path
+            print(DATA$folder_path)
+            image_files_()
+        })
+
+        # Save directory selection
+        observeEvent(input$save_state, {
+            shinyDirChoose(input, "save_state", roots=volumes,
+                           filetypes = c('', 'rds', 'RDS'))
+            savedir_path <- parseDirPath(roots = volumes,input$save_state)
+            req(dir.exists(savedir_path))
+            save_state(
+                input = input,
+                DATA = DATA,
+                DEBUGKEYS = DEBUGKEYS,
+                FLAGS = FLAGS,
+                volumes = getVolumes()
+            )
+        })
     }
     #### LAUNCH APP ####
     shinyApp(ui = ui, server = server, enableBookmarking = "server")
