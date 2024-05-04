@@ -308,6 +308,9 @@ duflor_gui <- function() {
                 autoWidth = TRUE
             )
         )
+        observeEvent(input$image_file_suffix, {
+            image_files_()
+        })
         #### REACTIVE - RESULTS_TABLE/BARPLOT, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
             req(input$reinspected_spectrums)
