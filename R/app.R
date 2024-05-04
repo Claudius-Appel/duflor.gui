@@ -201,6 +201,7 @@ duflor_gui <- function() {
     #### SERVER ####
     server <- function(input, output,session) {
         #### STARTUP MESSAGE ####
+        options(shiny.maxRequestSize=30*1024^2) # 30 MB of upload request size
         showNotification(
             ui = "App startup",
             id = "startup.notice",
