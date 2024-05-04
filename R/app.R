@@ -218,7 +218,8 @@ duflor_gui <- function() {
             notification_duration = 1.300,
             results = NA,
             last_masked_image = NA,
-            last_im = NA
+            last_im = NA,
+            folder_path = NA
         )
         DEBUGKEYS <- reactiveValues(
             force.prints = FALSE,
@@ -229,15 +230,22 @@ duflor_gui <- function() {
         FLAGS <- reactiveValues(
             analyse_single_image = FALSE
         )
+        image_files <- reactiveValues(image_files = data.frame(
+            images_filtered = character(),
+            index = numeric(),
+            stringsAsFactors = FALSE
+        ))
         # to make values only trigger reactives after x seconds of non-interaction, first assign them reactive.
         # next, assign a debounce-expression with a set timout after which the value is hnaded onwards to the reactive-pipeline
         # finally, refer to the debounce-expression via `expression()` instead of the input-value `input$value` in callbacks.
         volumes <- getVolumes()()
         #### DISPLAYING AND RENDERING FILES AND STUFF ####
-        image_files <- reactive({ # image_files is a list of filepaths, which gets set reactively.
-            req(input$folder[[1]],input$image_file_suffix)
-            shinyDirChoose(input = input, 'folder', roots=volumes)
-            folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+        image_files_ <- reactive({ # image_files is a list of filepaths, which gets set reactively.
+            # shinyDirChoose(input = input, 'folder', roots=volumes)
+            req(isFALSE(is.na(DATA$folder_path)))
+            folder_path <- DATA$folder_path # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+            req(dir.exists(folder_path))
+            req(input$image_file_suffix)
             # all buttons listed here must be disabled by default
             # they will be enabled if the `list.files()` returns a non-empty vector of files.
             buttons_to_toggle <- c(
@@ -262,7 +270,7 @@ duflor_gui <- function() {
                     for (each in buttons_to_toggle) {
                         updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = FALSE)
                     }
-                    return(ret)
+                    image_files$image_files <- ret
                 } else {
                     showNotification(
                         ui = str_c(
@@ -277,10 +285,9 @@ duflor_gui <- function() {
                     ret <- data.frame(images_filtered = character(),
                                                   index = numeric(),
                                                   stringsAsFactors = FALSE)
-                    return(ret)
+                    image_files$image_files <- ret
                 }
             }
-            return(df()) # return empty df in case no folder was selected (yet)
         })
         output$ctrl_current_folder <- renderText({
             file_selected <- parseDirPath(roots = volumes, input$folder)
@@ -292,7 +299,7 @@ duflor_gui <- function() {
         # selecting entries in the table should render the respective KPI for these
         # images only.
         output$tbl_dir_files <- renderDataTable({
-            image_files()},
+            image_files$image_files},
             server = TRUE,
             selection = "single",
             options = list(
