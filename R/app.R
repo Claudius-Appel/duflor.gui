@@ -228,7 +228,8 @@ duflor_gui <- function() {
 
         )
         FLAGS <- reactiveValues(
-            analyse_single_image = FALSE
+            analyse_single_image = FALSE,
+            restoring_state = FALSE
         )
         image_files <- reactiveValues(image_files = data.frame(
             images_filtered = character(),
@@ -373,7 +374,8 @@ duflor_gui <- function() {
         })
         #### SETUP PARALLELISATION ####
         observeEvent(input$open_parallelPanel, {
-            open_parallelPanel_event(input, DATA, use_logical_cores, session, STARTUP)
+            open_parallelPanel_event(input, DATA, FLAGS, use_logical_cores, session, STARTUP)
+            FLAGS$restoring_state <- FALSE
         })
         #### EDIT CROPPING ####
         observeEvent(input$do_crop_image, {
