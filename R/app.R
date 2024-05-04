@@ -81,7 +81,8 @@
 duflor_gui <- function() {
     use_logical_cores <- F
     ##### UI ####
-        ui <- fluidPage(
+        ui <- function(request) {
+            fluidPage(
         # App title
         titlePanel(str_c("duflor frontend v.",packageDescription("duflor.gui")$Version),windowTitle = str_c("duflor_gui v.",packageDescription("duflor.gui")$Version)),
         useShinyjs(),
@@ -196,6 +197,7 @@ duflor_gui <- function() {
             ),
         )
     )
+        }
     #### SERVER ####
     server <- function(input, output,session) {
         #### STARTUP MESSAGE ####
