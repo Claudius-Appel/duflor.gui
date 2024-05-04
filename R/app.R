@@ -775,11 +775,13 @@ duflor_gui <- function() {
                 duration = DATA$notification_duration,
                 type = "message"
             )
-
-            im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+            if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=selectedrow$images_filtered)) {
+                im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+            } else {
+                im <- DATA$last_im
+            }
             dims <- dim(im)
-            if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add previously selected rect to new image
-
+            if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add selected cropping_rect to image
                 im <- draw_rect(
                     im,
                     x0 = input$x0,
@@ -791,8 +793,7 @@ duflor_gui <- function() {
                     filled = T
                 )
             }
-            if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add previously selected rect to new image
-
+            if ((input$identifiersearch_x0!=0) && (input$identifiersearch_x1!=0)  && (input$identifiersearch_y0!=0)  && (input$identifiersearch_y1!=0))  { # add selected identcroping_rect to image
                 im <- draw_rect(
                     im,
                     x0 = input$identifiersearch_x0,
