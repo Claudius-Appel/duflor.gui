@@ -893,5 +893,6 @@ duflor_gui <- function() {
             duration = 1.3
         )
     }
-    shinyApp(ui = ui, server = server)
+    #### LAUNCH APP ####
+    shinyApp(ui = ui, server = server, enableBookmarking = "server")
 }
