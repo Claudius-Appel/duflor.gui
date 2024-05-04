@@ -832,8 +832,9 @@ duflor_gui <- function() {
             #TODO: add modal "analysis is ongoing, please wait"
             removeNotification(id = "analysis.completed")
             showNotification(
-                ui = "Analysis ongoing since ", Sys.time(), ".",
+                ui = str_c("Analysis ongoing since ", Sys.time(), "."),
                 id = "analysis.ongoing",
+                closeButton = F,
                 duration = NULL,
                 type = "warning"
             )
