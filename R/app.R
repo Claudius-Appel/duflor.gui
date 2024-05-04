@@ -197,10 +197,7 @@ duflor_gui <- function() {
                            ,plotOutput("results_visualisation_plot")
                            ,actionButton(inputId = "save_visualisation_plot", label = "Save plot", disabled = TRUE)
                            ,)
-                  #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
-                  #tabPanel("Analytics (misc3)",verbatimTextOutput("TAB5"))
                 )
-
             ),
         )
     )
