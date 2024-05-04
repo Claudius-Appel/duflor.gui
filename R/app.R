@@ -84,124 +84,127 @@
 duflor_gui <- function() {
     use_logical_cores <- F
     ##### UI ####
-        ui <- function(request) {
-            fluidPage(
-        # App title
-        titlePanel(str_c("duflor frontend v.",packageDescription("duflor.gui")$Version),windowTitle = str_c("duflor_gui v.",packageDescription("duflor.gui")$Version)),
-        useShinyjs(),
-        # Sidebar layout with input and output definitions
-        sidebarLayout(
+    ui <- function(request) {
+        fluidPage(
+            # App title
+            titlePanel(str_c("duflor frontend v.",packageDescription("duflor.gui")$Version),windowTitle = str_c("duflor_gui v.",packageDescription("duflor.gui")$Version)),
+            useShinyjs(),
+            # Sidebar layout with input and output definitions
+            sidebarLayout(
+                # Sidebar panel for inputs
+                sidebarPanel(
+                    ## FILES
+                    h4("Select folder containing images"),
+                    shinyDirButton(id = 'folder', label = 'Select a folder',title = 'Please select a folder',buttonType = FALSE),
+                    selectInput(inputId = "image_file_suffix",label = "Select imagetype to process",choices = c("JPG","PNG")),
+                    "Current Folder:",
+                    textOutput(outputId = "ctrl_current_folder"),
+                    ## ANALYSIS_TYPE
+                    radioButtons(inputId = "radio_analysis_type",
+                               h4("Type of Analysis"),
+                               choices = list("GFA" = 1,
+                                              "WFA" = 2),
+                               selected = 1),
+                    ## BUTTONS_1
+                    actionButton(inputId = "open_edit_HSV_ranges_conditionalPanel",label = "Edit HSV Ranges"),
+                    ## CONFIGURE_HSV_BOUNDS
+                    conditionalPanel(
+                        condition = "input.open_edit_HSV_ranges_conditionalPanel %% 2 == 1", # Condition to open the panel
+                        id = "HSV_PANEL",
+                        selectInput("selected_HSV_spectrum", "Select spectrum to edit.", choices = names(getOption("duflor.default_hsv_spectrums")$lower_bound)),
+                        numericInput(inputId = "lower_bound_H",label = "Lower Bound (H_0)", value = 0, min = 0, max = 359, step = 0.01),
+                        numericInput(inputId = "lower_bound_S",label = "Lower Bound (S_0)", value = 0, min = 0, max = 1, step = 0.01),
+                        numericInput(inputId = "lower_bound_V",label = "Lower Bound (V_0)", value = 0, min = 0, max = 1, step = 0.0001),
+                        numericInput(inputId = "upper_bound_H",label = "Upper Bound (H_1)", value = 0, min = 0, max = 359, step = 0.01),
+                        numericInput(inputId = "upper_bound_S",label = "Upper Bound (S_1)", value = 0, min = 0, max = 1, step = 0.01),
+                        numericInput(inputId = "upper_bound_V",label = "Upper Bound (V_1)", value = 0, min = 0, max = 1, step = 0.0001),
+                        actionButton(inputId = "reset_HSV_ranges", label = "Reset"),
+                        actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed spectra"),
+                        useShinyjs() # Enable shinyjs inside the conditional panel
+                    ),
+                    ## CROPPING TO_BE_ANALYSED MATRIX
+                    h4("Crop Image"),
+                    checkboxInput(inputId = "do_crop_image",label = "Do you want to analyse only a cropped section?"),
+                    conditionalPanel(
+                        condition = "input.do_crop_image %% 2 == 1",
+                        id = "CROPPING_PANEL",
+                        actionButton(inputId = "select_crops",label = "Select area to analyse"),
+                        actionButton(inputId = "reset_crops", label = "Reset"),
+                        numericInput(inputId = "x0",label = "x0",value = 0,min = 0),
+                        numericInput(inputId = "x1",label = "x1",value = 0,min = 0),
+                        numericInput(inputId = "y0",label = "y0",value = 0,min = 0),
+                        numericInput(inputId = "y1",label = "y1",value = 0,min = 0),
+                    ),
+                    ## LIMIT SEARCH-RANGE FOR IDENTIFIER_DOT
+                    h4("Limit area searched for identifier-dot"),
+                    checkboxInput(inputId = "do_crop_identifier_range",label = "Do you want to limit the area in which to search for the identifier-dot?"),
+                    conditionalPanel(
+                        condition = "input.do_crop_identifier_range %% 2 == 1",
+                        id = "IDENTIFIERCROPPING_PANEL",
+                        actionButton(inputId = "select_identifiercrops",label = "Select area to analyse"),
+                        actionButton(inputId = "reset_identifiercrops", label = "Reset"),
+                        numericInput(inputId = "identifiersearch_x0",label = "x0",value = 0,min = 0),
+                        numericInput(inputId = "identifiersearch_x1",label = "x1",value = 0,min = 0),
+                        numericInput(inputId = "identifiersearch_y0",label = "y0",value = 0,min = 0),
+                        numericInput(inputId = "identifiersearch_y1",label = "y1",value = 0,min = 0),
+                    ),
 
-            # Sidebar panel for inputs
-            sidebarPanel(
-                ## FILES
-                h4("Select folder containing images"),
-                shinyDirButton(id = 'folder', label = 'Select a folder',title = 'Please select a folder',buttonType = FALSE),
-                selectInput(inputId = "image_file_suffix",label = "Select imagetype to process",choices = c("JPG","PNG")),
-                "Current Folder:",
-                textOutput(outputId = "ctrl_current_folder"),
-                ## ANALYSIS_TYPE
-                radioButtons(inputId = "radio_analysis_type",
-                           h4("Type of Analysis"),
-                           choices = list("GFA" = 1,
-                                          "WFA" = 2),
-                           selected = 1),
-                ## BUTTONS_1
-                actionButton(inputId = "open_edit_HSV_ranges_conditionalPanel",label = "Edit HSV Ranges"),
-                ## CONFIGURE_HSV_BOUNDS
-                conditionalPanel(
-                    condition = "input.open_edit_HSV_ranges_conditionalPanel %% 2 == 1", # Condition to open the panel
-                    id = "HSV_PANEL",
-                    selectInput("selected_HSV_spectrum", "Select spectrum to edit.", choices = names(getOption("duflor.default_hsv_spectrums")$lower_bound)),
-                    numericInput(inputId = "lower_bound_H",label = "Lower Bound (H_0)", value = 0, min = 0, max = 359, step = 0.01),
-                    numericInput(inputId = "lower_bound_S",label = "Lower Bound (S_0)", value = 0, min = 0, max = 1, step = 0.01),
-                    numericInput(inputId = "lower_bound_V",label = "Lower Bound (V_0)", value = 0, min = 0, max = 1, step = 0.0001),
-                    numericInput(inputId = "upper_bound_H",label = "Upper Bound (H_1)", value = 0, min = 0, max = 359, step = 0.01),
-                    numericInput(inputId = "upper_bound_S",label = "Upper Bound (S_1)", value = 0, min = 0, max = 1, step = 0.01),
-                    numericInput(inputId = "upper_bound_V",label = "Upper Bound (V_1)", value = 0, min = 0, max = 1, step = 0.0001),
-                    actionButton(inputId = "reset_HSV_ranges", label = "Reset"),
-                    actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed spectra"),
-                    useShinyjs() # Enable shinyjs inside the conditional panel
-                ),
-                ## CROPPING TO_BE_ANALYSED MATRIX
-                h4("Crop Image"),
-                checkboxInput(inputId = "do_crop_image",label = "Do you want to analyse only a cropped section?"),
-                conditionalPanel(
-                    condition = "input.do_crop_image %% 2 == 1",
-                    id = "CROPPING_PANEL",
-                    actionButton(inputId = "select_crops",label = "Select area to analyse"),
-                    actionButton(inputId = "reset_crops", label = "Reset"),
-                    numericInput(inputId = "x0",label = "x0",value = 0,min = 0),
-                    numericInput(inputId = "x1",label = "x1",value = 0,min = 0),
-                    numericInput(inputId = "y0",label = "y0",value = 0,min = 0),
-                    numericInput(inputId = "y1",label = "y1",value = 0,min = 0),
-                ),
-                ## LIMIT SEARCH-RANGE FOR IDENTIFIER_DOT
-                h4("Limit area searched for identifier-dot"),
-                checkboxInput(inputId = "do_crop_identifier_range",label = "Do you want to limit the area in which to search for the identifier-dot?"),
-                conditionalPanel(
-                    condition = "input.do_crop_identifier_range %% 2 == 1",
-                    id = "IDENTIFIERCROPPING_PANEL",
-                    actionButton(inputId = "select_identifiercrops",label = "Select area to analyse"),
-                    actionButton(inputId = "reset_identifiercrops", label = "Reset"),
-                    numericInput(inputId = "identifiersearch_x0",label = "x0",value = 0,min = 0),
-                    numericInput(inputId = "identifiersearch_x1",label = "x1",value = 0,min = 0),
-                    numericInput(inputId = "identifiersearch_y0",label = "y0",value = 0,min = 0),
-                    numericInput(inputId = "identifiersearch_y1",label = "y1",value = 0,min = 0),
-                ),
 
-
-                ## PARALLELISATION
-                h4("Parallel Processing"),
-                checkboxInput(inputId = "open_parallelPanel",label = "Run analysis in parallel?"),
-                conditionalPanel(
-                    condition = "input.open_parallelPanel %% 2 == 1",
-                    id = "PARALLEL_PANEL",
-                    numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores(logical = use_logical_cores) - 1)),
+                    ## PARALLELISATION
+                    h4("Parallel Processing"),
+                    checkboxInput(inputId = "open_parallelPanel",label = "Run analysis in parallel?"),
+                    conditionalPanel(
+                        condition = "input.open_parallelPanel %% 2 == 1",
+                        id = "PARALLEL_PANEL",
+                        numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores(logical = use_logical_cores) - 1)),
+                    ),
+                    ## MISCELLANEOUS STUFF
+                    h5("Misc"),
+                    textInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
+                    dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
+                    numericInput(inputId = "identifier_area", label = "insert area of identifier-dot in cm^2", value = 0.503,min = 0,step = 0.00001),
+                    ## BUTTONS_2
+                    actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
+                    actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
+                    ## BOOKMARKING
+                    h5("BOOKMARKING"),
+                    fileInput(inputId = "restore_state",label = "Load State", multiple = F, accept = c(".rds",".RDS")),
+                    shinyDirButton(id = "save_state", label = "Select Save-directory",title = "Save Directory",FALSE)
                 ),
-                ## MISCELLANEOUS STUFF
-                h5("Misc"),
-                textInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
-                dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
-                numericInput(inputId = "identifier_area", label = "insert area of identifier-dot in cm^2", value = 0.503,min = 0,step = 0.00001),
-                ## BUTTONS_2
-                actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
-                actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
-                        ## BOOKMARKING
-                        h5("BOOKMARKING"),
-                        fileInput(inputId = "restore_state",label = "Load State", multiple = F, accept = c(".rds",".RDS")),
-                        shinyDirButton(id = "save_state", label = "Select Save-directory",title = "Save Directory",FALSE)
-            ),
-
-            # Main panel for displaying outputs
-            mainPanel(
-                tabsetPanel(id = "tabset_panel",
-                  tabPanel("Image Files"
-                           ,dataTableOutput("tbl_dir_files")
-                           ,actionButton(inputId = "render_plant",label = "Render Plant",disabled = TRUE)
-                           ),
-                  tabPanel("Results - complete"
+                # Main panel for displaying outputs
+                mainPanel(
+                    tabsetPanel(
+                        id = "tabset_panel",
+                        tabPanel(
+                            "Image Files"
+                            ,dataTableOutput("tbl_dir_files")
+                            ,actionButton(inputId = "render_plant",label = "Render Plant",disabled = TRUE)
+                        ),
+                        tabPanel(
+                            "Results - complete"
                            ,dataTableOutput("tbl_results")
                            ,checkboxInput(inputId = "save_as_xlsx",label = "Save results as xlsx?",value = FALSE)
                            ,actionButton(inputId = "save_results","Save results",disabled = TRUE)
-                           ),
-                  tabPanel("Results - inspect"
+                        ),
+                      tabPanel(
+                          "Results - inspect"
                            ,selectInput(inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = c())
                            ,dataTableOutput("tbl_results_filtered")
                            ,checkboxInput(inputId = "mask_extreme", label = "Do a high-contrast mask?", value = FALSE)
                            ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE)
-                           ),
-                  tabPanel("Results - plots"
+                        ),
+                      tabPanel(
+                          "Results - plots"
                            ,selectInput(inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = c())
                            ,selectInput(inputId = "reinspected_type2",label = "Select KPI to inspect",choices = c("_fraction","_count","_area","area_per_pixel"))
                            ,plotOutput("results_visualisation_plot")
                            ,actionButton(inputId = "save_visualisation_plot", label = "Save plot", disabled = TRUE)
-                           ,)
+                        ),
+                    )
                 )
-            ),
+            )
         )
-    )
-        }
+    }
     #### SERVER ####
     server <- function(input, output,session) {
         #### STARTUP MESSAGE ####
