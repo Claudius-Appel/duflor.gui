@@ -4,7 +4,12 @@
 \alias{store_results_to_file}
 \title{write results of the analysis to file}
 \usage{
-store_results_to_file(results, results_path, save_to_xlsx = FALSE)
+store_results_to_file(
+  results,
+  results_path,
+  save_to_xlsx = FALSE,
+  set_author_xlsx = FALSE
+)
 }
 \arguments{
 \item{results}{object to write.}
@@ -12,6 +17,8 @@ store_results_to_file(results, results_path, save_to_xlsx = FALSE)
 \item{results_path}{path to write file to, sans the filesuffix.}
 
 \item{save_to_xlsx}{should results be written into a \code{.xlsx}-file? If false, it will be written into a \code{.csv}-file instead.}
+
+\item{set_author_xlsx}{when writing to an xlsx-file, should the author be set to \verb{generated with 'duflor' via 'duflor.gui', on user_machine XX}?}
 }
 \value{
 list containing

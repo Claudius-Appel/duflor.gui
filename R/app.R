@@ -61,8 +61,6 @@
 #' @importFrom stringr str_flatten_comma
 #' @importFrom stringr str_to_lower
 #' @importFrom stringr str_to_upper
-#' @importFrom stringr str_replace_all
-#' @importFrom stringr str_remove_all
 #' @importFrom DT renderDataTable
 #' @importFrom DT dataTableOutput
 #' @importFrom parallel detectCores
@@ -83,7 +81,8 @@
 duflor_gui <- function() {
     use_logical_cores <- F
     ##### UI ####
-        ui <- fluidPage(
+        ui <- function(request) {
+            fluidPage(
         # App title
         titlePanel(str_c("duflor frontend v.",packageDescription("duflor.gui")$Version),windowTitle = str_c("duflor_gui v.",packageDescription("duflor.gui")$Version)),
         useShinyjs(),
@@ -198,6 +197,7 @@ duflor_gui <- function() {
             ),
         )
     )
+        }
     #### SERVER ####
     server <- function(input, output,session) {
         #### STARTUP MESSAGE ####
@@ -223,15 +223,11 @@ duflor_gui <- function() {
         DEBUGKEYS <- reactiveValues(
             force.prints = FALSE,
             force.log = FALSE,
-            set.author = FALSE
+            set.author = TRUE
 
         )
         FLAGS <- reactiveValues(
             analyse_single_image = FALSE
-        )
-        ranges <- reactiveValues(
-            x = NULL,
-            y = NULL
         )
         # to make values only trigger reactives after x seconds of non-interaction, first assign them reactive.
         # next, assign a debounce-expression with a set timout after which the value is hnaded onwards to the reactive-pipeline
@@ -355,77 +351,11 @@ duflor_gui <- function() {
         hide("PARALLEL_PANEL")
         #### DEV TOGGLES ####
         observeEvent(input$dev_pass, {
-            # add valid keys here
-            # private, undocumentable keys must be prefixed with 3 `-`
-            Arr <- str_split("--force-prints,--force-log,---set-author,-h",",")
-            # then add them to the reactive 'DEBUGKEYS' so that it can be accessed elsewhere as well.
-            Keys <- unlist(str_split(input$dev_pass,","))
-            for (each in Keys) {
-                each_ <- str_remove_all(each,"=(1|0|FALSE|TRUE)")
-                each_ <- str_remove_all(each,"=(F|T)")
-                if ((each %in% Arr[[1]]) || (each_ %in% Arr[[1]])) { # BUG: this bool returns an array if `each` is a char-vector itself.
-                    if (each=="-h") {
-                        showNotification(
-                            ui = str_c(
-                                "Available dev Keys (see documentation): ",
-                                str_flatten_comma(Arr[[1]][!str_count(Arr[[1]], "---")])
-                            ),
-                            duration = DATA$notification_duration,
-                            type = "message"
-                        )
-                    } else {
-                        key <- str_replace_all(str_replace_all(each,"---",""),"--","")
-                        key <- str_replace_all(key,"-",".")
-                        DEBUGKEYS[[key]] <- !DEBUGKEYS[[key]]
-                        showNotification(
-                            ui = str_c("DEBUG KEY ", " ", each, " set to ", DEBUGKEYS[[key]]),
-                            duration = DATA$notification_duration,
-                            type = "message"
-                        )
-                    }
-                }
-
-            }
+            DEBUGKEYS <- dev_key_handler(input, DATA, DEBUGKEYS, session, use_logical_cores)
         })
         #### SETUP PARALLELISATION ####
         observeEvent(input$open_parallelPanel, {
-            # controls whether or not the number of cores can be selected.
-            # Unchecking this will set the number of used cores to `1`
-            if (input$open_parallelPanel) {
-                show("PARALLEL_PANEL")
-                showNotification(
-                    ui = str_c(
-                        "Enabled parallelisation, please select the number of used cores.",
-                        "\nThe system has ",
-                        detectCores(all.tests = T, logical = use_logical_cores),
-                        " available cores, of which up to ",
-                        detectCores(all.tests = T, logical = use_logical_cores) - 1,
-                        " cores may be used by this program."
-                    ),
-                    duration = DATA$notification_duration * 5,
-                    type = "warning"
-                )
-                updateNumericInput(session,inputId = "parallel_cores",value = 2)
-            } else {
-                hide("PARALLEL_PANEL")
-                updateNumericInput(session,inputId = "parallel_cores",value = 1)
-                # I am terribly sorry for you, that you are reading this.
-                # It's a horrible solution that _WILL_ bite me/you in the ass
-                # if this app is extended at some point. Sadly, this conditional
-                # was the only way I could figure out how do resolve this
-                # properly.
-                # For the full details, checkout the Event-callback for
-                # `input%do_crop_image`, which must remain the last
-                # event-callback to contain a message which should not show on
-                # startup.
-                if (isFALSE(STARTUP$startup)) {
-                    showNotification(
-                        ui = str_c("Disabled parallelisation, program will utilise 1 core."),
-                        duration = DATA$notification_duration,
-                        type = "warning"
-                    )
-                }
-            }
+            open_parallelPanel_event(input, DATA, use_logical_cores, session, STARTUP)
         })
         #### EDIT CROPPING ####
         observeEvent(input$do_crop_image, {
@@ -908,8 +838,6 @@ duflor_gui <- function() {
                 updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
             }
             updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
-            ## TODO: check out the evaluation-functions outlined in the `dev`-folder of `duflor`-package
-            ## andeside which ones of those I want to display in the GUI.
         })
         #### RERUN ANALYSIS TO RENDER PLOTS ####
         observeEvent(input$render_selected_mask, {
@@ -925,8 +853,17 @@ duflor_gui <- function() {
             } else {
                 # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
 
-                results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results/results_",input$date_of_image_shooting)
-                out <- store_results_to_file(results = DATA$results,results_path = results_path,save_to_xlsx = input$save_as_xlsx)
+                results_path <- str_c(
+                    dirname(DATA$results$results$full_path[[1]]),
+                    "/results/results_",
+                    input$date_of_image_shooting
+                )
+                out <- store_results_to_file(
+                    results = DATA$results,
+                    results_path = results_path,
+                    save_to_xlsx = input$save_as_xlsx,
+                    set_author_xlsx =  DEBUGKEYS$set.author
+                )
                 ## verify save was successfull
                 if (out$success) {
                     showNotification(

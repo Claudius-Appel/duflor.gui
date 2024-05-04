@@ -3,6 +3,7 @@
 #' @param results object to write.
 #' @param results_path path to write file to, sans the filesuffix.
 #' @param save_to_xlsx should results be written into a `.xlsx`-file? If false, it will be written into a `.csv`-file instead.
+#' @param set_author_xlsx when writing to an xlsx-file, should the author be set to `generated with 'duflor' via 'duflor.gui', on user_machine XX`?
 #'
 #' @note
 #' `XLSX`-files are the suggested output if any additional postprocessing is required.
@@ -19,7 +20,7 @@
 #' @importFrom stringr str_c
 #' @keywords internal
 #'
-store_results_to_file <- function(results, results_path, save_to_xlsx=FALSE) {
+store_results_to_file <- function(results, results_path, save_to_xlsx=FALSE, set_author_xlsx=FALSE) {
     ## 1. find free csv-name next to image-source-files
     ## 2. save df as csv if `save_to_xlsx==F`, else save to xlsx
     if (str_count(results_path, "\\.(xlsx|csv)")) {
@@ -38,7 +39,15 @@ store_results_to_file <- function(results, results_path, save_to_xlsx=FALSE) {
             results,
             asTable = T,
             file = results_path,
-            creator = str_c("generated with 'duflor' via 'duflor.gui', on user_machine ", Sys.getenv("USERNAME"))
+            creator = ifelse(
+                set_author_xlsx,
+                str_c(
+                    "generated with 'duflor' via 'duflor.gui', on user_machine ",
+                    Sys.getenv("USERNAME")
+                )
+                ,
+                ""
+            )
         ) ## sign the file with being created by this username on this machine.
     } else {
         results_path <- str_c(results_path,".csv")

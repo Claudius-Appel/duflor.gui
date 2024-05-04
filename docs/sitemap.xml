@@ -34,6 +34,9 @@
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/convert_pixels_to_area_gui.html</loc>
   </url>
   <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/dev_key_handler.html</loc>
+  </url>
+  <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/duflor_gui.html</loc>
   </url>
   <url>
@@ -58,7 +61,13 @@
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/key_handle_cores.html</loc>
+  </url>
+  <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/limit_identifier_coordinates.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/open_parallelPanel_event.html</loc>
   </url>
   <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/reference/prepare_resultsObject.html</loc>
