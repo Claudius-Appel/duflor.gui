@@ -51,9 +51,11 @@
 #' @importFrom shiny conditionalPanel
 #' @importFrom shiny a
 #' @importFrom shiny onBookmark
-#' @importFrom shinyFiles shinyDirButton
+#' @importFrom shinyFiles shinyFileSave
+#' @importFrom shinyFiles shinySaveButton
 #' @importFrom shinyFiles shinyDirChoose
 #' @importFrom shinyFiles parseDirPath
+#' @importFrom shinyFiles parseSavePath
 #' @importFrom shinyFiles getVolumes
 #' @importFrom shinyjs useShinyjs
 #' @importFrom shinyjs hide
@@ -169,7 +171,7 @@ duflor_gui <- function() {
                     ## BOOKMARKING
                     h5("BOOKMARKING"),
                     fileInput(inputId = "restore_state",label = "Load State", multiple = F, accept = c(".rds",".RDS")),
-                    shinyDirButton(id = "save_state", label = "Select Save-directory",title = "Save Directory",FALSE)
+                    shinySaveButton(id = "save_state", label = "Save State",title = "Select filename",filetype = list(state = c(".rds",".RDS")))
                 ),
                 # Main panel for displaying outputs
                 mainPanel(
@@ -250,7 +252,6 @@ duflor_gui <- function() {
         volumes <- getVolumes()()
         #### DISPLAYING AND RENDERING FILES AND STUFF ####
         image_files_ <- reactive({ # image_files is a list of filepaths, which gets set reactively.
-            # shinyDirChoose(input = input, 'folder', roots=volumes)
             req(isFALSE(is.na(DATA$folder_path)))
             folder_path <- DATA$folder_path # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
             req(dir.exists(folder_path))
@@ -948,10 +949,11 @@ duflor_gui <- function() {
 
         # Save directory selection
         observeEvent(input$save_state, {
-            shinyDirChoose(input, "save_state", roots=volumes,
-                           filetypes = c('', 'rds', 'RDS'))
-            savedir_path <- parseDirPath(roots = volumes,input$save_state)
+            shinyFileSave(input, "save_state",roots = volumes,
+                                 session = getDefaultReactiveDomain(),allowDirCreate = T)
+            savedir_path <- parseDirPath(roots = volumes,selection = input$save_state)
             req(dir.exists(savedir_path))
+            req(isFALSE(is.numeric(input$save_state[[1]])))
             save_state(
                 input = input,
                 DATA = DATA,
