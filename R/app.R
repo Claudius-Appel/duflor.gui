@@ -55,7 +55,6 @@
 #' @importFrom shinyFiles shinySaveButton
 #' @importFrom shinyFiles shinyDirChoose
 #' @importFrom shinyFiles parseDirPath
-#' @importFrom shinyFiles parseSavePath
 #' @importFrom shinyFiles getVolumes
 #' @importFrom shinyjs useShinyjs
 #' @importFrom shinyjs hide
@@ -949,11 +948,6 @@ duflor_gui <- function() {
 
         # Save directory selection
         observeEvent(input$save_state, {
-            shinyFileSave(input, "save_state",roots = volumes,
-                                 session = getDefaultReactiveDomain(),allowDirCreate = T)
-            savedir_path <- parseDirPath(roots = volumes,selection = input$save_state)
-            req(dir.exists(savedir_path))
-            req(isFALSE(is.numeric(input$save_state[[1]])))
             save_state(
                 input = input,
                 DATA = DATA,
