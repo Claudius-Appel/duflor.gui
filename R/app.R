@@ -20,6 +20,8 @@
 #' @importFrom shiny showModal
 #' @importFrom shiny removeModal
 #' @importFrom shiny numericInput
+#' @importFrom shiny fileInput
+#' @importFrom shiny setBookmarkExclude
 #' @importFrom shiny updateNumericInput
 #' @importFrom shiny updateActionButton
 #' @importFrom shiny updateSelectInput
@@ -48,7 +50,9 @@
 #' @importFrom shiny isolate
 #' @importFrom shiny conditionalPanel
 #' @importFrom shiny a
-#' @importFrom shinyFiles shinyDirButton
+#' @importFrom shiny onBookmark
+#' @importFrom shinyFiles shinyFileSave
+#' @importFrom shinyFiles shinySaveButton
 #' @importFrom shinyFiles shinyDirChoose
 #' @importFrom shinyFiles parseDirPath
 #' @importFrom shinyFiles getVolumes
@@ -81,126 +85,131 @@
 duflor_gui <- function() {
     use_logical_cores <- F
     ##### UI ####
-        ui <- function(request) {
-            fluidPage(
-        # App title
-        titlePanel(str_c("duflor frontend v.",packageDescription("duflor.gui")$Version),windowTitle = str_c("duflor_gui v.",packageDescription("duflor.gui")$Version)),
-        useShinyjs(),
-        # Sidebar layout with input and output definitions
-        sidebarLayout(
+    ui <- function(request) {
+        fluidPage(
+            # App title
+            titlePanel(str_c("duflor frontend v.",packageDescription("duflor.gui")$Version),windowTitle = str_c("duflor_gui v.",packageDescription("duflor.gui")$Version)),
+            useShinyjs(),
+            # Sidebar layout with input and output definitions
+            sidebarLayout(
+                # Sidebar panel for inputs
+                sidebarPanel(
+                    ## FILES
+                    h4("Select folder containing images"),
+                    shinyDirButton(id = 'folder', label = 'Select a folder',title = 'Please select a folder',buttonType = FALSE),
+                    selectInput(inputId = "image_file_suffix",label = "Select imagetype to process",choices = c("JPG","PNG")),
+                    "Current Folder:",
+                    textOutput(outputId = "ctrl_current_folder"),
+                    ## ANALYSIS_TYPE
+                    radioButtons(inputId = "radio_analysis_type",
+                               h4("Type of Analysis"),
+                               choices = list("GFA" = 1,
+                                              "WFA" = 2),
+                               selected = 1),
+                    ## BUTTONS_1
+                    actionButton(inputId = "open_edit_HSV_ranges_conditionalPanel",label = "Edit HSV Ranges"),
+                    ## CONFIGURE_HSV_BOUNDS
+                    conditionalPanel(
+                        condition = "input.open_edit_HSV_ranges_conditionalPanel %% 2 == 1", # Condition to open the panel
+                        id = "HSV_PANEL",
+                        selectInput("selected_HSV_spectrum", "Select spectrum to edit.", choices = names(getOption("duflor.default_hsv_spectrums")$lower_bound)),
+                        numericInput(inputId = "lower_bound_H",label = "Lower Bound (H_0)", value = 0, min = 0, max = 359, step = 0.01),
+                        numericInput(inputId = "lower_bound_S",label = "Lower Bound (S_0)", value = 0, min = 0, max = 1, step = 0.01),
+                        numericInput(inputId = "lower_bound_V",label = "Lower Bound (V_0)", value = 0, min = 0, max = 1, step = 0.0001),
+                        numericInput(inputId = "upper_bound_H",label = "Upper Bound (H_1)", value = 0, min = 0, max = 359, step = 0.01),
+                        numericInput(inputId = "upper_bound_S",label = "Upper Bound (S_1)", value = 0, min = 0, max = 1, step = 0.01),
+                        numericInput(inputId = "upper_bound_V",label = "Upper Bound (V_1)", value = 0, min = 0, max = 1, step = 0.0001),
+                        actionButton(inputId = "reset_HSV_ranges", label = "Reset"),
+                        actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed spectra"),
+                        useShinyjs() # Enable shinyjs inside the conditional panel
+                    ),
+                    ## CROPPING TO_BE_ANALYSED MATRIX
+                    h4("Crop Image"),
+                    checkboxInput(inputId = "do_crop_image",label = "Do you want to analyse only a cropped section?"),
+                    conditionalPanel(
+                        condition = "input.do_crop_image %% 2 == 1",
+                        id = "CROPPING_PANEL",
+                        actionButton(inputId = "select_crops",label = "Select area to analyse"),
+                        actionButton(inputId = "reset_crops", label = "Reset"),
+                        numericInput(inputId = "x0",label = "x0",value = 0,min = 0),
+                        numericInput(inputId = "x1",label = "x1",value = 0,min = 0),
+                        numericInput(inputId = "y0",label = "y0",value = 0,min = 0),
+                        numericInput(inputId = "y1",label = "y1",value = 0,min = 0),
+                    ),
+                    ## LIMIT SEARCH-RANGE FOR IDENTIFIER_DOT
+                    h4("Limit area searched for identifier-dot"),
+                    checkboxInput(inputId = "do_crop_identifier_range",label = "Do you want to limit the area in which to search for the identifier-dot?"),
+                    conditionalPanel(
+                        condition = "input.do_crop_identifier_range %% 2 == 1",
+                        id = "IDENTIFIERCROPPING_PANEL",
+                        actionButton(inputId = "select_identifiercrops",label = "Select area to analyse"),
+                        actionButton(inputId = "reset_identifiercrops", label = "Reset"),
+                        numericInput(inputId = "identifiersearch_x0",label = "x0",value = 0,min = 0),
+                        numericInput(inputId = "identifiersearch_x1",label = "x1",value = 0,min = 0),
+                        numericInput(inputId = "identifiersearch_y0",label = "y0",value = 0,min = 0),
+                        numericInput(inputId = "identifiersearch_y1",label = "y1",value = 0,min = 0),
+                    ),
 
-            # Sidebar panel for inputs
-            sidebarPanel(
-                ## FILES
-                h4("Select folder containing images"),
-                shinyDirButton(id = 'folder', label = 'Select a folder',title = 'Please select a folder',buttonType = FALSE),
-                selectInput(inputId = "image_file_suffix",label = "Select imagetype to process",choices = c("JPG","PNG")),
-                "Current Folder:",
-                textOutput(outputId = "ctrl_current_folder"),
-                ## ANALYSIS_TYPE
-                radioButtons(inputId = "radio_analysis_type",
-                           h4("Type of Analysis"),
-                           choices = list("GFA" = 1,
-                                          "WFA" = 2),
-                           selected = 1),
-                ## BUTTONS_1
-                actionButton(inputId = "open_edit_HSV_ranges_conditionalPanel",label = "Edit HSV Ranges"),
-                ## CONFIGURE_HSV_BOUNDS
-                conditionalPanel(
-                    condition = "input.open_edit_HSV_ranges_conditionalPanel %% 2 == 1", # Condition to open the panel
-                    id = "HSV_PANEL",
-                    selectInput("selected_HSV_spectrum", "Select spectrum to edit.", choices = names(getOption("duflor.default_hsv_spectrums")$lower_bound)),
-                    numericInput(inputId = "lower_bound_H",label = "Lower Bound (H_0)", value = 0, min = 0, max = 359, step = 0.01),
-                    numericInput(inputId = "lower_bound_S",label = "Lower Bound (S_0)", value = 0, min = 0, max = 1, step = 0.01),
-                    numericInput(inputId = "lower_bound_V",label = "Lower Bound (V_0)", value = 0, min = 0, max = 1, step = 0.0001),
-                    numericInput(inputId = "upper_bound_H",label = "Upper Bound (H_1)", value = 0, min = 0, max = 359, step = 0.01),
-                    numericInput(inputId = "upper_bound_S",label = "Upper Bound (S_1)", value = 0, min = 0, max = 1, step = 0.01),
-                    numericInput(inputId = "upper_bound_V",label = "Upper Bound (V_1)", value = 0, min = 0, max = 1, step = 0.0001),
-                    actionButton(inputId = "reset_HSV_ranges", label = "Reset"),
-                    actionButton("close_edit_HSV_ranges_conditionalPanel", "Submit changed spectra"),
-                    useShinyjs() # Enable shinyjs inside the conditional panel
-                ),
-                ## CROPPING TO_BE_ANALYSED MATRIX
-                h4("Crop Image"),
-                checkboxInput(inputId = "do_crop_image",label = "Do you want to analyse only a cropped section?"),
-                conditionalPanel(
-                    condition = "input.do_crop_image %% 2 == 1",
-                    id = "CROPPING_PANEL",
-                    actionButton(inputId = "select_crops",label = "Select area to analyse"),
-                    actionButton(inputId = "reset_crops", label = "Reset"),
-                    numericInput(inputId = "x0",label = "x0",value = 0,min = 0),
-                    numericInput(inputId = "x1",label = "x1",value = 0,min = 0),
-                    numericInput(inputId = "y0",label = "y0",value = 0,min = 0),
-                    numericInput(inputId = "y1",label = "y1",value = 0,min = 0),
-                ),
-                ## LIMIT SEARCH-RANGE FOR IDENTIFIER_DOT
-                h4("Limit area searched for identifier-dot"),
-                checkboxInput(inputId = "do_crop_identifier_range",label = "Do you want to limit the area in which to search for the identifier-dot?"),
-                conditionalPanel(
-                    condition = "input.do_crop_identifier_range %% 2 == 1",
-                    id = "IDENTIFIERCROPPING_PANEL",
-                    actionButton(inputId = "select_identifiercrops",label = "Select area to analyse"),
-                    actionButton(inputId = "reset_identifiercrops", label = "Reset"),
-                    numericInput(inputId = "identifiersearch_x0",label = "x0",value = 0,min = 0),
-                    numericInput(inputId = "identifiersearch_x1",label = "x1",value = 0,min = 0),
-                    numericInput(inputId = "identifiersearch_y0",label = "y0",value = 0,min = 0),
-                    numericInput(inputId = "identifiersearch_y1",label = "y1",value = 0,min = 0),
-                ),
 
-
-                ## PARALLELISATION
-                h4("Parallel Processing"),
-                checkboxInput(inputId = "open_parallelPanel",label = "Run analysis in parallel?"),
-                conditionalPanel(
-                    condition = "input.open_parallelPanel %% 2 == 1",
-                    id = "PARALLEL_PANEL",
-                    numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores(logical = use_logical_cores) - 1)),
+                    ## PARALLELISATION
+                    h4("Parallel Processing"),
+                    checkboxInput(inputId = "open_parallelPanel",label = "Run analysis in parallel?"),
+                    conditionalPanel(
+                        condition = "input.open_parallelPanel %% 2 == 1",
+                        id = "PARALLEL_PANEL",
+                        numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores(logical = use_logical_cores) - 1)),
+                    ),
+                    ## MISCELLANEOUS STUFF
+                    h5("Misc"),
+                    textInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
+                    dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
+                    numericInput(inputId = "identifier_area", label = "insert area of identifier-dot in cm^2", value = 0.503,min = 0,step = 0.00001),
+                    ## BUTTONS_2
+                    actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
+                    actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
+                    ## BOOKMARKING
+                    h5("BOOKMARKING"),
+                    fileInput(inputId = "restore_state",label = "Load State", multiple = F, accept = c(".rds",".RDS")),
+                    shinySaveButton(id = "save_state", label = "Save State",title = "Select filename",filetype = list(state = c(".rds",".RDS")))
                 ),
-                ## MISCELLANEOUS STUFF
-                h5("Misc"),
-                textInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
-                dateInput(inputId = "date_of_image_shooting",label = "Select date the images were shot",value = NULL,format = "yyyy-mm-dd",weekstart = 1,startview = "month",language = "en",autoclose = T),
-                numericInput(inputId = "identifier_area", label = "insert area of identifier-dot in cm^2", value = 0.503,min = 0,step = 0.00001),
-                ## BUTTONS_2
-                actionButton(inputId = "execute_analysis",label = "Execute Analysis"),
-                actionButton(inputId = "execute_analysis_single",label = "Execute Analysis (single)"),
-            ),
-
-            # Main panel for displaying outputs
-            mainPanel(
-                tabsetPanel(id = "tabset_panel",
-                  tabPanel("Image Files"
-                           ,dataTableOutput("tbl_dir_files")
-                           ,actionButton(inputId = "render_plant",label = "Render Plant",disabled = TRUE)
-                           ),
-                  tabPanel("Results - complete"
+                # Main panel for displaying outputs
+                mainPanel(
+                    tabsetPanel(
+                        id = "tabset_panel",
+                        tabPanel(
+                            "Image Files"
+                            ,dataTableOutput("tbl_dir_files")
+                            ,actionButton(inputId = "render_plant",label = "Render Plant",disabled = TRUE)
+                        ),
+                        tabPanel(
+                            "Results - complete"
                            ,dataTableOutput("tbl_results")
                            ,checkboxInput(inputId = "save_as_xlsx",label = "Save results as xlsx?",value = FALSE)
                            ,actionButton(inputId = "save_results","Save results",disabled = TRUE)
-                           ),
-                  tabPanel("Results - inspect"
+                        ),
+                      tabPanel(
+                          "Results - inspect"
                            ,selectInput(inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = c())
                            ,dataTableOutput("tbl_results_filtered")
                            ,checkboxInput(inputId = "mask_extreme", label = "Do a high-contrast mask?", value = FALSE)
                            ,actionButton(inputId = "render_selected_mask",label = "Render masks for selected image",disabled = TRUE)
-                           ),
-                  tabPanel("Results - plots"
+                        ),
+                      tabPanel(
+                          "Results - plots"
                            ,selectInput(inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = c())
                            ,selectInput(inputId = "reinspected_type2",label = "Select KPI to inspect",choices = c("_fraction","_count","_area","area_per_pixel"))
                            ,plotOutput("results_visualisation_plot")
                            ,actionButton(inputId = "save_visualisation_plot", label = "Save plot", disabled = TRUE)
-                           ,)
-                  #tabPanel("Analytics (misc2)",verbatimTextOutput("TAB4")),
-                  #tabPanel("Analytics (misc3)",verbatimTextOutput("TAB5"))
+                        ),
+                    )
                 )
-
-            ),
+            )
         )
-    )
-        }
+    }
     #### SERVER ####
     server <- function(input, output,session) {
         #### STARTUP MESSAGE ####
+        options(shiny.maxRequestSize=30*1024^2) # 30 MB of upload request size
         showNotification(
             ui = "App startup",
             id = "startup.notice",
@@ -218,7 +227,8 @@ duflor_gui <- function() {
             notification_duration = 1.300,
             results = NA,
             last_masked_image = NA,
-            last_im = NA
+            last_im = NA,
+            folder_path = NA
         )
         DEBUGKEYS <- reactiveValues(
             force.prints = FALSE,
@@ -227,17 +237,24 @@ duflor_gui <- function() {
 
         )
         FLAGS <- reactiveValues(
-            analyse_single_image = FALSE
+            analyse_single_image = FALSE,
+            restoring_state = FALSE
         )
+        image_files <- reactiveValues(image_files = data.frame(
+            images_filtered = character(),
+            index = numeric(),
+            stringsAsFactors = FALSE
+        ))
         # to make values only trigger reactives after x seconds of non-interaction, first assign them reactive.
         # next, assign a debounce-expression with a set timout after which the value is hnaded onwards to the reactive-pipeline
         # finally, refer to the debounce-expression via `expression()` instead of the input-value `input$value` in callbacks.
         volumes <- getVolumes()()
         #### DISPLAYING AND RENDERING FILES AND STUFF ####
-        image_files <- reactive({ # image_files is a list of filepaths, which gets set reactively.
-            req(input$folder[[1]],input$image_file_suffix)
-            shinyDirChoose(input = input, 'folder', roots=volumes)
-            folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+        image_files_ <- reactive({ # image_files is a list of filepaths, which gets set reactively.
+            req(isFALSE(is.na(DATA$folder_path)))
+            folder_path <- DATA$folder_path # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+            req(dir.exists(folder_path))
+            req(input$image_file_suffix)
             # all buttons listed here must be disabled by default
             # they will be enabled if the `list.files()` returns a non-empty vector of files.
             buttons_to_toggle <- c(
@@ -262,7 +279,7 @@ duflor_gui <- function() {
                     for (each in buttons_to_toggle) {
                         updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = FALSE)
                     }
-                    return(ret)
+                    image_files$image_files <- ret
                 } else {
                     showNotification(
                         ui = str_c(
@@ -277,10 +294,9 @@ duflor_gui <- function() {
                     ret <- data.frame(images_filtered = character(),
                                                   index = numeric(),
                                                   stringsAsFactors = FALSE)
-                    return(ret)
+                    image_files$image_files <- ret
                 }
             }
-            return(df()) # return empty df in case no folder was selected (yet)
         })
         output$ctrl_current_folder <- renderText({
             file_selected <- parseDirPath(roots = volumes, input$folder)
@@ -292,7 +308,7 @@ duflor_gui <- function() {
         # selecting entries in the table should render the respective KPI for these
         # images only.
         output$tbl_dir_files <- renderDataTable({
-            image_files()},
+            image_files$image_files},
             server = TRUE,
             selection = "single",
             options = list(
@@ -301,6 +317,17 @@ duflor_gui <- function() {
                 autoWidth = TRUE
             )
         )
+        observeEvent(input$image_file_suffix, {
+            image_files_()
+        })
+        observeEvent(input$folder, {
+            req(input$folder[[1]],input$image_file_suffix)
+            shinyDirChoose(input = input, 'folder', roots=volumes)
+            folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+            req(dir.exists(folder_path))
+            DATA$folder_path <- folder_path
+            image_files_()
+        })
         #### REACTIVE - RESULTS_TABLE/BARPLOT, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
             req(input$reinspected_spectrums)
@@ -355,7 +382,8 @@ duflor_gui <- function() {
         })
         #### SETUP PARALLELISATION ####
         observeEvent(input$open_parallelPanel, {
-            open_parallelPanel_event(input, DATA, use_logical_cores, session, STARTUP)
+            open_parallelPanel_event(input, DATA, FLAGS, use_logical_cores, session, STARTUP)
+            FLAGS$restoring_state <- FALSE
         })
         #### EDIT CROPPING ####
         observeEvent(input$do_crop_image, {
@@ -756,88 +784,107 @@ duflor_gui <- function() {
             select_spectra_gui_comp(input)
         })
         observeEvent(input$submit_selected_spectra, {
-            if (is.null(input$selected_spectra)) {
-                showNotification(
-                    ui = str_c(
-                        "Please select at least one option."
-                    ),
-                    duration = DATA$notification_duration * 5,
-                    type = "warning"
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                if (is.null(input$selected_spectra)) {
+                    showNotification(
+                        ui = str_c(
+                            "Please select at least one option."
+                        ),
+                        duration = DATA$notification_duration * 5,
+                        type = "warning"
 
-                )
-            }
-            req(input$selected_spectra)
-            removeModal()
-            spectrums <- DATA$spectrums
-            spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
-            spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
-
-            # update the spectrum-selection DDLs in tabs `Results - inspect` and `Results - plots`
-            updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
-            updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
-            DATA$spectrums <- spectrums
-            #### SETUP PARALLELISATION ####
-            if (input$parallel_cores > 1) {
-                if (.Platform$OS.type == "windows") {
-                    cluster_type <- "PSOCK"
-                } else {
-                    cluster_type <- "FORK"
+                    )
+                    return()
                 }
-                if (getDoParRegistered()) {
-                    # a cluster is already spun up, so check if it can be reused
-                    current_workers <- getDoParWorkers()
-                    if (current_workers!=input$parallel_cores) {
-                        # desired number of workers have changed, so we need to
-                        # shut down the old cluster and build a new one
-                        shutdown_parallel()
+                removeModal()
+                spectrums <- DATA$spectrums
+                spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
+                spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
+                # update the spectrum-selection DDLs in tabs `Results - inspect` and `Results - plots`
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
+                DATA$spectrums <- spectrums
+                #### SETUP PARALLELISATION ####
+                if (input$parallel_cores > 1) {
+                    if (.Platform$OS.type == "windows") {
+                        cluster_type <- "PSOCK"
+                    } else {
+                        cluster_type <- "FORK"
+                    }
+                    if (getDoParRegistered()) {
+                        # a cluster is already spun up, so check if it can be reused
+                        current_workers <- getDoParWorkers()
+                        if (current_workers!=input$parallel_cores) {
+                            # desired number of workers have changed, so we need to
+                            # shut down the old cluster and build a new one
+                            shutdown_parallel()
+                            setup_parallel(input$parallel_cores, cluster_type)
+                        }
+                    } else {
+                        # no preexisting cluster, must init one
                         setup_parallel(input$parallel_cores, cluster_type)
+
                     }
                 } else {
-                    # no preexisting cluster, must init one
-                    setup_parallel(input$parallel_cores, cluster_type)
-
+                    if (getDoParRegistered()) {
+                        # shut down existing cluster first (?)
+                        shutdown_parallel()
+                    }
                 }
-            } else {
-                if (getDoParRegistered()) {
-                    # shut down existing cluster first (?)
-                    shutdown_parallel()
-                }
-            }
-            #### EXECUTE ANALYSIS ####
-            #TODO: add modal "analysis is ongoing, please wait"
-            removeNotification(id = "analysis.completed")
-            showNotification(
-                ui = "Analysis ongoing since ", Sys.time(), ".",
-                id = "analysis.ongoing",
-                duration = NULL,
-                type = "warning"
-            )
-            execution_time <- system.time(
-                results <- execute_analysis(input, DATA, DEBUGKEYS, FLAGS)
-            )
-            removeNotification(id = "analysis.ongoing")
-            showNotification(
-                ui = str_c("Analysis finished in ",round(x = execution_time[[3]],digits = 4)," seconds."),
-                id = "analysis.completed",
-                duration = NULL,
-                type = "message"
-            )
-            DATA$results <- results
-            # RENDER RESULTS OBJECT
-            output$tbl_results <- renderDataTable({
-                results$results},
-                server = TRUE,
-                selection = "single",
-                options = list(
-                    paging = TRUE,
-                    pageLength = 15,
-                    autoWidth = TRUE
+                #### EXECUTE ANALYSIS ####
+                removeNotification(id = "analysis.completed")
+                showNotification(
+                    ui = str_c("Analysis ongoing since ", Sys.time(), "."),
+                    id = "analysis.ongoing",
+                    closeButton = F,
+                    duration = NULL,
+                    type = "warning"
                 )
-            )
-            if (isFALSE(FLAGS$analyse_single_image)) { ## disallow save-to-file when running single-analysis
-                updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
-            }
-            updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
+                execution_time <- system.time(
+                    results <- execute_analysis(input, DATA, DEBUGKEYS, FLAGS)
+                )
+                removeNotification(id = "analysis.ongoing")
+                showNotification(
+                    ui = str_c("Analysis finished in ",round(x = execution_time[[3]],digits = 4)," seconds."),
+                    id = "analysis.completed",
+                    duration = NULL,
+                    type = "message"
+                )
+                DATA$results <- results
+                # RENDER RESULTS OBJECT
+                output$tbl_results <- renderDataTable({
+                    results$results},
+                    server = TRUE,
+                    selection = "single",
+                    options = list(
+                        paging = TRUE,
+                        pageLength = 15,
+                        autoWidth = TRUE
+                    )
+                )
+                if (isFALSE(FLAGS$analyse_single_image)) { ## disallow save-to-file when running single-analysis
+                    updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
+                }
+                updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path
+                )
+                showNotification(
+                    ui = str_c("Error occured during analysis. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### RERUN ANALYSIS TO RENDER PLOTS ####
         observeEvent(input$render_selected_mask, {
@@ -892,6 +939,84 @@ duflor_gui <- function() {
             type = "message",
             duration = 1.3
         )
+        #### MANUAL BOOKMARKING ####
+        # the input-folder is relative to the system, and thush shouldn't be
+        # bookmarked.
+        setBookmarkExclude(
+            c(
+                "folder",
+                "folder_modal",
+                "folder-modal",
+                "restore_folder",
+                "restore_folder-modal",
+                "restore_folder_modal"
+            )
+        )
+        onBookmark(function(state) {
+
+        })
+        # Load button action
+        observeEvent(input$restore_state, {
+            showNotification(
+                ui = "State is being restored.",
+                id = "restore_state.ongoing",
+                duration = NA,
+                type = "warning"
+            )
+            state_file <- input$restore_state$datapath
+            loaded_path <- restore_state(input, output, DATA, FLAGS, DEBUGKEYS, getDefaultReactiveDomain(), getVolumes(), state_file)
+            DATA$folder_path <- loaded_path
+            image_files_()
+            removeNotification(id = "restore_state.ongoing")
+            if (file.exists(loaded_path)) {
+                showNotification(
+                    ui = str_c("State successfully restored from '",loaded_path,"'."),
+                    id = "restore_state.done",
+                    duration = DATA$notification_duration * 4,
+                    type = "message"
+                )
+            } else {
+                showNotification(
+                    ui = str_c("State was not successfully restored from '",loaded_path,"'."),
+                    id = "restore_state.error",
+                    duration = DATA$notification_duration * 4,
+                    type = "error"
+                )
+            }
+        })
+        # Save directory selection
+        observeEvent(input$save_state, {
+            showNotification(
+                ui = "State is being saved.",
+                id = "save_state.ongoing",
+                duration = NA,
+                type = "warning"
+            )
+            saved_state_path <- save_state(
+                input = input,
+                DATA = DATA,
+                DEBUGKEYS = DEBUGKEYS,
+                FLAGS = FLAGS,
+                volumes = getVolumes()
+            )
+            removeNotification(id = "save_state.ongoing")
+            if (file.exists(saved_state_path)) {
+                showNotification(
+                    ui = str_c("State successfully saved to '",saved_state_path,"'."),
+                    id = "save_state.done",
+                    duration = DATA$notification_duration * 4,
+                    type = "message"
+                )
+            } else {
+                showNotification(
+                    ui = str_c("State was not successfully saved to '",saved_state_path,"'."),
+                    id = "save_state.error",
+                    duration = DATA$notification_duration * 4,
+                    type = "error"
+                )
+            }
+        })
     }
-    shinyApp(ui = ui, server = server)
+    #### LAUNCH APP ####
+    shinyApp(ui = ui, server = server, enableBookmarking = "server")
 }
