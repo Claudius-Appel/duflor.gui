@@ -13,13 +13,28 @@
     <loc>https://Claudius-Appel.github.io/duflor.gui/articles/general-user-manual.html</loc>
   </url>
   <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/identifier-cropping.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/image-cropping.html</loc>
+  </url>
+  <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/modifying-hsv-bounds.html</loc>
   </url>
   <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/articles/optimising-speed.html</loc>
   </url>
   <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/parallelisation.html</loc>
+  </url>
+  <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/articles/raising-issues.html</loc>
+  </url>
+  <url>
+    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/saving-and-restoring-application-states.html</loc>
   </url>
   <url>
     <loc>https://Claudius-Appel.github.io/duflor.gui/authors.html</loc>

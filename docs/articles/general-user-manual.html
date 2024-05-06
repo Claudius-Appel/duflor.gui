@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9037</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9038</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,8 +42,13 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/general-user-manual.html">General user manual for 'duflor.gui'</a>
+    <a class="dropdown-item" href="../articles/identifier-cropping.html">Restricting area for quantification of the identifier-dot</a>
+    <a class="dropdown-item" href="../articles/image-cropping.html">Cropping the image for selective and faster analysis</a>
+    <a class="dropdown-item" href="../articles/modifying-hsv-bounds.html">Fine-tuning HSV-boundaries</a>
     <a class="dropdown-item" href="../articles/optimising-speed.html">Measures to reduce execution time</a>
+    <a class="dropdown-item" href="../articles/parallelisation.html">Parallelised computing as a method for increased performance</a>
     <a class="dropdown-item" href="../articles/raising-issues.html">How to report issues, raise suggestions and feedback</a>
+    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">saving-and-restoring-application-states</a>
   </div>
 </li>
       </ul>
@@ -73,7 +78,7 @@
       <img src="" class="logo" alt=""><h1>General user manual for 'duflor.gui'</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Claudius-Appel/duflor.gui/blob/HEAD/vignettes/articles/general-user-manual.Rmd" class="external-link"><code>vignettes/articles/general-user-manual.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Claudius-Appel/duflor.gui/blob/HEAD/vignettes/general-user-manual.Rmd" class="external-link"><code>vignettes/general-user-manual.Rmd</code></a></small>
       <div class="d-none name"><code>general-user-manual.Rmd</code></div>
     </div>
 
@@ -112,13 +117,13 @@ bottom<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-cont
 they just &lt;em&gt;should&lt;/em&gt;.&lt;/p&gt;"><sup>2</sup></a>:</p>
 <ol style="list-style-type: decimal">
 <li>Selecting the folder containing the input images.<br><strong>Note:</strong> This folder must not contain any images which are
-not intended to be evaluated, and this extends to subfolders. If you
+not intended to be evaluated, and this extends to sub-folders. If you
 select folder <code>foo</code> to be analysed, then image
 <code>foo/bar.png</code> will be evaluated. However, the images
 <code>foo/baz/bar.png</code> and
 <code>foo/baz/another/ridiculous/nesting/plant.png</code> will also be
 evaluated.</li>
-<li>Selecting the type of analysis to be performed<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;This is technically optional, as all spectrums can be
+<li>Selecting the type of analysis to be performed<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;This is technically optional, as all spectra can be
 selected at will before the analysis-routine is initiated.&lt;/p&gt;"><sup>3</sup></a>. Select
 <code>GFA</code> for a
 <code>Leaf Area Analysis</code>/<code>Grünflächenanalyse</code>, and
@@ -139,7 +144,7 @@ and in accordance to the following rules:
 <li>
 <span class="math inline">\(0 \le V_0 \le 1\)</span>, <span class="math inline">\(0 \le V_1 \le 1\)</span>, <span class="math inline">\(V_0 \lt V_1\)</span><br>
 Experience suggests that especially the <span class="math inline">\(V_0\)</span>-parameter should be adjusted <em>very
-carefully</em>.</li>
+carefully</em>. This step is explained in further detail in “<a href="#fine-tuning-hsv-boundaries">Fine-tuning HSV-boundaries</a>”.</li>
 </ol>
 </li>
 <li>Decide whether or not the image should be cropped. Cropping is
@@ -157,6 +162,7 @@ Parallelisation can significantly reduce execution-time,
 comfortable giving a blanket recommendation. For more information, see
 “<a href="#parallelised-execution">Parallelised execution</a>”.</li>
 <li>Select the date at which the images were shot.</li>
+<li>Optionally alter the area for the identifier.</li>
 <li>Decide whether or not to analyse all images listed in the tab
 <code>Image Files</code>, or a single one of that set. Pressing either
 of these buttons will render the GUI unresponsive while executing the
@@ -237,6 +243,25 @@ hits<br>
 <h3 id="edge-cases-special-controls">Edge-cases / special controls<a class="anchor" aria-label="anchor" href="#edge-cases-special-controls"></a>
 </h3>
 <div class="section level4">
+<h4 id="state-management-saving-and-restoring-application-configuration-to-and-from-files">State-Management: Saving and restoring application configuration to
+and from files<a class="anchor" aria-label="anchor" href="#state-management-saving-and-restoring-application-configuration-to-and-from-files"></a>
+</h4>
+<p>At the bottom of the grey panel exists a section called
+“Bookmarking”. It allows the user to store the current state of the
+app’s <strong>input</strong> data (configuration, chosen directory-path,
+relevant data` to a file, which can be loaded at a later time.</p>
+<p>In general, this has two use-cases:</p>
+<ol style="list-style-type: decimal">
+<li>Retaining and restoring common configuration changes for easier
+access.</li>
+<li>Restoring configurations which induced errors, so that they might be
+debugged in a reproducible manner.<br>
+</li>
+</ol>
+<p>For more details, see
+<code>vignette("saving-and-restoring-application-state", package = "duflor.gui")</code>.</p>
+</div>
+<div class="section level4">
 <h4 id="tab-1-image-files">Tab 1: <code>Image Files</code><a class="anchor" aria-label="anchor" href="#tab-1-image-files"></a>
 </h4>
 <p>This tab contains the image files which <em>will</em> be analysed.
@@ -258,178 +283,67 @@ vicinity of the pot will be excluded from further processing.</div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="i-have-no-idea-what-to-call-this-heading">I HAVE NO IDEA WHAT TO CALL THIS HEADING<a class="anchor" aria-label="anchor" href="#i-have-no-idea-what-to-call-this-heading"></a>
+<h2 id="measures-for-optimising-execution-speed">Measures for optimising execution speed<a class="anchor" aria-label="anchor" href="#measures-for-optimising-execution-speed"></a>
 </h2>
 <div class="section level3">
-<h3 id="measures-for-optimising-execution-speed">Measures for optimising execution speed<a class="anchor" aria-label="anchor" href="#measures-for-optimising-execution-speed"></a>
+<h3 id="cropping-images">Cropping Images<a class="anchor" aria-label="anchor" href="#cropping-images"></a>
 </h3>
-<div class="section level4">
-<h4 id="cropping-images">Cropping Images<a class="anchor" aria-label="anchor" href="#cropping-images"></a>
-</h4>
 <p>A very effective way of increasing execution time is to reduce the
 size of the data- set which is being analysed.</p>
 <p>After the desired area has been selected as described above, it can
 be optionally reviewed on the same (or another) image by pressing the
 <code>Render plant</code>-button on the tab
 <code>Image Files</code>.</p>
-<p>An in-depth description can be found in this
-<strong><code>vignette</code></strong></p>
-</div>
-<div class="section level4">
-<h4 id="parallelised-execution">Parallelised execution<a class="anchor" aria-label="anchor" href="#parallelised-execution"></a>
-</h4>
-</div>
+<p>An in-depth description can be found in
+<code><a href="../articles/image-cropping.html">vignette("image-cropping", package = "duflor.gui")</a></code>.</p>
 </div>
 <div class="section level3">
-<h3 id="measures-for-maximising-accuracy">Measures for maximising accuracy<a class="anchor" aria-label="anchor" href="#measures-for-maximising-accuracy"></a>
+<h3 id="parallelised-execution">Parallelised execution<a class="anchor" aria-label="anchor" href="#parallelised-execution"></a>
 </h3>
-<div class="section level4">
-<h4 id="restricting-area-within-which-the-identifier-dot-is-quantified">Restricting area within which the identifier-dot is quantified<a class="anchor" aria-label="anchor" href="#restricting-area-within-which-the-identifier-dot-is-quantified"></a>
-</h4>
+<p>Based on the power of the system running the app, one might consider
+parallelising the evaluation of images to further reduce computation
+time. However, its effectiveness depends heavily on the resources
+available.</p>
+<p>An in-depth description can be found in
+<code><a href="../articles/parallelisation.html">vignette("parallelisation", package = "duflor.gui")</a></code>.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="measures-for-maximising-accuracy">Measures for maximising accuracy<a class="anchor" aria-label="anchor" href="#measures-for-maximising-accuracy"></a>
+</h2>
+<div class="section level3">
+<h3 id="restricting-area-within-which-the-identifier-dot-is-quantified">Restricting area within which the identifier-dot is quantified<a class="anchor" aria-label="anchor" href="#restricting-area-within-which-the-identifier-dot-is-quantified"></a>
+</h3>
 <p>Typically, the largest error-source has been a bad or inconsistent
-determination of the identifier used to calculate the area of spectrums
-extracted. This issue can be observed in figure 3.</p>
-<p>To counteract this, the GUI allows you to limit the range within
-which matches for the identifier-spectrum will be considered “valid”.
-All matches <em>outside</em> of this area will be ignored.</p>
-<p>To select the area, follow the steps outlined below. Each step
-corresponds to a number within figures 5 and 6:</p>
-<ol style="list-style-type: decimal">
-<li>Select an image to inspect. You may select any <em>one</em> image
-within the <code>Image Files</code>-Tab</li>
-<li>Check the check-box to enable this feature. This will expand a
-previously-hidden panel.</li>
-<li>Next, press the button <code>Select area to analyse</code> to launch
-the window shown in figure 6.</li>
-<li>Finally, left-click-and-drag over the area within which the
-identifier-dot resides. The selection may contain anything, and may be
-of any size. When you let go, the selection-GUI will close, and the
-bounding coordinates will be inserted into the respective numeric input
-controls.</li>
-</ol>
-<p>You might be tempted to make it as small as possible. However, while
-it is certainly advantageous to minimise the area as much as possible, a
-certain buffer-zone should be kept. As the position of the
-identifier-dot might differ subtly across all images, a too-strict
-selection might suddenly exclude pixels which are actually part of the
-identifier-dot.</p>
-<p>The difference this step can make can be observed in tables 1 and 2.
-Note that this is a small example, the influence</p>
-<table class="table">
-<caption>Table 1: Number of pixels for the ‘identifer_dot’, as well as
-the resulting area for an example-drought spectrum based on a given
-number of matched pixels. In this case, all qualified
-“identifier”-pixels were used to determine areas.</caption>
-<colgroup>
-<col width="36%">
-<col width="32%">
-<col width="30%">
-</colgroup>
-<thead><tr class="header">
-<th>bex_identifier_dot_count</th>
-<th>bex_drought_HSV_count</th>
-<th>bex_drought_HSV_area</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>833</td>
-<td>297798</td>
-<td>179.8228019207683</td>
-</tr>
-<tr class="even">
-<td>796</td>
-<td>260776</td>
-<td>164.7868442211055</td>
-</tr>
-<tr class="odd">
-<td>870</td>
-<td>262390</td>
-<td>151.7036436781609</td>
-</tr>
-</tbody>
-</table>
-<table class="table">
-<caption>Table 2: Restricting the area in which the identifier-dot lies
-changes a given spectrum’s calculated area.</caption>
-<colgroup>
-<col width="36%">
-<col width="32%">
-<col width="30%">
-</colgroup>
-<thead><tr class="header">
-<th>bex_identifier_dot_count</th>
-<th>bex_drought_HSV_count</th>
-<th>bex_drought_HSV_area</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>824</td>
-<td>297798</td>
-<td>181.7868859223301</td>
-</tr>
-<tr class="even">
-<td>783</td>
-<td>260776</td>
-<td>167.5227688378033</td>
-</tr>
-<tr class="odd">
-<td>822</td>
-<td>262390</td>
-<td>160.5622506082725</td>
-</tr>
-</tbody>
-</table>
-<div class="float">
-<img src="../reference/figures/limit_identifier_workflow_steps.png" alt="Fig.5: First three steps required to restrict search-range for the quantification of the identifier-dot."><div class="figcaption">Fig.5: First three steps required to restrict
-search-range for the quantification of the identifier-dot.</div>
+determination of the identifier used to calculate the area of extracted
+spectra. For information on how to counter this issue, an in-depth
+description can be found in
+<code><a href="../articles/identifier-cropping.html">vignette("identifier-cropping", package = "duflor.gui")</a></code>.</p>
 </div>
-<div class="float">
-<img src="../reference/figures/selecting_area_of_identifier_dot.png" alt="Fig.6: Final step required to restrict search-range for the quantification of the identifier-dot"><div class="figcaption">Fig.6: Final step required to restrict
-search-range for the quantification of the identifier-dot</div>
-</div>
-</div>
-<div class="section level4">
-<h4 id="fine-tuning-hsv-boundaries">Fine-tuning HSV-boundaries<a class="anchor" aria-label="anchor" href="#fine-tuning-hsv-boundaries"></a>
-</h4>
+<div class="section level3">
+<h3 id="fine-tuning-hsv-boundaries">Fine-tuning HSV-boundaries<a class="anchor" aria-label="anchor" href="#fine-tuning-hsv-boundaries"></a>
+</h3>
 <p>Determining the HSV-boundaries can be an arduous and time-consuming
 process. It is <em>not</em> recommended to frequently do this via the
 GUI, but instead to create a small script calling the relevant functions
-of the <code>duflor</code>-package itself.</p>
-<p>However, on occasion a spectrum’s HSV-boundaries must be modified -
-and in this case, a spectrum can be altered. To do so, follow the steps
-outlined below. Each step corresponds to</p>
+of the <code>duflor</code>-package itself.<br>
+An in-depth guide and further details can be found in
+<code><a href="../articles/modifying-hsv-bounds.html">vignette("modifying-hsv-bounds", package = "duflor.gui")</a></code>.</p>
 </div>
 </div>
-<div class="section level3">
-<h3 id="advanced-debugging">(Advanced) Debugging<a class="anchor" aria-label="anchor" href="#advanced-debugging"></a>
-</h3>
+<div class="section level2">
+<h2 id="advanced-debugging">(Advanced) Debugging<a class="anchor" aria-label="anchor" href="#advanced-debugging"></a>
+</h2>
 <p>Generally, the app tries to give reasonable warnings and
 status-messages via small red/yellow/blue message boxes. These should be
 fairly self-explanatory, and will pop up where the author thought them
 sensible or necessary.</p>
-<div class="section level4">
-<h4 id="dev-consoler">Dev-consoler<a class="anchor" aria-label="anchor" href="#dev-consoler"></a>
-</h4>
-</div>
-</div>
 </div>
 <div class="section level2">
 <h2 id="development-modifications-issues">Development, Modifications, Issues<a class="anchor" aria-label="anchor" href="#development-modifications-issues"></a>
 </h2>
-<p>To keep development efficient and reasonable, there are a certain
-number of requirements for reporting problems or requesting
-features.</p>
-<ul>
-<li><p>If problems arise which are to be fixed, they must be raised in
-the <code>issues</code>-section of the respective package’s
-Github-Repository. Issues should be detailed, provide errors output to
-the console, a step-by-step guide to reproduce the issue and supply test
-files which trigger the issue (if
-applicable/required/sensible).</p></li>
-<li><p>Similarly, additional features/changes are to be raised there as
-well, with a clear outline of the desired feature.</p></li>
-</ul>
-<p>Aside from these fundamental requirements, TODO</p>
+<p>For details on how to raise new feature-requests, please refer to
+<code><a href="../articles/raising-issues.html">vignette("raising-issues", package = "duflor.gui")</a></code>.</p>
 <div class="section level3">
 <h3 id="reporting-issues">Reporting issues<a class="anchor" aria-label="anchor" href="#reporting-issues"></a>
 </h3>
@@ -437,7 +351,8 @@ well, with a clear outline of the desired feature.</p></li>
 upfront work by opening the source-code from GitHub - either by manually
 downloading it, or by cloning it via <code>git</code>. To do either,
 navigate to the <a href="https://github.com/Claudius-Appel/duflor" class="external-link">duflor</a>- or <a href="https://github.com/Claudius-Appel/duflor.gui" class="external-link">duflor.gui</a>-repository.
-For details on doing so see .</p>
+For details on doing so see
+<code><a href="../articles/raising-issues.html">vignette("raising-issues", package = "duflor.gui")</a></code>.</p>
 </div>
 <div class="section level3">
 <h3 id="further-development">Further development<a class="anchor" aria-label="anchor" href="#further-development"></a>

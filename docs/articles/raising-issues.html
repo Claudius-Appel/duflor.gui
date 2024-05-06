@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9032</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9038</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,8 +42,13 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/general-user-manual.html">General user manual for 'duflor.gui'</a>
+    <a class="dropdown-item" href="../articles/identifier-cropping.html">Restricting area for quantification of the identifier-dot</a>
+    <a class="dropdown-item" href="../articles/image-cropping.html">Cropping the image for selective and faster analysis</a>
+    <a class="dropdown-item" href="../articles/modifying-hsv-bounds.html">Fine-tuning HSV-boundaries</a>
     <a class="dropdown-item" href="../articles/optimising-speed.html">Measures to reduce execution time</a>
+    <a class="dropdown-item" href="../articles/parallelisation.html">Parallelised computing as a method for increased performance</a>
     <a class="dropdown-item" href="../articles/raising-issues.html">How to report issues, raise suggestions and feedback</a>
+    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">saving-and-restoring-application-states</a>
   </div>
 </li>
       </ul>
@@ -85,7 +90,7 @@
 <p>When issues arise, they <strong>must be tracked on the package’s
 GitHub page</strong>, under “<a href="https://github.com/Claudius-Appel/duflor.gui/issues" class="external-link uri">https://github.com/Claudius-Appel/duflor.gui/issues</a>”.</p>
 <div class="section level2">
-<h2 id="general-etiquette-and-different-tyoes-of-issues">General etiquette and different tyoes of ‘issues’<a class="anchor" aria-label="anchor" href="#general-etiquette-and-different-tyoes-of-issues"></a>
+<h2 id="general-etiquette-and-different-types-of-issues">General etiquette and different types of ‘issues’<a class="anchor" aria-label="anchor" href="#general-etiquette-and-different-types-of-issues"></a>
 </h2>
 <p>Although they are all conglomerated under the same name “issues”,
 generally reports are differentiated into two categories:</p>
@@ -117,8 +122,19 @@ include example-images.</li>
 <li>Information on the system’s specifications (OS, hardware
 configuration, etc. pp.)</li>
 <li>The R-Version in use</li>
-<li>notes on all warnings/errors emitted to the console before/when
+<li>Notes on all warnings/errors emitted to the console before/when
 encountering the bug.</li>
+<li>
+<strong>If generated, the
+<code>error_state.rds</code>-file</strong>. This file is generated when
+errors occur in certain sections of the code, but not in all. It bundles
+the state of the app’s data structure at the point at which the error
+occurred, including its configuration. However, it does <em>not</em>
+include the raw image-files as input, which must be supplied separately.
+For more details, see
+<code><a href="../articles/saving-and-restoring-application-states.html">vignette("saving-and-restoring-application-states", package = "duflor.gui")</a></code>.
+When reporting bugs, it is <strong>heavily suggested to supply this
+file</strong>.</li>
 </ul>
 <p>The more information is available, the easier it becomes to identify
 the actual issue.</p>
@@ -126,12 +142,14 @@ the actual issue.</p>
 <div class="section level3">
 <h3 id="feature-requests">Feature Requests<a class="anchor" aria-label="anchor" href="#feature-requests"></a>
 </h3>
-<p>A feature request should clearly define what additional feature
-should be implemented. As with bug-reports, the more information
-provided, the easier it’s viability and ease of implementation can be
-assessed.</p>
-<p>It should clearly describe <em>what</em> should be implemented, and
-<em>why</em> it should.</p>
+<p>To keep development efficient and reasonable, there are a certain
+number of requirements for reporting problems or requesting features. A
+feature request should clearly define what additional feature should be
+implemented. As with bug-reports, the more information provided, the
+easier it’s viability and ease of implementation can be assessed.</p>
+<p>It should clearly describe <em>what</em> should be implemented, as
+well as <em>why</em> (and in broad strokes <em>how</em>) it should be
+implemented.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
