@@ -42,7 +42,7 @@ Generally, the steps are designed to be done in order, from top to bottom[^2]:
 [^2]: Obviously they don't *have* to be done in order, they just *should*.
 
 1.  Selecting the folder containing the input images.\
-    **Note:** This folder must not contain any images which are not intended to be evaluated, and this extends to subfolders. If you select folder `foo` to be analysed, then image `foo/bar.png` will be evaluated. However, the images `foo/baz/bar.png` and `foo/baz/another/ridiculous/nesting/plant.png` will also be evaluated.
+    **Note:** This folder must not contain any images which are not intended to be evaluated, and this extends to sub-folders. If you select folder `foo` to be analysed, then image `foo/bar.png` will be evaluated. However, the images `foo/baz/bar.png` and `foo/baz/another/ridiculous/nesting/plant.png` will also be evaluated.
 2.  Selecting the type of analysis to be performed[^3]. Select `GFA` for a `Leaf Area Analysis`/`Grünflächenanalyse`, and `WFA` if you intend to perform a `Root Area Analysis/Wurzelflächenanalyse`.
 3.  Optionally, temporarily[^4] modify the HSV-boundaries used for a respective type of analysis. Values must be provided in HSV-color space and in accordance to the following rules:
     1.  $0 \le H_0 \le 359$, $0 \le H_1 \le 359$, $H_0 \lt H_1$
@@ -53,7 +53,8 @@ Generally, the steps are designed to be done in order, from top to bottom[^2]:
 5.  Decide whether or not to restrict the area within which the identifier-dot truely lies. For more information, see "[Restricting area within which the identifier-dot is quantified]". **Taking this precaution is heavily suggested**.
 6.  Decide whether or not the execution should be run in parallel. Parallelisation can significantly reduce execution-time, *particularly for larger image-sets*. It's use is **strongly advised** when the number of images gets above \~40. Below that, it might still be sensible, but the author is not comfortable giving a blanket recommendation. For more information, see "[Parallelised execution]".
 7.  Select the date at which the images were shot.
-8.  Decide whether or not to analyse all images listed in the tab `Image Files`, or a single one of that set. Pressing either of these buttons will render the GUI unresponsive while executing the respective workflow, until it has been completed and the various results on the right side of the app are being updated.
+8.  Optionally alter the area for the identifier.
+9.  Decide whether or not to analyse all images listed in the tab `Image Files`, or a single one of that set. Pressing either of these buttons will render the GUI unresponsive while executing the respective workflow, until it has been completed and the various results on the right side of the app are being updated.
 
 [^3]: This is technically optional, as all spectra can be selected at will before the analysis-routine is initiated.
 
@@ -94,6 +95,17 @@ Currently, the following KPIs are available:
 [^6]: assumed to be in $cm^2$
 
 ## Edge-cases / special controls
+
+### State-Management: Saving and restoring application configuration to and from files
+
+At the bottom of the grey panel exists a section called "Bookmarking". It allows the user to store the current state of the app's **input** data (configuration, chosen directory-path, relevant data\` to a file, which can be loaded at a later time.
+
+In general, this has two use-cases:
+
+1.  Retaining and restoring common configuration changes for easier access.
+2.  Restoring configurations which induced errors, so that they might be debugged in a reproducible manner.\
+
+For more details, see `vignette("saving-and-restoring-application-state", package = "duflor.gui")`.
 
 ### Tab 1: `Image Files`
 

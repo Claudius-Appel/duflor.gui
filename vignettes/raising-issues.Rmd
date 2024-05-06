@@ -42,8 +42,8 @@ To be useful, there is a bare-minimum amount of information that must be provide
 - An example-dataset which exhibits the problem. In the case `duflor.gui` and `duflor`, this would often include example-images.
 - Information on the system's specifications (OS, hardware configuration, etc. pp.)
 - The R-Version in use
-- notes on all warnings/errors emitted to the console before/when encountering the bug.
-
+- Notes on all warnings/errors emitted to the console before/when encountering the bug.
+- **If generated, the `error_state.rds`-file**. This file is generated when errors occur in certain sections of the code, but not in all. It bundles the state of the app's data structure at the point at which the error occurred, including its configuration. However, it does _not_ include the raw image-files as input, which must be supplied separately. For more details, see `vignette("saving-and-restoring-application-states", package = "duflor.gui")`. When reporting bugs, it is **heavily suggested to supply this file**.
 
 The more information is available, the easier it becomes to identify the actual issue.
 

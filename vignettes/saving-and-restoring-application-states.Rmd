@@ -33,7 +33,7 @@ Let's build a hypothetical scenario, in which you perform an experiment on a set
 
 Recreating these modifications every time a set of images must be analysed for this experimental setup has an enormous potential for inducing errors along the way.
 
-To counteract this, the user may save the current configuration of all **input**-controls and settings to a file, along with the .
+To counteract this, the user may save the current configuration of all **input**-controls and settings to a file.
 
 **Note that the following limitations apply**:
 
@@ -42,7 +42,7 @@ To counteract this, the user may save the current configuration of all **input**
     2.  Options which cannot be modified via the GUI will not be stored.
 2.  The state of certain data-objects change dynamically, and performing an analysis also affect this. This has two consequences:
     1.  Assume you load configuration `X`, perform an analysis with it, *then* change the HSV-bounds for a specific spectrum, and finally save the state *without* re-executing the analysis. As a result, the HSV-spectra in the stored state-file differ from those used for the analysis. If the user were to load this state and execute it, the new results would not be identical to the previous version.
-    2.   While a "state" technically stores the general `DATA`-object which also contains the results-data (if it was computed before the state-file is generated), this data will not be rendered when a state is loaded. The `DATA`-object is essentially only stored for internal purposes, **not** to retain the results-data across sessions.
+    2.  While a "state" technically stores the general `DATA`-object which also contains the results-data (if it was computed before the state-file is generated), this data will not be rendered when a state is loaded. The `DATA`-object is essentially only stored for internal purposes, **not** to retain the results-data across sessions.
 
 # Saving states when errors occur during analysis
 
