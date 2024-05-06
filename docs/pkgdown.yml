@@ -3,8 +3,14 @@ pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   general-user-manual: general-user-manual.html
+  identifier-cropping: identifier-cropping.html
+  image-cropping: image-cropping.html
+  modifying-hsv-bounds: modifying-hsv-bounds.html
   optimising-speed: optimising-speed.html
-last_built: 2024-05-06T11:06Z
+  parallelisation: parallelisation.html
+  raising-issues: raising-issues.html
+  saving-and-restoring-application-states: saving-and-restoring-application-states.html
+last_built: 2024-05-06T13:20Z
 urls:
   reference: https://Claudius-Appel.github.io/duflor.gui/reference
   article: https://Claudius-Appel.github.io/duflor.gui/articles

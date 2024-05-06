@@ -2,10 +2,7 @@
 % Please edit documentation in R/app.R
 \name{duflor_gui}
 \alias{duflor_gui}
-\title{Start the duflor-gui via this function
-importFrom shiny
-importFrom stringr str_
-importFrom stringr str_}
+\title{Start the duflor-gui via this function}
 \usage{
 duflor_gui()
 }
@@ -14,7 +11,4 @@ duflor_gui()
 }
 \description{
 Start the duflor-gui via this function
-importFrom shiny
-importFrom stringr str_
-importFrom stringr str_
 }
