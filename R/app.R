@@ -247,10 +247,7 @@ duflor_gui <- function() {
         volumes <- getVolumes()()
         #### DISPLAYING AND RENDERING FILES AND STUFF ####
         image_files_ <- reactive({ # image_files is a list of filepaths, which gets set reactively.
-            req(isFALSE(is.na(DATA$folder_path)))
             folder_path <- DATA$folder_path # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
-            req(dir.exists(folder_path))
-            req(input$image_file_suffix)
             # all buttons listed here must be disabled by default
             # they will be enabled if the `list.files()` returns a non-empty vector of files.
             buttons_to_toggle <- c(
@@ -263,7 +260,6 @@ duflor_gui <- function() {
             for (each in buttons_to_toggle) {
                 updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = TRUE)
             }
-            req(folder_path) ## make sure the rest of this react is only executed if 'folder_path' is set
             if (dir.exists(folder_path)) {
                 ## we do not recurse to force all input-files to be in the same level
                 images_ <- list.files(folder_path,pattern = paste0("*.(",str_to_lower(input$image_file_suffix),"|",str_to_upper(input$image_file_suffix),")"),recursive = F,full.names = T)
@@ -297,12 +293,6 @@ duflor_gui <- function() {
         output$ctrl_current_folder <- renderText({
             file_selected <- parseDirPath(roots = volumes, input$folder)
         })
-
-        #TODO: figure out how to make selecting rows in this table responsive:
-        # after executing 'execute_analysis', the plot-area above should render the
-        # parameter set in 'r__KPI_type', by default for all entries
-        # selecting entries in the table should render the respective KPI for these
-        # images only.
         output$tbl_dir_files <- renderDataTable({
             image_files$image_files},
             server = TRUE,
@@ -314,6 +304,9 @@ duflor_gui <- function() {
             )
         )
         observeEvent(input$image_file_suffix, {
+            req(isFALSE(is.na(DATA$folder_path)))
+            req(dir.exists(DATA$folder_path))
+            req(input$image_file_suffix) # image_files_
             image_files_()
         })
         observeEvent(input$folder, {
@@ -327,19 +320,40 @@ duflor_gui <- function() {
         #### REACTIVE - RESULTS_TABLE/BARPLOT, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
             req(input$reinspected_spectrums)
-            if (is.na(DATA$results)) { # handle empty DATA$results (this cannot be done via `req()` because `DATA$results` is initialised at startup)
-                ret <- data.frame(image_name = character(),
-                                  stringsAsFactors = FALSE)
-                return(ret)
-            }
-            RESULTS <- DATA$results
-            available_columns <- names(DATA$results$results)
-            static_columns <- c("image_name","date_of_analysis","processed_width","processed_height","area_per_pixel")
-            dynamic_columns_idx <- grep(input$reinspected_spectrums,available_columns)
-            dynamic_columns <- available_columns[dynamic_columns_idx]
-            total_columns <- c(static_columns,dynamic_columns)
-            filtered_table <- RESULTS$results[,total_columns]
-            return(filtered_table)
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                if (is.na(DATA$results)) { # handle empty DATA$results (this cannot be done via `req()` because `DATA$results` is initialised at startup)
+                    ret <- data.frame(image_name = character(),
+                                      stringsAsFactors = FALSE)
+                    return(ret)
+                }
+                RESULTS <- DATA$results
+                available_columns <- names(DATA$results$results)
+                static_columns <- c("image_name","date_of_analysis","processed_width","processed_height","area_per_pixel")
+                dynamic_columns_idx <- grep(input$reinspected_spectrums,available_columns)
+                dynamic_columns <- available_columns[dynamic_columns_idx]
+                total_columns <- c(static_columns,dynamic_columns)
+                filtered_table <- RESULTS$results[,total_columns]
+                return(filtered_table)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "filtered_results"
+                )
+                showNotification(
+                    ui = str_c("Error occured during reactive 'filtered_results'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         output$tbl_results_filtered <- renderDataTable({
             filtered_results()},
@@ -354,10 +368,31 @@ duflor_gui <- function() {
         #### PLOT OUTPUT RESULTS ####
         filtered_plot <- reactive({
             req(input$reinspected_spectrums2,input$reinspected_type2,hasName(DATA$results,"results"))
-            KPI <- get_KPI_plot(input, DATA)
-            DATA$current_KPI_key <- KPI$key
-            DATA$current_KPI_plot <- KPI$plt
-            return(KPI$plt)
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                KPI <- get_KPI_plot(input, DATA)
+                DATA$current_KPI_key <- KPI$key
+                DATA$current_KPI_plot <- KPI$plt
+                return(KPI$plt)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "filtered_plot"
+                )
+                showNotification(
+                    ui = str_c("Error occured during reactive 'filtered_plot'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         output$results_visualisation_plot <- renderPlot({
             filtered_plot()
@@ -374,7 +409,28 @@ duflor_gui <- function() {
         hide("PARALLEL_PANEL")
         #### DEV TOGGLES ####
         observeEvent(input$dev_pass, {
-            DEBUGKEYS <- dev_key_handler(input, DATA, DEBUGKEYS, session, use_logical_cores)
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                DEBUGKEYS <- dev_key_handler(input, DATA, DEBUGKEYS, session, use_logical_cores)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "dev_pass"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$dev_pass'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### SETUP PARALLELISATION ####
         observeEvent(input$open_parallelPanel, {
@@ -636,7 +692,7 @@ duflor_gui <- function() {
                     ),
                     type = "message"
                 )
-            hide("HSV_PANEL")
+                hide("HSV_PANEL")
             } else { ## ask the user if the changes are okay?
                 ## set values which exceed their bounds to the respective bound
                 for (each in names(changes$return_obj)) {
@@ -721,45 +777,65 @@ duflor_gui <- function() {
         #### RENDER PLOT ####
         observeEvent(input$render_plant, {
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
-
-            selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
-            DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
-            showNotification(
-                ui = str_c("loading ", " ", selectedrow$images_filtered),
-                duration = DATA$notification_duration,
-                type = "message"
-            )
-            if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=selectedrow$images_filtered)) {
-                im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
-            } else {
-                im <- DATA$last_im
-            }
-            dims <- dim(im)
-            if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add selected cropping_rect to image
-                im <- draw_rect(
-                    im,
-                    x0 = input$x0,
-                    x1 = input$x1,
-                    y0 = input$y0,
-                    y1 = input$y1,
-                    color = "lightblue",
-                    opacity = 0.25,
-                    filled = T
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
+                DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
+                showNotification(
+                    ui = str_c("loading ", " ", selectedrow$images_filtered),
+                    duration = DATA$notification_duration,
+                    type = "message"
                 )
-            }
-            if ((input$identifiersearch_x0!=0) && (input$identifiersearch_x1!=0)  && (input$identifiersearch_y0!=0)  && (input$identifiersearch_y1!=0))  { # add selected identcroping_rect to image
-                im <- draw_rect(
-                    im,
-                    x0 = input$identifiersearch_x0,
-                    x1 = input$identifiersearch_x1,
-                    y0 = input$identifiersearch_y0,
-                    y1 = input$identifiersearch_y1,
-                    color = "yellow",
-                    opacity = 0.25,
-                    filled = T
+                if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=selectedrow$images_filtered)) {
+                    im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+                } else {
+                    im <- DATA$last_im
+                }
+                dims <- dim(im)
+                if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add selected cropping_rect to image
+                    im <- draw_rect(
+                        im,
+                        x0 = input$x0,
+                        x1 = input$x1,
+                        y0 = input$y0,
+                        y1 = input$y1,
+                        color = "lightblue",
+                        opacity = 0.25,
+                        filled = T
+                    )
+                }
+                if ((input$identifiersearch_x0!=0) && (input$identifiersearch_x1!=0)  && (input$identifiersearch_y0!=0)  && (input$identifiersearch_y1!=0))  { # add selected identcroping_rect to image
+                    im <- draw_rect(
+                        im,
+                        x0 = input$identifiersearch_x0,
+                        x1 = input$identifiersearch_x1,
+                        y0 = input$identifiersearch_y0,
+                        y1 = input$identifiersearch_y1,
+                        color = "yellow",
+                        opacity = 0.25,
+                        filled = T
+                    )
+                }
+                display(im)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "render_plant"
                 )
-            }
-            display(im)
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$render_plant'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### MAIN CALLBACK>EXECUTE DUFLOR_PACKAGE HERE ####
         observeEvent(input$execute_analysis_single, {
@@ -872,10 +948,11 @@ duflor_gui <- function() {
                     FLAGS = FLAGS,
                     volumes = getVolumes(),
                     error = e,
-                    errordir_path = DATA$folder_path
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "submit_selected_spectra"
                 )
                 showNotification(
-                    ui = str_c("Error occured during analysis. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    ui = str_c("Error occured during analysis (callback 'input$submit_selected_spectra'). The configuration which triggered this error was stored to '",error_state_path,"'."),
                     id = "error_state_generated.done",
                     duration = NULL,
                     type = "error"
@@ -885,47 +962,89 @@ duflor_gui <- function() {
         #### RERUN ANALYSIS TO RENDER PLOTS ####
         observeEvent(input$render_selected_mask, {
             req(input$reinspected_spectrums)
-            render_selected_mask(input, DATA, FLAGS)
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                render_selected_mask(input, DATA, FLAGS)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "render_selected_mask"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$render_selected_mask'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### SAVE RESULTS BTN ####
         observeEvent(input$save_results, {
             req(DATA$results)
-            if (is.na(DATA$results)) {
-                #TODO: add warning: results are empty, could not save.
-                return()
-            } else {
-                # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
-
-                results_path <- str_c(
-                    dirname(DATA$results$results$full_path[[1]]),
-                    "/results/results_",
-                    input$date_of_image_shooting
-                )
-                out <- store_results_to_file(
-                    results = DATA$results,
-                    results_path = results_path,
-                    save_to_xlsx = input$save_as_xlsx,
-                    set_author_xlsx =  DEBUGKEYS$set.author
-                )
-                ## verify save was successfull
-                if (out$success) {
-                    showNotification(
-                        ui = "Analysis completed. Results have been written to '",
-                        out$results_path,
-                        "'",
-                        duration = DATA$notification_duration,
-                        type = "message"
-                    )
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                if (is.na(DATA$results)) {
+                    #TODO: add warning: results are empty, could not save.
+                    return()
                 } else {
-                    showNotification(
-                        ui = "Analysis could not be completed successfully, and results could not be successfully written to",
-                        out$results_path,
-                        "'",
-                        duration = DATA$notification_duration * 4,
-                        type = "warning"
+                    # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
+
+                    results_path <- str_c(
+                        dirname(DATA$results$results$full_path[[1]]),
+                        "/results/results_",
+                        input$date_of_image_shooting
                     )
+                    out <- store_results_to_file(
+                        results = DATA$results,
+                        results_path = results_path,
+                        save_to_xlsx = input$save_as_xlsx,
+                        set_author_xlsx =  DEBUGKEYS$set.author
+                    )
+                    ## verify save was successfull
+                    if (out$success) {
+                        showNotification(
+                            ui = "Analysis completed. Results have been written to '",
+                            out$results_path,
+                            "'",
+                            duration = DATA$notification_duration,
+                            type = "message"
+                        )
+                    } else {
+                        showNotification(
+                            ui = "Analysis could not be completed successfully, and results could not be successfully written to",
+                            out$results_path,
+                            "'",
+                            duration = DATA$notification_duration * 4,
+                            type = "warning"
+                        )
+                    }
                 }
-            }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "save_results"
+                )
+                showNotification(
+                    ui = str_c("Error occured callback 'input$save_results'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### FINISH STARTUP ####
         STARTUP <- reactiveValues(startup = TRUE)
@@ -953,64 +1072,131 @@ duflor_gui <- function() {
         })
         # Load button action
         observeEvent(input$restore_state, {
-            showNotification(
-                ui = "State is being restored.",
-                id = "restore_state.ongoing",
-                duration = NA,
-                type = "warning"
-            )
-            state_file <- input$restore_state$datapath
-            loaded_path <- restore_state(input, output, DATA, FLAGS, DEBUGKEYS, getDefaultReactiveDomain(), getVolumes(), state_file)
-            DATA$folder_path <- loaded_path
-            image_files_()
-            removeNotification(id = "restore_state.ongoing")
-            if (file.exists(loaded_path)) {
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            req(input$restore_state$datapath!="") # restore_state()
+            req(file.exists(input$restore_state$datapath)) # restore_state()
+            # req(isFALSE(is.na(DATA$folder_path)))
+            # folder_path <- DATA$folder_path  # image_files_ # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+            # req(dir.exists(folder_path)) # image_files_
+            req(input$image_file_suffix) # image_files_
+            tryCatch({
                 showNotification(
-                    ui = str_c("State successfully restored from '",loaded_path,"'."),
-                    id = "restore_state.done",
-                    duration = DATA$notification_duration * 4,
-                    type = "message"
+                    ui = "State is being restored.",
+                    id = "restore_state.ongoing",
+                    duration = NA,
+                    type = "warning"
                 )
-            } else {
+                state_file <- input$restore_state$datapath
+                loaded_path <- restore_state(
+                    input = input,
+                    output = output,
+                    DATA = DATA,
+                    FLAGS = FLAGS,
+                    DEBUGKEYS = DEBUGKEYS,
+                    session = getDefaultReactiveDomain(),
+                    volumes = getVolumes(),
+                    state_file = state_file
+                )
+                DATA$folder_path <- loaded_path
+                image_files_()
+                removeNotification(id = "restore_state.ongoing")
+                if (file.exists(loaded_path)) {
+                    showNotification(
+                        ui = str_c("State successfully restored from '",loaded_path,"'."),
+                        id = "restore_state.done",
+                        duration = DATA$notification_duration * 4,
+                        type = "message"
+                    )
+                } else {
+                    showNotification(
+                        ui = str_c("State was not successfully restored from '",loaded_path,"'."),
+                        id = "restore_state.error",
+                        duration = DATA$notification_duration * 4,
+                        type = "error"
+                    )
+                }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "restore_state"
+                )
                 showNotification(
-                    ui = str_c("State was not successfully restored from '",loaded_path,"'."),
-                    id = "restore_state.error",
-                    duration = DATA$notification_duration * 4,
+                    ui = str_c("Error occured while restoring state (during callback `input$restore_state`). The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
                     type = "error"
                 )
-            }
+            })
         })
         # Save directory selection
         observeEvent(input$save_state, {
-            showNotification(
-                ui = "State is being saved.",
-                id = "save_state.ongoing",
-                duration = NA,
-                type = "warning"
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            shinyFileSave(
+                input,
+                "save_state",
+                roots = volumes,
+                session = getDefaultReactiveDomain(),
+                allowDirCreate = T
             )
-            saved_state_path <- save_state(
-                input = input,
-                DATA = DATA,
-                DEBUGKEYS = DEBUGKEYS,
-                FLAGS = FLAGS,
-                volumes = getVolumes()
-            )
-            removeNotification(id = "save_state.ongoing")
-            if (file.exists(saved_state_path)) {
+            savedir_path <- parseDirPath(roots = volumes, selection = input$save_state)
+            req(isFALSE(is.numeric(input$save_state[[1]])))
+            req(dir.exists(savedir_path))
+            tryCatch({
                 showNotification(
-                    ui = str_c("State successfully saved to '",saved_state_path,"'."),
-                    id = "save_state.done",
-                    duration = DATA$notification_duration * 4,
-                    type = "message"
+                    ui = "State is being saved.",
+                    id = "save_state.ongoing",
+                    duration = NA,
+                    type = "warning"
                 )
-            } else {
+                saved_state_path <- save_state(
+                    input = input,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes()
+                )
+                removeNotification(id = "save_state.ongoing")
+                if (file.exists(saved_state_path)) {
+                    showNotification(
+                        ui = str_c("State successfully saved to '",saved_state_path,"'."),
+                        id = "save_state.done",
+                        duration = DATA$notification_duration * 4,
+                        type = "message"
+                    )
+                } else {
+                    showNotification(
+                        ui = str_c("State was not successfully saved to '",saved_state_path,"'."),
+                        id = "save_state.error",
+                        duration = DATA$notification_duration * 4,
+                        type = "error"
+                    )
+                }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- f(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "save_state"
+                )
                 showNotification(
-                    ui = str_c("State was not successfully saved to '",saved_state_path,"'."),
-                    id = "save_state.error",
-                    duration = DATA$notification_duration * 4,
+                    ui = str_c("Error occured while saving state (during callback 'input$save_state'). The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
                     type = "error"
                 )
-            }
+            })
         })
     }
     #### LAUNCH APP ####

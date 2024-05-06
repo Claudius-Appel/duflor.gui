@@ -19,16 +19,6 @@
 #' @importFrom shinyFiles parseDirPath
 #'
 save_state <- function(input, DATA, DEBUGKEYS, FLAGS, volumes) {
-    shinyFileSave(
-        input,
-        "save_state",
-        roots = volumes,
-        session = getDefaultReactiveDomain(),
-        allowDirCreate = T
-    )
-    savedir_path <- parseDirPath(roots = volumes, selection = input$save_state)
-    req(dir.exists(savedir_path))
-    req(isFALSE(is.numeric(input$save_state[[1]])))
     savefile_path <- parseSavePath(roots = volumes, selection = input$save_state)
     fpath <- file.path(savefile_path$datapath)
     cat("\nSaving to '",fpath,"'")
