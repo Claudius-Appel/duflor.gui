@@ -833,7 +833,6 @@ duflor_gui <- function() {
                     }
                 }
                 #### EXECUTE ANALYSIS ####
-                #TODO: add modal "analysis is ongoing, please wait"
                 removeNotification(id = "analysis.completed")
                 showNotification(
                     ui = str_c("Analysis ongoing since ", Sys.time(), "."),
@@ -877,7 +876,7 @@ duflor_gui <- function() {
                     FLAGS = FLAGS,
                     volumes = getVolumes(),
                     error = e,
-                    errordir = DATA$folder_path
+                    errordir_path = DATA$folder_path
                 )
                 showNotification(
                     ui = str_c("Error occured during analysis. The configuration which triggered this error was stored to '",error_state_path,"'."),
