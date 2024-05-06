@@ -1057,32 +1057,68 @@ duflor_gui <- function() {
         })
         # Load button action
         observeEvent(input$restore_state, {
-            showNotification(
-                ui = "State is being restored.",
-                id = "restore_state.ongoing",
-                duration = NA,
-                type = "warning"
-            )
-            state_file <- input$restore_state$datapath
-            loaded_path <- restore_state(input, output, DATA, FLAGS, DEBUGKEYS, getDefaultReactiveDomain(), getVolumes(), state_file)
-            DATA$folder_path <- loaded_path
-            image_files_()
-            removeNotification(id = "restore_state.ongoing")
-            if (file.exists(loaded_path)) {
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            req(input$restore_state$datapath!="") # restore_state()
+            req(file.exists(input$restore_state$datapath)) # restore_state()
+            # req(isFALSE(is.na(DATA$folder_path)))
+            # folder_path <- DATA$folder_path  # image_files_ # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+            # req(dir.exists(folder_path)) # image_files_
+            req(input$image_file_suffix) # image_files_
+            tryCatch({
                 showNotification(
-                    ui = str_c("State successfully restored from '",loaded_path,"'."),
-                    id = "restore_state.done",
-                    duration = DATA$notification_duration * 4,
-                    type = "message"
+                    ui = "State is being restored.",
+                    id = "restore_state.ongoing",
+                    duration = NA,
+                    type = "warning"
                 )
-            } else {
+                state_file <- input$restore_state$datapath
+                loaded_path <- restore_state(
+                    input = input,
+                    output = output,
+                    DATA = DATA,
+                    FLAGS = FLAGS,
+                    DEBUGKEYS = DEBUGKEYS,
+                    session = getDefaultReactiveDomain(),
+                    volumes = getVolumes(),
+                    state_file = state_file
+                )
+                DATA$folder_path <- loaded_path
+                image_files_()
+                removeNotification(id = "restore_state.ongoing")
+                if (file.exists(loaded_path)) {
+                    showNotification(
+                        ui = str_c("State successfully restored from '",loaded_path,"'."),
+                        id = "restore_state.done",
+                        duration = DATA$notification_duration * 4,
+                        type = "message"
+                    )
+                } else {
+                    showNotification(
+                        ui = str_c("State was not successfully restored from '",loaded_path,"'."),
+                        id = "restore_state.error",
+                        duration = DATA$notification_duration * 4,
+                        type = "error"
+                    )
+                }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "restore_state"
+                )
                 showNotification(
-                    ui = str_c("State was not successfully restored from '",loaded_path,"'."),
-                    id = "restore_state.error",
-                    duration = DATA$notification_duration * 4,
+                    ui = str_c("Error occured while restoring state (during callback `input$restore_state`). The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
                     type = "error"
                 )
-            }
+            })
         })
         # Save directory selection
         observeEvent(input$save_state, {
