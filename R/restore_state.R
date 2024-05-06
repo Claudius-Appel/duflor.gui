@@ -10,6 +10,9 @@
 #' @param session - shiny session
 #' @param volumes - volume letters available
 #' @param state_file filepath for to-be-loaded state_file
+#' @keywords internal
+#' @return path to the loaded file.
+#'
 #' @importFrom shiny updateRadioButtons
 #' @importFrom shiny updateSelectInput
 #' @importFrom shiny updateActionButton
@@ -23,18 +26,16 @@
 #' @importFrom DT renderDataTable
 #' @importFrom shinyFiles parseDirPath
 #'
-#' @keywords internal
-#'
 restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volumes, state_file) {
     req(state_file!="")
     req(file.exists(state_file))
 
     input_state <- readRDS(state_file)
     ## Restore DATA
-    DATA <<- input_state$DATA
+    DATA <- input_state$DATA
     DATA$r__tbl_dir_files <- input_state$DATA$r__tbl_dir_files
-    DEBUGKEYS <<- input_state$DEBUGKEYS
-    FLAGS <<- input_state$FLAGS
+    DEBUGKEYS <- input_state$DEBUGKEYS
+    FLAGS <- input_state$FLAGS
 
 
     ## restore imagetype
