@@ -948,10 +948,11 @@ duflor_gui <- function() {
                     FLAGS = FLAGS,
                     volumes = getVolumes(),
                     error = e,
-                    errordir_path = DATA$folder_path
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "submit_selected_spectra"
                 )
                 showNotification(
-                    ui = str_c("Error occured during analysis. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    ui = str_c("Error occured during analysis (callback 'input$submit_selected_spectra'). The configuration which triggered this error was stored to '",error_state_path,"'."),
                     id = "error_state_generated.done",
                     duration = NULL,
                     type = "error"
