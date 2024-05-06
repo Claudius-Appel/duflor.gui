@@ -678,7 +678,7 @@ duflor_gui <- function() {
                     ),
                     type = "message"
                 )
-            hide("HSV_PANEL")
+                hide("HSV_PANEL")
             } else { ## ask the user if the changes are okay?
                 ## set values which exceed their bounds to the respective bound
                 for (each in names(changes$return_obj)) {
