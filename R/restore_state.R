@@ -64,9 +64,8 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
     })
     ## setup tbl_dir_files
     # shiny::isolate({
-    # image_files <<- input_state$DATA$r__tbl_dir_files
-    # image_files$image_files <<- input_state$DATA$r__tbl_dir_files
     loaded_path <- parseDirPath(roots = volumes,selection = input_state$input$folder)
+    cat("\nLoading '",loaded_path,"'")
     buttons_to_toggle <- c(
         "render_plant",
         "select_crops",
