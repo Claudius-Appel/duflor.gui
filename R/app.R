@@ -247,10 +247,7 @@ duflor_gui <- function() {
         volumes <- getVolumes()()
         #### DISPLAYING AND RENDERING FILES AND STUFF ####
         image_files_ <- reactive({ # image_files is a list of filepaths, which gets set reactively.
-            req(isFALSE(is.na(DATA$folder_path)))
             folder_path <- DATA$folder_path # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
-            req(dir.exists(folder_path))
-            req(input$image_file_suffix)
             # all buttons listed here must be disabled by default
             # they will be enabled if the `list.files()` returns a non-empty vector of files.
             buttons_to_toggle <- c(
@@ -263,7 +260,6 @@ duflor_gui <- function() {
             for (each in buttons_to_toggle) {
                 updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = TRUE)
             }
-            req(folder_path) ## make sure the rest of this react is only executed if 'folder_path' is set
             if (dir.exists(folder_path)) {
                 ## we do not recurse to force all input-files to be in the same level
                 images_ <- list.files(folder_path,pattern = paste0("*.(",str_to_lower(input$image_file_suffix),"|",str_to_upper(input$image_file_suffix),")"),recursive = F,full.names = T)
@@ -297,12 +293,6 @@ duflor_gui <- function() {
         output$ctrl_current_folder <- renderText({
             file_selected <- parseDirPath(roots = volumes, input$folder)
         })
-
-        #TODO: figure out how to make selecting rows in this table responsive:
-        # after executing 'execute_analysis', the plot-area above should render the
-        # parameter set in 'r__KPI_type', by default for all entries
-        # selecting entries in the table should render the respective KPI for these
-        # images only.
         output$tbl_dir_files <- renderDataTable({
             image_files$image_files},
             server = TRUE,
@@ -314,6 +304,9 @@ duflor_gui <- function() {
             )
         )
         observeEvent(input$image_file_suffix, {
+            req(isFALSE(is.na(DATA$folder_path)))
+            req(dir.exists(DATA$folder_path))
+            req(input$image_file_suffix) # image_files_
             image_files_()
         })
         observeEvent(input$folder, {
