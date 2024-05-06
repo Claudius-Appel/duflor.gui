@@ -784,6 +784,8 @@ duflor_gui <- function() {
             select_spectra_gui_comp(input)
         })
         observeEvent(input$submit_selected_spectra, {
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
             if (is.null(input$selected_spectra)) {
                 showNotification(
                     ui = str_c(
@@ -793,13 +795,12 @@ duflor_gui <- function() {
                     type = "warning"
 
                 )
+                    return()
             }
-            req(input$selected_spectra)
             removeModal()
             spectrums <- DATA$spectrums
             spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
             spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
-
             # update the spectrum-selection DDLs in tabs `Results - inspect` and `Results - plots`
             updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
             updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
@@ -867,6 +868,24 @@ duflor_gui <- function() {
                 updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
             }
             updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir = DATA$folder_path
+                )
+                showNotification(
+                    ui = str_c("Error occured during analysis. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### RERUN ANALYSIS TO RENDER PLOTS ####
         observeEvent(input$render_selected_mask, {
