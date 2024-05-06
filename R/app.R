@@ -354,10 +354,31 @@ duflor_gui <- function() {
         #### PLOT OUTPUT RESULTS ####
         filtered_plot <- reactive({
             req(input$reinspected_spectrums2,input$reinspected_type2,hasName(DATA$results,"results"))
-            KPI <- get_KPI_plot(input, DATA)
-            DATA$current_KPI_key <- KPI$key
-            DATA$current_KPI_plot <- KPI$plt
-            return(KPI$plt)
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                KPI <- get_KPI_plot(input, DATA)
+                DATA$current_KPI_key <- KPI$key
+                DATA$current_KPI_plot <- KPI$plt
+                return(KPI$plt)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "filtered_plot"
+                )
+                showNotification(
+                    ui = str_c("Error occured during reactive 'filtered_plot'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         output$results_visualisation_plot <- renderPlot({
             filtered_plot()
