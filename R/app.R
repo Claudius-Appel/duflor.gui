@@ -1143,35 +1143,66 @@ duflor_gui <- function() {
         })
         # Save directory selection
         observeEvent(input$save_state, {
-            showNotification(
-                ui = "State is being saved.",
-                id = "save_state.ongoing",
-                duration = NA,
-                type = "warning"
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            shinyFileSave(
+                input,
+                "save_state",
+                roots = volumes,
+                session = getDefaultReactiveDomain(),
+                allowDirCreate = T
             )
-            saved_state_path <- save_state(
-                input = input,
-                DATA = DATA,
-                DEBUGKEYS = DEBUGKEYS,
-                FLAGS = FLAGS,
-                volumes = getVolumes()
-            )
-            removeNotification(id = "save_state.ongoing")
-            if (file.exists(saved_state_path)) {
+            savedir_path <- parseDirPath(roots = volumes, selection = input$save_state)
+            req(isFALSE(is.numeric(input$save_state[[1]])))
+            req(dir.exists(savedir_path))
+            tryCatch({
                 showNotification(
-                    ui = str_c("State successfully saved to '",saved_state_path,"'."),
-                    id = "save_state.done",
-                    duration = DATA$notification_duration * 4,
-                    type = "message"
+                    ui = "State is being saved.",
+                    id = "save_state.ongoing",
+                    duration = NA,
+                    type = "warning"
                 )
-            } else {
+                saved_state_path <- save_state(
+                    input = input,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes()
+                )
+                removeNotification(id = "save_state.ongoing")
+                if (file.exists(saved_state_path)) {
+                    showNotification(
+                        ui = str_c("State successfully saved to '",saved_state_path,"'."),
+                        id = "save_state.done",
+                        duration = DATA$notification_duration * 4,
+                        type = "message"
+                    )
+                } else {
+                    showNotification(
+                        ui = str_c("State was not successfully saved to '",saved_state_path,"'."),
+                        id = "save_state.error",
+                        duration = DATA$notification_duration * 4,
+                        type = "error"
+                    )
+                }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- f(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "save_state"
+                )
                 showNotification(
-                    ui = str_c("State was not successfully saved to '",saved_state_path,"'."),
-                    id = "save_state.error",
-                    duration = DATA$notification_duration * 4,
+                    ui = str_c("Error occured while saving state (during callback 'input$save_state'). The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
                     type = "error"
                 )
-            }
+            })
         })
     }
     #### LAUNCH APP ####
