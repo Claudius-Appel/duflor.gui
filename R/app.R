@@ -968,7 +968,28 @@ duflor_gui <- function() {
         #### RERUN ANALYSIS TO RENDER PLOTS ####
         observeEvent(input$render_selected_mask, {
             req(input$reinspected_spectrums)
-            render_selected_mask(input, DATA, FLAGS)
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                render_selected_mask(input, DATA, FLAGS)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "render_selected_mask"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$render_selected_mask'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### SAVE RESULTS BTN ####
         observeEvent(input$save_results, {
