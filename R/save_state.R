@@ -30,7 +30,7 @@ save_state <- function(input, DATA, DEBUGKEYS, FLAGS, volumes) {
     req(isFALSE(is.numeric(input$save_state[[1]])))
     savefile_path <- parseSavePath(roots = volumes, selection = input$save_state)
     fpath <- file.path(savefile_path$datapath)
-    print(fpath)
+    cat("\nSaving to '",fpath,"'")
     saveRDS(list(
         input = input,
         DATA = DATA,
