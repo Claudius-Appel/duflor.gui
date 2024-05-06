@@ -1,8 +1,4 @@
 #' Start the duflor-gui via this function
-#'importFrom shiny
-#' importFrom stringr str_
-#' importFrom stringr str_
-#'
 #'
 #' @importFrom shiny fluidPage
 #' @importFrom shiny titlePanel
