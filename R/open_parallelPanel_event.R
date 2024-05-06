@@ -2,6 +2,7 @@
 #'
 #' @param input - `input` respective shiny-component
 #' @param DATA - `DATA` respective shiny-component
+#' @param FLAGS - `FLAGS` respective shiny-component
 #' @param use_logical_cores - internal flag
 #' @param session - shiny session
 #' @param STARTUP - `STARTUP` respective shiny-component
@@ -14,7 +15,7 @@
 #' @importFrom shinyjs hide
 #' @importFrom parallel detectCores
 #'
-open_parallelPanel_event <- function(input, DATA, use_logical_cores, session, STARTUP, default_init_cores = 2) {
+open_parallelPanel_event <- function(input, DATA, FLAGS, use_logical_cores, session, STARTUP, default_init_cores = 2) {
     # controls whether or not the number of cores can be selected.
     # Unchecking this will set the number of used cores to `1`
     if (input$open_parallelPanel) {
@@ -31,8 +32,10 @@ open_parallelPanel_event <- function(input, DATA, use_logical_cores, session, ST
             duration = DATA$notification_duration * 5,
             type = "warning"
         )
-        updateNumericInput(session,inputId = "parallel_cores",value = 2)
-        print("executing 'input$open_parallelPanel")
+        if (isFALSE(FLAGS$restoring_state)) {
+            updateNumericInput(session,inputId = "parallel_cores",value = 2)
+            print("executing 'input$open_parallelPanel")
+        }
     } else {
         hide("PARALLEL_PANEL")
         updateNumericInput(session,inputId = "parallel_cores",value = 1)

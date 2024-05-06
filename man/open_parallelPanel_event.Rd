@@ -7,6 +7,7 @@
 open_parallelPanel_event(
   input,
   DATA,
+  FLAGS,
   use_logical_cores,
   session,
   STARTUP,
@@ -20,6 +21,10 @@ open_parallelPanel_event(
 
 \item{DATA}{\itemize{
 \item \code{DATA} respective shiny-component
+}}
+
+\item{FLAGS}{\itemize{
+\item \code{FLAGS} respective shiny-component
 }}
 
 \item{use_logical_cores}{\itemize{

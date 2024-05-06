@@ -75,10 +75,6 @@ render_selected_mask <- function(input, DATA, FLAGS) {
         if (input$do_crop_image) {
             # coordinates of the identifier-dot has "moved" because the image
             # got cropped
-            identifiersearch_x0 =
-            identifiersearch_x1 =
-            identifiersearch_y0 =
-            identifiersearch_y1 =
             identifiersearch_x0 <- input$identifiersearch_x0 - input$x0
             identifiersearch_x1 <- input$identifiersearch_x1 - input$x0
             identifiersearch_y0 <- input$identifiersearch_y0 - input$y0
