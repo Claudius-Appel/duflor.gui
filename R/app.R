@@ -786,88 +786,88 @@ duflor_gui <- function() {
         observeEvent(input$submit_selected_spectra, {
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             tryCatch({
-            if (is.null(input$selected_spectra)) {
-                showNotification(
-                    ui = str_c(
-                        "Please select at least one option."
-                    ),
-                    duration = DATA$notification_duration * 5,
-                    type = "warning"
+                if (is.null(input$selected_spectra)) {
+                    showNotification(
+                        ui = str_c(
+                            "Please select at least one option."
+                        ),
+                        duration = DATA$notification_duration * 5,
+                        type = "warning"
 
-                )
+                    )
                     return()
-            }
-            removeModal()
-            spectrums <- DATA$spectrums
-            spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
-            spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
-            # update the spectrum-selection DDLs in tabs `Results - inspect` and `Results - plots`
-            updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
-            updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
-            DATA$spectrums <- spectrums
-            #### SETUP PARALLELISATION ####
-            if (input$parallel_cores > 1) {
-                if (.Platform$OS.type == "windows") {
-                    cluster_type <- "PSOCK"
-                } else {
-                    cluster_type <- "FORK"
                 }
-                if (getDoParRegistered()) {
-                    # a cluster is already spun up, so check if it can be reused
-                    current_workers <- getDoParWorkers()
-                    if (current_workers!=input$parallel_cores) {
-                        # desired number of workers have changed, so we need to
-                        # shut down the old cluster and build a new one
-                        shutdown_parallel()
+                removeModal()
+                spectrums <- DATA$spectrums
+                spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
+                spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
+                # update the spectrum-selection DDLs in tabs `Results - inspect` and `Results - plots`
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(spectrums$lower_bound))
+                DATA$spectrums <- spectrums
+                #### SETUP PARALLELISATION ####
+                if (input$parallel_cores > 1) {
+                    if (.Platform$OS.type == "windows") {
+                        cluster_type <- "PSOCK"
+                    } else {
+                        cluster_type <- "FORK"
+                    }
+                    if (getDoParRegistered()) {
+                        # a cluster is already spun up, so check if it can be reused
+                        current_workers <- getDoParWorkers()
+                        if (current_workers!=input$parallel_cores) {
+                            # desired number of workers have changed, so we need to
+                            # shut down the old cluster and build a new one
+                            shutdown_parallel()
+                            setup_parallel(input$parallel_cores, cluster_type)
+                        }
+                    } else {
+                        # no preexisting cluster, must init one
                         setup_parallel(input$parallel_cores, cluster_type)
+
                     }
                 } else {
-                    # no preexisting cluster, must init one
-                    setup_parallel(input$parallel_cores, cluster_type)
-
+                    if (getDoParRegistered()) {
+                        # shut down existing cluster first (?)
+                        shutdown_parallel()
+                    }
                 }
-            } else {
-                if (getDoParRegistered()) {
-                    # shut down existing cluster first (?)
-                    shutdown_parallel()
-                }
-            }
-            #### EXECUTE ANALYSIS ####
-            #TODO: add modal "analysis is ongoing, please wait"
-            removeNotification(id = "analysis.completed")
-            showNotification(
-                ui = str_c("Analysis ongoing since ", Sys.time(), "."),
-                id = "analysis.ongoing",
-                closeButton = F,
-                duration = NULL,
-                type = "warning"
-            )
-            execution_time <- system.time(
-                results <- execute_analysis(input, DATA, DEBUGKEYS, FLAGS)
-            )
-            removeNotification(id = "analysis.ongoing")
-            showNotification(
-                ui = str_c("Analysis finished in ",round(x = execution_time[[3]],digits = 4)," seconds."),
-                id = "analysis.completed",
-                duration = NULL,
-                type = "message"
-            )
-            DATA$results <- results
-            # RENDER RESULTS OBJECT
-            output$tbl_results <- renderDataTable({
-                results$results},
-                server = TRUE,
-                selection = "single",
-                options = list(
-                    paging = TRUE,
-                    pageLength = 15,
-                    autoWidth = TRUE
+                #### EXECUTE ANALYSIS ####
+                #TODO: add modal "analysis is ongoing, please wait"
+                removeNotification(id = "analysis.completed")
+                showNotification(
+                    ui = str_c("Analysis ongoing since ", Sys.time(), "."),
+                    id = "analysis.ongoing",
+                    closeButton = F,
+                    duration = NULL,
+                    type = "warning"
                 )
-            )
-            if (isFALSE(FLAGS$analyse_single_image)) { ## disallow save-to-file when running single-analysis
-                updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
-            }
-            updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
+                execution_time <- system.time(
+                    results <- execute_analysis(input, DATA, DEBUGKEYS, FLAGS)
+                )
+                removeNotification(id = "analysis.ongoing")
+                showNotification(
+                    ui = str_c("Analysis finished in ",round(x = execution_time[[3]],digits = 4)," seconds."),
+                    id = "analysis.completed",
+                    duration = NULL,
+                    type = "message"
+                )
+                DATA$results <- results
+                # RENDER RESULTS OBJECT
+                output$tbl_results <- renderDataTable({
+                    results$results},
+                    server = TRUE,
+                    selection = "single",
+                    options = list(
+                        paging = TRUE,
+                        pageLength = 15,
+                        autoWidth = TRUE
+                    )
+                )
+                if (isFALSE(FLAGS$analyse_single_image)) { ## disallow save-to-file when running single-analysis
+                    updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
+                }
+                updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
@@ -961,7 +961,6 @@ duflor_gui <- function() {
             state_file <- input$restore_state$datapath
             loaded_path <- restore_state(input, output, DATA, FLAGS, DEBUGKEYS, getDefaultReactiveDomain(), getVolumes(), state_file)
             DATA$folder_path <- loaded_path
-            print(DATA$folder_path)
             image_files_()
         })
 
