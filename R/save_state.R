@@ -8,6 +8,7 @@
 #' @param DEBUGKEYS .
 #' @param FLAGS .
 #' @param volumes .
+#' @return path to the saved state-file
 #'
 #' @keywords internal
 #' @importFrom shiny req
@@ -38,4 +39,5 @@ save_state <- function(input, DATA, DEBUGKEYS, FLAGS, volumes) {
         FLAGS = FLAGS
     ),
     file =  fpath)
+    return(fpath)
 }

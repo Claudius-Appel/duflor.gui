@@ -958,21 +958,64 @@ duflor_gui <- function() {
         })
         # Load button action
         observeEvent(input$restore_state, {
+            showNotification(
+                ui = "State is being restored.",
+                id = "restore_state.ongoing",
+                duration = NA,
+                type = "warning"
+            )
             state_file <- input$restore_state$datapath
             loaded_path <- restore_state(input, output, DATA, FLAGS, DEBUGKEYS, getDefaultReactiveDomain(), getVolumes(), state_file)
             DATA$folder_path <- loaded_path
             image_files_()
+            removeNotification(id = "restore_state.ongoing")
+            if (file.exists(loaded_path)) {
+                showNotification(
+                    ui = str_c("State successfully restored from '",loaded_path,"'."),
+                    id = "restore_state.done",
+                    duration = DATA$notification_duration * 4,
+                    type = "message"
+                )
+            } else {
+                showNotification(
+                    ui = str_c("State was not successfully restored from '",loaded_path,"'."),
+                    id = "restore_state.error",
+                    duration = DATA$notification_duration * 4,
+                    type = "error"
+                )
+            }
         })
-
         # Save directory selection
         observeEvent(input$save_state, {
-            save_state(
+            showNotification(
+                ui = "State is being saved.",
+                id = "save_state.ongoing",
+                duration = NA,
+                type = "warning"
+            )
+            saved_state_path <- save_state(
                 input = input,
                 DATA = DATA,
                 DEBUGKEYS = DEBUGKEYS,
                 FLAGS = FLAGS,
                 volumes = getVolumes()
             )
+            removeNotification(id = "save_state.ongoing")
+            if (file.exists(saved_state_path)) {
+                showNotification(
+                    ui = str_c("State successfully saved to '",saved_state_path,"'."),
+                    id = "save_state.done",
+                    duration = DATA$notification_duration * 4,
+                    type = "message"
+                )
+            } else {
+                showNotification(
+                    ui = str_c("State was not successfully saved to '",saved_state_path,"'."),
+                    id = "save_state.error",
+                    duration = DATA$notification_duration * 4,
+                    type = "error"
+                )
+            }
         })
     }
     #### LAUNCH APP ####

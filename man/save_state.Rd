@@ -17,6 +17,9 @@ save_state(input, DATA, DEBUGKEYS, FLAGS, volumes)
 
 \item{volumes}{.}
 }
+\value{
+path to the saved state-file
+}
 \description{
 \itemize{
 \item assumes \code{input$save_state} to be properly formatted, as returned by \code{\link[shinyFiles:shinyFiles-observers]{shinyFiles::shinyFileSave()}}
