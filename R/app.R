@@ -994,42 +994,63 @@ duflor_gui <- function() {
         #### SAVE RESULTS BTN ####
         observeEvent(input$save_results, {
             req(DATA$results)
-            if (is.na(DATA$results)) {
-                #TODO: add warning: results are empty, could not save.
-                return()
-            } else {
-                # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
-
-                results_path <- str_c(
-                    dirname(DATA$results$results$full_path[[1]]),
-                    "/results/results_",
-                    input$date_of_image_shooting
-                )
-                out <- store_results_to_file(
-                    results = DATA$results,
-                    results_path = results_path,
-                    save_to_xlsx = input$save_as_xlsx,
-                    set_author_xlsx =  DEBUGKEYS$set.author
-                )
-                ## verify save was successfull
-                if (out$success) {
-                    showNotification(
-                        ui = "Analysis completed. Results have been written to '",
-                        out$results_path,
-                        "'",
-                        duration = DATA$notification_duration,
-                        type = "message"
-                    )
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                if (is.na(DATA$results)) {
+                    #TODO: add warning: results are empty, could not save.
+                    return()
                 } else {
-                    showNotification(
-                        ui = "Analysis could not be completed successfully, and results could not be successfully written to",
-                        out$results_path,
-                        "'",
-                        duration = DATA$notification_duration * 4,
-                        type = "warning"
+                    # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
+
+                    results_path <- str_c(
+                        dirname(DATA$results$results$full_path[[1]]),
+                        "/results/results_",
+                        input$date_of_image_shooting
                     )
+                    out <- store_results_to_file(
+                        results = DATA$results,
+                        results_path = results_path,
+                        save_to_xlsx = input$save_as_xlsx,
+                        set_author_xlsx =  DEBUGKEYS$set.author
+                    )
+                    ## verify save was successfull
+                    if (out$success) {
+                        showNotification(
+                            ui = "Analysis completed. Results have been written to '",
+                            out$results_path,
+                            "'",
+                            duration = DATA$notification_duration,
+                            type = "message"
+                        )
+                    } else {
+                        showNotification(
+                            ui = "Analysis could not be completed successfully, and results could not be successfully written to",
+                            out$results_path,
+                            "'",
+                            duration = DATA$notification_duration * 4,
+                            type = "warning"
+                        )
+                    }
                 }
-            }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "save_results"
+                )
+                showNotification(
+                    ui = str_c("Error occured callback 'input$save_results'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### FINISH STARTUP ####
         STARTUP <- reactiveValues(startup = TRUE)
