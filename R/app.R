@@ -763,45 +763,65 @@ duflor_gui <- function() {
         #### RENDER PLOT ####
         observeEvent(input$render_plant, {
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
-
-            selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
-            DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
-            showNotification(
-                ui = str_c("loading ", " ", selectedrow$images_filtered),
-                duration = DATA$notification_duration,
-                type = "message"
-            )
-            if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=selectedrow$images_filtered)) {
-                im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
-            } else {
-                im <- DATA$last_im
-            }
-            dims <- dim(im)
-            if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add selected cropping_rect to image
-                im <- draw_rect(
-                    im,
-                    x0 = input$x0,
-                    x1 = input$x1,
-                    y0 = input$y0,
-                    y1 = input$y1,
-                    color = "lightblue",
-                    opacity = 0.25,
-                    filled = T
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
+                DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
+                showNotification(
+                    ui = str_c("loading ", " ", selectedrow$images_filtered),
+                    duration = DATA$notification_duration,
+                    type = "message"
                 )
-            }
-            if ((input$identifiersearch_x0!=0) && (input$identifiersearch_x1!=0)  && (input$identifiersearch_y0!=0)  && (input$identifiersearch_y1!=0))  { # add selected identcroping_rect to image
-                im <- draw_rect(
-                    im,
-                    x0 = input$identifiersearch_x0,
-                    x1 = input$identifiersearch_x1,
-                    y0 = input$identifiersearch_y0,
-                    y1 = input$identifiersearch_y1,
-                    color = "yellow",
-                    opacity = 0.25,
-                    filled = T
+                if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=selectedrow$images_filtered)) {
+                    im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+                } else {
+                    im <- DATA$last_im
+                }
+                dims <- dim(im)
+                if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add selected cropping_rect to image
+                    im <- draw_rect(
+                        im,
+                        x0 = input$x0,
+                        x1 = input$x1,
+                        y0 = input$y0,
+                        y1 = input$y1,
+                        color = "lightblue",
+                        opacity = 0.25,
+                        filled = T
+                    )
+                }
+                if ((input$identifiersearch_x0!=0) && (input$identifiersearch_x1!=0)  && (input$identifiersearch_y0!=0)  && (input$identifiersearch_y1!=0))  { # add selected identcroping_rect to image
+                    im <- draw_rect(
+                        im,
+                        x0 = input$identifiersearch_x0,
+                        x1 = input$identifiersearch_x1,
+                        y0 = input$identifiersearch_y0,
+                        y1 = input$identifiersearch_y1,
+                        color = "yellow",
+                        opacity = 0.25,
+                        filled = T
+                    )
+                }
+                display(im)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "render_plant"
                 )
-            }
-            display(im)
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$render_plant'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### MAIN CALLBACK>EXECUTE DUFLOR_PACKAGE HERE ####
         observeEvent(input$execute_analysis_single, {
