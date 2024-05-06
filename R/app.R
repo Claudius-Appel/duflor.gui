@@ -327,19 +327,40 @@ duflor_gui <- function() {
         #### REACTIVE - RESULTS_TABLE/BARPLOT, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
             req(input$reinspected_spectrums)
-            if (is.na(DATA$results)) { # handle empty DATA$results (this cannot be done via `req()` because `DATA$results` is initialised at startup)
-                ret <- data.frame(image_name = character(),
-                                  stringsAsFactors = FALSE)
-                return(ret)
-            }
-            RESULTS <- DATA$results
-            available_columns <- names(DATA$results$results)
-            static_columns <- c("image_name","date_of_analysis","processed_width","processed_height","area_per_pixel")
-            dynamic_columns_idx <- grep(input$reinspected_spectrums,available_columns)
-            dynamic_columns <- available_columns[dynamic_columns_idx]
-            total_columns <- c(static_columns,dynamic_columns)
-            filtered_table <- RESULTS$results[,total_columns]
-            return(filtered_table)
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                if (is.na(DATA$results)) { # handle empty DATA$results (this cannot be done via `req()` because `DATA$results` is initialised at startup)
+                    ret <- data.frame(image_name = character(),
+                                      stringsAsFactors = FALSE)
+                    return(ret)
+                }
+                RESULTS <- DATA$results
+                available_columns <- names(DATA$results$results)
+                static_columns <- c("image_name","date_of_analysis","processed_width","processed_height","area_per_pixel")
+                dynamic_columns_idx <- grep(input$reinspected_spectrums,available_columns)
+                dynamic_columns <- available_columns[dynamic_columns_idx]
+                total_columns <- c(static_columns,dynamic_columns)
+                filtered_table <- RESULTS$results[,total_columns]
+                return(filtered_table)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "filtered_results"
+                )
+                showNotification(
+                    ui = str_c("Error occured during reactive 'filtered_results'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         output$tbl_results_filtered <- renderDataTable({
             filtered_results()},
