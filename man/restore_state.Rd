@@ -46,6 +46,9 @@ restore_state(
 
 \item{state_file}{filepath for to-be-loaded state_file}
 }
+\value{
+path to the loaded file.
+}
 \description{
 This function is responsible for
 }
