@@ -205,7 +205,7 @@ duflor_gui <- function() {
     #### SERVER ####
     server <- function(input, output,session) {
         #### STARTUP MESSAGE ####
-        options(shiny.maxRequestSize=30*1024^2) # 30 MB of upload request size
+        options(shiny.maxRequestSize=300*1024^2) # 300 MB of upload request size
         showNotification(
             ui = "App startup",
             id = "startup.notice",
@@ -1155,6 +1155,8 @@ duflor_gui <- function() {
                     duration = NA,
                     type = "warning"
                 )
+                # but first we must remove some values which are not to be saved to ensure filesize is minimal:
+                # - DATA$last_im (which caches the last-loaded image of the 'render_selected_mask'-subroutine)
                 saved_state_path <- save_state(
                     input = input,
                     DATA = DATA,
