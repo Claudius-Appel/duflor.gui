@@ -27,9 +27,6 @@
 #' @importFrom shinyFiles parseDirPath
 #'
 restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volumes, state_file) {
-    req(state_file!="")
-    req(file.exists(state_file))
-
     input_state <- readRDS(state_file)
     ## Restore DATA
     DATA <- input_state$DATA

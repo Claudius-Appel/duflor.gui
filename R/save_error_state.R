@@ -21,7 +21,7 @@
 #' @importFrom shinyFiles parseSavePath
 #' @importFrom shinyFiles parseDirPath
 #'
-save_error_state <- function(input, DATA, DEBUGKEYS, FLAGS, volumes, error, errordir_path = NA) {
+save_error_state <- function(input, DATA, DEBUGKEYS, FLAGS, volumes, error, errordir_path = NA, erroneous_callback = "") {
     if (is.na(errordir_path)) {
         errordir_path <- tempdir()
         showNotification(
@@ -37,7 +37,7 @@ save_error_state <- function(input, DATA, DEBUGKEYS, FLAGS, volumes, error, erro
     req(dir.exists(errordir_path))
     time <- Sys.time()
 
-    fpath <- file.path(errordir_path,str_c("duflor_gui - error_state (",format(Sys.time(),'%Y_%m_%d__%H_%M'),").rds"))
+    fpath <- file.path(errordir_path,str_c("duflor_gui - error_state (",erroneous_callback," - ",format(Sys.time(),'%Y_%m_%d__%H_%M'),").rds"))
     cat("\nSaving  error-state to '",fpath,"'")
     saveRDS(list(
         input = input,

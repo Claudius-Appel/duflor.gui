@@ -11,7 +11,8 @@ save_error_state(
   FLAGS,
   volumes,
   error,
-  errordir_path = NA
+  errordir_path = NA,
+  erroneous_callback = ""
 )
 }
 \arguments{
