@@ -21,13 +21,18 @@
 save_state <- function(input, DATA, DEBUGKEYS, FLAGS, volumes) {
     savefile_path <- parseSavePath(roots = volumes, selection = input$save_state)
     fpath <- file.path(savefile_path$datapath)
-    cat("\nSaving to '",fpath,"'")
+    cat("\nSaving state to '",fpath,"'")
+    # but first we must remove some values which are not to be saved to ensure filesize is minimal:
+    # - DATA$last_im (which caches the last-loaded image of the 'render_selected_mask'-subroutine)
+    DATA2 <- DATA
+    DATA2$last_im <- NULL
     saveRDS(list(
         input = input,
-        DATA = DATA,
+        DATA = DATA2,
         DEBUGKEYS = DEBUGKEYS,
         FLAGS = FLAGS
     ),
     file =  fpath)
+    DATA2 <- NULL
     return(fpath)
 }
