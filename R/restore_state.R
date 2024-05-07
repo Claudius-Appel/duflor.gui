@@ -60,8 +60,8 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
         file_selected <- parseDirPath(roots = volumes, input_state$input$folder)
     })
     ## setup tbl_dir_files
-    # shiny::isolate({
-    loaded_path <- parseDirPath(roots = volumes,selection = input_state$input$folder)
+    # we cannot restore from `input_state$input$folder` because the button might not have been pressed yet, and thus will return '1'
+    loaded_path <- input_state$DATA$folder_path
     cat("\nLoading '",loaded_path,"'")
     buttons_to_toggle <- c(
         "render_plant",
