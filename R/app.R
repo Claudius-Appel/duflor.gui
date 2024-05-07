@@ -1155,6 +1155,8 @@ duflor_gui <- function() {
                     duration = NA,
                     type = "warning"
                 )
+                # but first we must remove some values which are not to be saved to ensure filesize is minimal:
+                # - DATA$last_im (which caches the last-loaded image of the 'render_selected_mask'-subroutine)
                 saved_state_path <- save_state(
                     input = input,
                     DATA = DATA,
