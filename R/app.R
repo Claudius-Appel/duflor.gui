@@ -1180,7 +1180,7 @@ duflor_gui <- function() {
                 }
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
-                error_state_path <- f(
+                error_state_path <- save_error_state(
                     input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
