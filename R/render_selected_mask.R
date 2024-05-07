@@ -85,17 +85,37 @@ render_selected_mask <- function(input, DATA, FLAGS) {
             identifiersearch_y0 = input$identifiersearch_y0
             identifiersearch_y1 = input$identifiersearch_y1
         }
-        hsv_results <- limit_identifier_coordinates(
-            spectrums_object = hsv_results,
-            image_dimensions = image_dimensions,
-            identifiersearch_x0 = identifiersearch_x0,
-            identifiersearch_x1 = identifiersearch_x1,
-            identifiersearch_y0 = identifiersearch_y0,
-            identifiersearch_y1 = identifiersearch_y1
-        )
-        # # update the repackaged pixel.counts, so that the area's are updated properly
-        # repackaged_pixel_counts[[idx]] <- sum(condition)
-        # repackaged_pixel_counts[[idx]] <- current_identifier_idx[condition,]
+        if (str_count(mask,"identifier")) {
+            # guard against coordinates being shifted into the negative
+            identifiersearch_x0 <- limit_to_range(
+                identifiersearch_x0,
+                replace_lower = 0,
+                replace_upper = image_dimensions[[1]]
+                )
+            identifiersearch_x1 <- limit_to_range(
+                identifiersearch_x1,
+                replace_lower = 0,
+                replace_upper = image_dimensions[[1]]
+                )
+            identifiersearch_y0 <- limit_to_range(
+                identifiersearch_y0,
+                replace_lower = 0,
+                replace_upper = image_dimensions[[2]]
+                )
+            identifiersearch_y1 <- limit_to_range(
+                identifiersearch_y1,
+                replace_lower = 0,
+                replace_upper = image_dimensions[[2]]
+                )
+            hsv_results <- limit_identifier_coordinates(
+                spectrums_object = hsv_results,
+                image_dimensions = image_dimensions,
+                identifiersearch_x0 = identifiersearch_x0,
+                identifiersearch_x1 = identifiersearch_x1,
+                identifiersearch_y0 = identifiersearch_y0,
+                identifiersearch_y1 = identifiersearch_y1
+            )
+        }
     }
     # make a mask
     mask <- apply_HSV_color_by_mask(
