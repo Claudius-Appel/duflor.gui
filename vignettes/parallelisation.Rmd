@@ -64,7 +64,7 @@ $$
  = 250\times(6000\times4000)\times2=1.2\times 10^{10}
 $$ comparisons between a pixel's HSV-triplet and a lower- and upper-bound's HSV-triplet must be performed. Note: the above calculation is for a hypothetical root-area analysis of 250 images, where two spectra must be quantified (roots and the identifier-area itself).
 
-While performing a single such check is performed basically instantaneously, it still takes *some* time.
+While a single such check is performed basically instantaneously, it still takes *some* time.
 
 # How a parallelised setup can help
 
