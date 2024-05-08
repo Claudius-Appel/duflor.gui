@@ -32,14 +32,14 @@ Although they are all conglomerated under the same name "issues", generally repo
 
 ## Bug Reports
 
-Bug reports... are somewhat obvious at first. However, there is a great difference between what a good, a bad, and a useless bug-report.
+Bug reports... are somewhat obvious at first. However, there is a great difference between what constitutes a good, a bad, and a useless bug-report.
 
 To be useful, there is a bare-minimum amount of information that must be provided, including
 
 - The package-versions of `duflor` and `duflor.gui` which are used.
    - If the package is run from source and is under version-control via `git` on the local machine (instead of being an installed package within R), the SHA of the currently checked-out commit must be provided.
 - Detailed, clear instructions required to reproduce the issue.
-- An example-dataset which exhibits the problem. In the case `duflor.gui` and `duflor`, this would often include example-images.
+- An example-data set which exhibits the problem. In the case `duflor.gui` and `duflor`, this would often include example-images.
 - Information on the system's specifications (OS, hardware configuration, etc. pp.)
 - The R-Version in use
 - Notes on all warnings/errors emitted to the console before/when encountering the bug.
