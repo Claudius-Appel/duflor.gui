@@ -22,7 +22,7 @@ library(duflor.gui)
 
 Analysing the entire image bears the risk of introducing high error-rates if the determined number of pixels for the "identifier" deviates. Given the difference in the orders of magnitude between the number of "identifier"-pixels and the typical number of pixels for a plant-related spectrum (e.g. "green plant area"), any small deviation in the number of detected "identifier"-pixels compared to other images will drastically influence the computed areas for all spectra. This issue can be observed in the figure below:
 
-![Fig. 1: High-contrast mask of pixels which are considered part of the identifier-dot. Notice the collection of pixels in the vicinity of the pot which were matched, even though they are obviously false-positives. To counteract this, see "[Restricting area within which the identifier-dot is quantified]". Note that **this step is heavily recommended**.](../man/figures/inspect_green_mask_extreme.PNG)
+![Fig. 1: High-contrast mask of pixels which are considered part of the identifier-dot. Notice the collection of pixels in the vicinity of the pot which were matched, even though they are obviously false-positives. To counteract this, see "[The solution]". Note that **this step is heavily recommended**.](../man/figures/inspect_green_mask_extreme.PNG)
 
 # The solution
 
@@ -30,16 +30,16 @@ To counteract this, the GUI allows you to limit the range within which matches f
 
 To select the area, follow the steps outlined below. Each step corresponds to a number within figures 2 and 3:
 
-1.  Select an image to inspect. You may select any *one* image within the `Image Files`-Tab
+1.  Select an image to inspect. You may select any *one* image within the `Image Files`-Tab.
 2.  Check the check-box to enable this feature. This will expand a previously-hidden panel.
 3.  Next, press the button `Select area to analyse` to launch the window shown in figure 3.
 4.  Finally, left-click-and-drag over the area within which the identifier-dot resides. The selection may contain anything, and may be of any size. When you let go, the selection-GUI will close, and the bounding coordinates will be inserted into the respective numeric input controls.
 
 You might be tempted to make it as small as possible. However, while it is certainly advantageous to minimise the area as much as possible, a certain buffer-zone should be kept. As the position of the identifier-dot might differ subtly across all images, a too-strict selection might suddenly exclude pixels which are actually part of the identifier-dot.
 
-![Fig. 2: First three steps required to restrict search-range for the quantification of the identifier-dot.](../man/figures/limit_identifier_workflow_steps.png){alt="Fig. 2: First three steps required to restrict search-range for the quantification of the identifier-dot."}
+![Fig. 2: First three steps required to restrict search-range for the quantification of the identifier-dot.](../man/figures/limit_identifier_workflow_steps.png)
 
-![Fig. 3: Final step required to restrict search-range for the quantification of the identifier-dot](../man/figures/selecting_area_of_identifier_dot.png){alt="Fig. 3: Final step required to restrict search-range for the quantification of the identifier-dot"}
+![Fig. 3: Final step required to restrict search-range for the quantification of the identifier-dot](../man/figures/selecting_area_of_identifier_dot.png)
 
 # Results
 
@@ -51,7 +51,7 @@ The difference this step can make can be observed in tables 1 and 2. Note that t
 | 796                      | 260776                | 164.7868442211055    |
 | 870                      | 262390                | 151.7036436781609    |
 
-: Table 1: Number of pixels for the 'identifer_dot', as well as the resulting area for an example-drought spectrum based on a given number of matched pixels. In this case, all qualified "identifier"-pixels were used to determine areas.
+: Table 1: Number of pixels for the 'identifier_dot', as well as the resulting area for an example-drought spectrum based on a given number of matched pixels. In this case, all qualified "identifier"-pixels were used to determine areas.
 
 | bex_identifier_dot_count | bex_drought_HSV_count | bex_drought_HSV_area |
 |--------------------------|-----------------------|----------------------|

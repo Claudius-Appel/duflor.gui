@@ -98,14 +98,14 @@ Currently, the following KPIs are available:
 
 ### State-Management: Saving and restoring application configuration to and from files
 
-At the bottom of the grey panel exists a section called "Bookmarking". It allows the user to store the current state of the app's **input** data (configuration, chosen directory-path, relevant data\` to a file, which can be loaded at a later time.
+At the bottom of the grey panel exists a section called "Bookmarking". It allows the user to store the current state of the app's **input** data (configuration, chosen directory-path, relevant data) to a file, which can be loaded at a later time.
 
 In general, this has two use-cases:
 
 1.  Retaining and restoring common configuration changes for easier access.
 2.  Restoring configurations which induced errors, so that they might be debugged in a reproducible manner.\
 
-For more details, see `vignette("saving-and-restoring-application-state", package = "duflor.gui")`.
+For more details, see `vignette("saving-and-restoring-application-states", package = "duflor.gui")`.
 
 ### Tab 1: `Image Files`
 
@@ -144,7 +144,9 @@ An in-depth guide and further details can be found in `vignette("modifying-hsv-b
 
 # (Advanced) Debugging
 
-Generally, the app tries to give reasonable warnings and status-messages via small red/yellow/blue message boxes. These should be fairly self-explanatory, and will pop up where the author thought them sensible or necessary.
+Generally, the app tries to give reasonable warnings and status-messages via small red/yellow/blue message boxes. These should be fairly self-explanatory, and will pop up where the author thought them sensible or necessary.\
+\
+If the app runs into an error, in most cases the configuration required for triggering said error is preserved. For further info, see the section "Saving states when errors occur during analysis" in `vignette("saving-and-restoring-application-states", package = "duflor.gui")`.
 
 # Development, Modifications, Issues
 

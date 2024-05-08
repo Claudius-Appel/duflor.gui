@@ -6,12 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="duflor.gui">
-<title>saving-and-restoring-application-states • duflor.gui</title>
+<title>Saving and restoring application-states • duflor.gui</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="saving-and-restoring-application-states">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Saving and restoring application-states">
 <meta property="og:description" content="duflor.gui">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9046</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9047</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,7 @@
     <a class="dropdown-item" href="../articles/optimising-speed.html">Measures to reduce execution time</a>
     <a class="dropdown-item" href="../articles/parallelisation.html">Parallelised computing as a method for increased performance</a>
     <a class="dropdown-item" href="../articles/raising-issues.html">How to report issues, raise suggestions and feedback</a>
-    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">saving-and-restoring-application-states</a>
+    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">Saving and restoring application-states</a>
   </div>
 </li>
       </ul>
@@ -75,7 +75,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>saving-and-restoring-application-states</h1>
+      <img src="" class="logo" alt=""><h1>Saving and restoring application-states</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/Claudius-Appel/duflor.gui/blob/HEAD/vignettes/saving-and-restoring-application-states.Rmd" class="external-link"><code>vignettes/saving-and-restoring-application-states.Rmd</code></a></small>
@@ -94,7 +94,7 @@ across sessions, so it can be restored at a later state - or on a
 different machine.</p>
 </div>
 <div class="section level2">
-<h2 id="saving-and-restoring-common-states">Saving and Restoring common states<a class="anchor" aria-label="anchor" href="#saving-and-restoring-common-states"></a>
+<h2 id="saving-and-restoring-common-states">Saving and restoring common states<a class="anchor" aria-label="anchor" href="#saving-and-restoring-common-states"></a>
 </h2>
 <p>The most common use-case for the user is to save and restore
 config-changes across sessions.</p>
@@ -113,8 +113,15 @@ default value</li>
 <p>Recreating these modifications every time a set of images must be
 analysed for this experimental setup has an enormous potential for
 inducing errors along the way.</p>
-<p>To counteract this, the user may save the current configuration of
-all <strong>input</strong>-controls and settings to a file.</p>
+<p>To counteract this, the user may save the <strong>current
+configuration of all input</strong>-controls and settings to a file (see
+step (A) in figure 1.</p>
+<p>These changes can later be reloaded from the same file (step (B) in
+figure 1.</p>
+<div class="float">
+<img src="../reference/figures/bookmarking_load_and_save_state.png" alt="Fig. 1: Section of the input-GUI responsible for creating and loading a state-file"><div class="figcaption">Fig. 1: Section of the input-GUI responsible for
+creating and loading a state-file</div>
+</div>
 <p><strong>Note that the following limitations apply</strong>:</p>
 <ol style="list-style-type: decimal">
 <li>This system is agnostic to outside changes:
@@ -156,13 +163,29 @@ execution of certain subroutines:</p>
 <li>
 <p><code>input$submit_selected_spectra</code>: The callback which
 issues the analysis of images, from loading the images up to the
-generation of the results</p>
+generation of the results.</p>
 <ul>
 <li>This is <strong>the</strong> subroutine responsible for computing
 analyses, all steps required to obtain the results-table and figures
 branch off from here.</li>
 </ul>
 </li>
+<li><p><code>input$render_selected_mask</code>: The callback responsible
+for inspecting the mask of spectrum-matches against the respective
+image-file after results were computed.</p></li>
+<li><p><code>input$save_results</code>: The callback responsible for
+saving the results-table to either a <code>.xlsx</code>-or
+<code>.csv</code>-file.</p></li>
+<li><p><code>input$save_visualisation_plot</code>: The callback
+responsible for saving the selected KPI-plot in tab
+<code>Results - plots</code>.</p></li>
+<li><p><code>input$render_plant</code>: The callback responsible for
+viewing the input image-file.</p></li>
+<li><p>reactive <code>filtered_plot</code>: The reactive which generates
+the KPI-plots in the tab <code>Results - plots</code>.</p></li>
+<li><p>reactive <code>filtered_results</code>: The reactive which
+generates the filtered results-table in the tab
+<code>Results - inspect</code>.</p></li>
 </ul>
 <p>Error-states are saved relative to the selected input-folder
 containing the input-images. These states are not supposed to be used
@@ -176,6 +199,23 @@ recommended to load the application as a source-code package-project via
 <p><u><strong>Error-states are not deleted automatically, and can
 accumulate. Be sure to remove them when they outlived their
 usefulness.</strong></u></p>
+</div>
+<div class="section level2">
+<h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
+</h2>
+<p>There are a couple limitations to this system:</p>
+<ol style="list-style-type: decimal">
+<li>Only one state can be loaded at one time.<br>
+You may leverage this system to save and restore changed HSV-spectra,
+and thus generate a state-file with these modified spectra.<br>
+You may additionally generate a <em>different</em> state-file with a
+predefined set of allocated cores for parallelisation.<br>
+Now, you have two different state-files, but when loading both in
+succession, the latter will overwrite all changes made by the former
+one. First loading the “parallelisation”-state, then loading the
+“spectra”-state will discard the changes made by the
+“parallelisation”-state.</li>
+</ol>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

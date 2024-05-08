@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9046</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9047</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,7 @@
     <a class="dropdown-item" href="../articles/optimising-speed.html">Measures to reduce execution time</a>
     <a class="dropdown-item" href="../articles/parallelisation.html">Parallelised computing as a method for increased performance</a>
     <a class="dropdown-item" href="../articles/raising-issues.html">How to report issues, raise suggestions and feedback</a>
-    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">saving-and-restoring-application-states</a>
+    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">Saving and restoring application-states</a>
   </div>
 </li>
       </ul>
@@ -150,12 +150,13 @@ above, a total of</p>
 N_{Images}\times({Width}_{Image}\times{Height}_{Image})\times
 N_{spectra}\\
 = 250\times(6000\times4000)\times2=1.2\times 10^{10}
-\]</span> comparisons between a pixel’s HSV-triplet and a lower- and
+\]</span></p>
+<p>comparisons between a pixel’s HSV-triplet and a lower- and
 upper-bound’s HSV-triplet must be performed. Note: the above calculation
 is for a hypothetical root-area analysis of 250 images, where two
 spectra must be quantified (roots and the identifier-area itself).</p>
-<p>While performing a single such check is performed basically
-instantaneously, it still takes <em>some</em> time.</p>
+<p>While a single such check is performed basically instantaneously, it
+still takes <em>some</em> time.</p>
 </div>
 </div>
 <div class="section level2">
@@ -227,7 +228,7 @@ use <code>fork</code>-back-ends.<br><br></p>
 <div class="section level3">
 <h3 id="suggestions">Suggestions<a class="anchor" aria-label="anchor" href="#suggestions"></a>
 </h3>
-<p>When setting up a parallel backend via the app, you should consider
+<p>When setting up a parallel back-end via the app, you should consider
 the specifications of your machine as described above:</p>
 <ol style="list-style-type: decimal">
 <li>You might be tempted to create a parallel back.end using all
@@ -239,9 +240,11 @@ least a single core available. When setting up parallelisation via the
 shiny-GUI, it is not possible to use all cores available.</li>
 <li>If you have a limited amount of available RAM, there comes a point
 at which adding additional workers will deteriorate the performance of
-the entire backend. If your machine has e.g. 8 GB of available RAM, 2
+the entire back-end. If your machine has e.g. 8 GB of available RAM, 2
 workers might work efficiently, and 3 might work just as fast as a
-sequential backend. There is no clear guide to determine this
+sequential back-end<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;In fact, 3 might be as fast as a non-parallelised
+back-end, or might even be slower. The same goes for adding even more
+workers.&lt;/p&gt;"><sup>2</sup></a>. There is no clear guide to determine this
 tipping-point. In general, if your cluster comes close to consuming all
 available system RAM, adding more workers is likely to deteriorate
 overall performance, and slightly reducing the number of workers might
