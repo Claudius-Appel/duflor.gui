@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9044</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9047</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,7 @@
     <a class="dropdown-item" href="../articles/optimising-speed.html">Measures to reduce execution time</a>
     <a class="dropdown-item" href="../articles/parallelisation.html">Parallelised computing as a method for increased performance</a>
     <a class="dropdown-item" href="../articles/raising-issues.html">How to report issues, raise suggestions and feedback</a>
-    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">saving-and-restoring-application-states</a>
+    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">Saving and restoring application-states</a>
   </div>
 </li>
       </ul>
@@ -249,7 +249,7 @@ and from files<a class="anchor" aria-label="anchor" href="#state-management-savi
 <p>At the bottom of the grey panel exists a section called
 “Bookmarking”. It allows the user to store the current state of the
 app’s <strong>input</strong> data (configuration, chosen directory-path,
-relevant data` to a file, which can be loaded at a later time.</p>
+relevant data) to a file, which can be loaded at a later time.</p>
 <p>In general, this has two use-cases:</p>
 <ol style="list-style-type: decimal">
 <li>Retaining and restoring common configuration changes for easier
@@ -259,7 +259,7 @@ debugged in a reproducible manner.<br>
 </li>
 </ol>
 <p>For more details, see
-<code>vignette("saving-and-restoring-application-state", package = "duflor.gui")</code>.</p>
+<code><a href="../articles/saving-and-restoring-application-states.html">vignette("saving-and-restoring-application-states", package = "duflor.gui")</a></code>.</p>
 </div>
 <div class="section level4">
 <h4 id="tab-1-image-files">Tab 1: <code>Image Files</code><a class="anchor" aria-label="anchor" href="#tab-1-image-files"></a>
@@ -337,7 +337,11 @@ An in-depth guide and further details can be found in
 <p>Generally, the app tries to give reasonable warnings and
 status-messages via small red/yellow/blue message boxes. These should be
 fairly self-explanatory, and will pop up where the author thought them
-sensible or necessary.</p>
+sensible or necessary.<br><br>
+If the app runs into an error, in most cases the configuration required
+for triggering said error is preserved. For further info, see the
+section “Saving states when errors occur during analysis” in
+<code><a href="../articles/saving-and-restoring-application-states.html">vignette("saving-and-restoring-application-states", package = "duflor.gui")</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="development-modifications-issues">Development, Modifications, Issues<a class="anchor" aria-label="anchor" href="#development-modifications-issues"></a>

@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9044</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9047</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,7 @@
     <a class="dropdown-item" href="../articles/optimising-speed.html">Measures to reduce execution time</a>
     <a class="dropdown-item" href="../articles/parallelisation.html">Parallelised computing as a method for increased performance</a>
     <a class="dropdown-item" href="../articles/raising-issues.html">How to report issues, raise suggestions and feedback</a>
-    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">saving-and-restoring-application-states</a>
+    <a class="dropdown-item" href="../articles/saving-and-restoring-application-states.html">Saving and restoring application-states</a>
   </div>
 </li>
       </ul>
@@ -98,12 +98,11 @@ the number of detected “identifier”-pixels compared to other images will
 drastically influence the computed areas for all spectra. This issue can
 be observed in the figure below:</p>
 <div class="float">
-<img src="../reference/figures/inspect_green_mask_extreme.PNG" alt="Fig. 1: High-contrast mask of pixels which are considered part of the identifier-dot. Notice the collection of pixels in the vicinity of the pot which were matched, even though they are obviously false-positives. To counteract this, see “[Restricting area within which the identifier-dot is quantified]”. Note that this step is heavily recommended."><div class="figcaption">Fig. 1: High-contrast mask of pixels which are
+<img src="../reference/figures/inspect_green_mask_extreme.PNG" alt="Fig. 1: High-contrast mask of pixels which are considered part of the identifier-dot. Notice the collection of pixels in the vicinity of the pot which were matched, even though they are obviously false-positives. To counteract this, see “The solution”. Note that this step is heavily recommended."><div class="figcaption">Fig. 1: High-contrast mask of pixels which are
 considered part of the identifier-dot. Notice the collection of pixels
 in the vicinity of the pot which were matched, even though they are
-obviously false-positives. To counteract this, see “[Restricting area
-within which the identifier-dot is quantified]”. Note that <strong>this
-step is heavily recommended</strong>.</div>
+obviously false-positives. To counteract this, see “<a href="#the-solution">The solution</a>”. Note that <strong>this step is
+heavily recommended</strong>.</div>
 </div>
 </div>
 <div class="section level2">
@@ -116,7 +115,7 @@ All matches <em>outside</em> of this area will be ignored.</p>
 corresponds to a number within figures 2 and 3:</p>
 <ol style="list-style-type: decimal">
 <li>Select an image to inspect. You may select any <em>one</em> image
-within the <code>Image Files</code>-Tab</li>
+within the <code>Image Files</code>-Tab.</li>
 <li>Check the check-box to enable this feature. This will expand a
 previously-hidden panel.</li>
 <li>Next, press the button <code>Select area to analyse</code> to launch
@@ -151,7 +150,7 @@ entirely dependent upon each image, and is thus hard to predict. There
 can be images which contain almost no impurities, and images which are
 severely polluted with “invalid” hits.</p>
 <table class="table">
-<caption>Table 1: Number of pixels for the ‘identifer_dot’, as well as
+<caption>Table 1: Number of pixels for the ‘identifier_dot’, as well as
 the resulting area for an example-drought spectrum based on a given
 number of matched pixels. In this case, all qualified
 “identifier”-pixels were used to determine areas.</caption>
