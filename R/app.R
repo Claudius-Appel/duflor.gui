@@ -399,7 +399,28 @@ duflor_gui <- function() {
         })
         observeEvent(input$save_visualisation_plot, {
             req(DATA$current_KPI_plot)
-            store_KPI_plot_to_file(input, DATA)
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                store_KPI_plot_to_file(input, DATA)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "save_visualisation_plot"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$save_visualisation_plot'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         ### selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
 
