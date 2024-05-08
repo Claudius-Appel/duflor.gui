@@ -14,4 +14,4 @@ knitr::opts_chunk$set(
 )
 ```
 
-For a general breakdown of performance-related methods and issues in the computational backend-package `duflor`, see `vignette("optimising_for_speed", package = "duflor")`.
+For a general breakdown of performance-related methods and issues in the computational back-end-package `duflor`, see `vignette("optimising_for_speed", package = "duflor")`.
