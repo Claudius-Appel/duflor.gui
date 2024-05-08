@@ -61,3 +61,12 @@ Error-states are saved relative to the selected input-folder containing the inpu
 When this application is installed as a built package, its internal functions and logic-flow become somewhat harder to debug. Thus, it is recommended to load the application as a source-code package-project via `{devtools}` when inspecting bugs.
 
 [**Error-states are not deleted automatically, and can accumulate. Be sure to remove them when they outlived their usefulness.**]{.underline}
+
+# Limitations
+
+There are a couple limitations to this system:
+
+1.  Only one state can be loaded at one time. \
+    You may leverage this system to save and restore changed HSV-spectra, and thus generate a state-file with these modified spectra. \
+    You may additionally generate a *different* state-file with a predefined set of allocated cores for parallelisation. \
+    Now, you have two different state-files, but when loading both in succession, the latter will overwrite all changes made by the former one. First loading the "parallelisation"-state, then loading the "spectra"-state will discard the changes made by the "parallelisation"-state.
