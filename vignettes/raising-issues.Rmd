@@ -32,7 +32,7 @@ Although they are all conglomerated under the same name "issues", generally repo
 
 ## Bug Reports
 
-Bug reports... are somewhat obvious at first. However, there is a great difference between what a good, a bad, and a useless bug-report.
+Bug reports... are somewhat obvious at first. However, there is a great difference between what constitutes a good, a bad, and a useless bug-report.
 
 To be useful, there is a bare-minimum amount of information that must be provided, including
 
