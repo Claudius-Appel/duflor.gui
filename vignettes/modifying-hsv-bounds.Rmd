@@ -110,7 +110,17 @@ On occasion a spectrum's HSV-boundaries must be modified - and in this case, a s
 
 ![Fig. 5: Steps required to modify the HSV-range for a single spectrum](../man/figures/modify_HSV_bounds_workflow.png)
 
+## ...permanently by loading modified state-file
+
+This method is recommended over the steps outlined in "[...pseudo-permanently by changing underlying option before opening the GUI]".
+
+The state-management system outlined in the section "Saving and restoring common states" of the vignette `vignette("saving-and-restoring-application-states", package = "duflor.gui")` can be used to save modified settings, and thus also changes to the *existing* HSV-ranges.
+
+To do so, first change the HSV-spectra as desired via the steps outlined in "[... temporarily via the GUI]". Following that, save this state of the app to a state-file.
+
 ## ...pseudo-permanently by changing underlying option before opening the GUI
+
+This method is not recommended, but remains documented for the sake of completeness. It is likely significantly easier to follow the steps outlined in "[...permanently by loading modified state-file]".
 
 There is no true "do-once-and-forget-about-it" method of changing spectra. The "most-persistent" method to modify a spectrum is described below:
 
@@ -151,4 +161,3 @@ duflor.gui::duflor_gui() # and run the app
 ```
 
 3.  From now on, running this script will insert the new spectrum `new_spectrum` each time the app is started via this script.
-
