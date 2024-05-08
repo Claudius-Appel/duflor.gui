@@ -1,5 +1,5 @@
 ---
-title: "saving-and-restoring-application-states"
+title: "Saving and restoring application-states"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{saving-and-restoring-application-states}
