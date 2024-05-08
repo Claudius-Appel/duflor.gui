@@ -335,8 +335,29 @@ duflor_gui <- function() {
             shinyDirChoose(input = input, 'folder', roots=volumes)
             folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
             req(dir.exists(folder_path))
-            DATA$folder_path <- folder_path
-            image_files_()
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                DATA$folder_path <- folder_path
+                image_files_()
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "folder"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$folder'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### REACTIVE - RESULTS_TABLE/BARPLOT, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
