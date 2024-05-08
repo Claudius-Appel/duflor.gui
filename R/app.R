@@ -696,58 +696,79 @@ duflor_gui <- function() {
             hide("HSV_PANEL")
         })
         observeEvent(input$close_edit_HSV_ranges_conditionalPanel, {
-            ## check if submitted values are valid (i.e. do they exceed boundaries by being inputted as numbers manually?)
-            changes <- validate_custom_HSV_values(input, DATA, getDefaultReactiveDomain())
-            DATA$spectrum_changes <- changes
-            ## assemble the vectors of updated HSV-bounds
-            adjustments_lower <- c(input$lower_bound_H,input$lower_bound_S,input$lower_bound_V)
-            adjustments_upper <- c(input$upper_bound_H,input$upper_bound_S,input$upper_bound_V)
-            if (length(changes$return_obj)==0) { # just commit the changes (no infringing values were found - all changes were within valid range-limits)
-                DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
-                DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
-                showNotification(
-                    ui = str_c(
-                        "Updated values for spectrum '",
-                        input$selected_HSV_spectrum,
-                        "'"
-                    ),
-                    type = "message"
-                )
-                hide("HSV_PANEL")
-            } else { ## ask the user if the changes are okay?
-                ## set values which exceed their bounds to the respective bound
-                for (each in names(changes$return_obj)) {
-                    if (str_count(each,str_c("lower_bound"))) {
-                        if (str_count(each,str_c("bound_H"))) {
-                            adjustments_lower[[1]] <- changes$return_obj[[each]]
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                ## check if submitted values are valid (i.e. do they exceed boundaries by being inputted as numbers manually?)
+                changes <- validate_custom_HSV_values(input, DATA, getDefaultReactiveDomain())
+                DATA$spectrum_changes <- changes
+                ## assemble the vectors of updated HSV-bounds
+                adjustments_lower <- c(input$lower_bound_H,input$lower_bound_S,input$lower_bound_V)
+                adjustments_upper <- c(input$upper_bound_H,input$upper_bound_S,input$upper_bound_V)
+                if (length(changes$return_obj)==0) { # just commit the changes (no infringing values were found - all changes were within valid range-limits)
+                    DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
+                    DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
+                    showNotification(
+                        ui = str_c(
+                            "Updated values for spectrum '",
+                            input$selected_HSV_spectrum,
+                            "'"
+                        ),
+                        type = "message"
+                    )
+                    hide("HSV_PANEL")
+                } else { ## ask the user if the changes are okay?
+                    ## set values which exceed their bounds to the respective bound
+                    for (each in names(changes$return_obj)) {
+                        if (str_count(each,str_c("lower_bound"))) {
+                            if (str_count(each,str_c("bound_H"))) {
+                                adjustments_lower[[1]] <- changes$return_obj[[each]]
+                            }
+                            if (str_count(each,str_c("bound_S"))) {
+                                adjustments_lower[[2]] <- changes$return_obj[[each]]
+                            }
+                            if (str_count(each,str_c("bound_V"))) {
+                                adjustments_lower[[3]] <- changes$return_obj[[each]]
+                            }
                         }
-                        if (str_count(each,str_c("bound_S"))) {
-                            adjustments_lower[[2]] <- changes$return_obj[[each]]
-                        }
-                        if (str_count(each,str_c("bound_V"))) {
-                            adjustments_lower[[3]] <- changes$return_obj[[each]]
+                        if (str_count(each,str_c("upper_bound"))) {
+                            if (str_count(each,str_c("bound_H"))) {
+                                adjustments_upper[[1]] <- changes$return_obj[[each]]
+                            }
+                            if (str_count(each,str_c("bound_S"))) {
+                                adjustments_upper[[2]] <- changes$return_obj[[each]]
+                            }
+                            if (str_count(each,str_c("bound_V"))) {
+                                adjustments_upper[[3]] <- changes$return_obj[[each]]
+                            }
                         }
                     }
-                    if (str_count(each,str_c("upper_bound"))) {
-                        if (str_count(each,str_c("bound_H"))) {
-                            adjustments_upper[[1]] <- changes$return_obj[[each]]
-                        }
-                        if (str_count(each,str_c("bound_S"))) {
-                            adjustments_upper[[2]] <- changes$return_obj[[each]]
-                        }
-                        if (str_count(each,str_c("bound_V"))) {
-                            adjustments_upper[[3]] <- changes$return_obj[[each]]
-                        }
-                    }
+                    # make a copy to use when confirming the modalDialogue
+                    DATA$coerced_spectrums <- DATA$spectrums
+                    DATA$coerced_spectrums <- DATA$spectrums
+                    # then modify it, so that the changes may be applied.
+                    DATA$coerced_spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
+                    DATA$coerced_spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
+                    show_infringing_spectrum_elements_gui_comp(input, DATA, changes)
                 }
-                # make a copy to use when confirming the modalDialogue
-                DATA$coerced_spectrums <- DATA$spectrums
-                DATA$coerced_spectrums <- DATA$spectrums
-                # then modify it, so that the changes may be applied.
-                DATA$coerced_spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
-                DATA$coerced_spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
-                show_infringing_spectrum_elements_gui_comp(input, DATA, changes)
-            }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "save_visualisation_plot"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$close_edit_HSV_ranges_conditionalPanel'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         observeEvent(input$confirm_coerced_HSV_values_modal, {
             ## user wants to use the range-limits for the respective HSV-parameters as their respective bounds
