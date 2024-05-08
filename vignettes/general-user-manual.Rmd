@@ -105,7 +105,7 @@ In general, this has two use-cases:
 1.  Retaining and restoring common configuration changes for easier access.
 2.  Restoring configurations which induced errors, so that they might be debugged in a reproducible manner.\
 
-For more details, see `vignette("saving-and-restoring-application-state", package = "duflor.gui")`.
+For more details, see `vignette("saving-and-restoring-application-states", package = "duflor.gui")`.
 
 ### Tab 1: `Image Files`
 
