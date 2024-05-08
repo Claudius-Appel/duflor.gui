@@ -772,18 +772,40 @@ duflor_gui <- function() {
         })
         observeEvent(input$confirm_coerced_HSV_values_modal, {
             ## user wants to use the range-limits for the respective HSV-parameters as their respective bounds
-            DATA$spectrums$lower_bound <- DATA$coerced_spectrums$lower_bound
-            DATA$spectrums$upper_bound <- DATA$coerced_spectrums$upper_bound
-            removeModal()
-            showNotification(
-                ui = str_c(
-                    "Updated values for spectrum '",
-                    input$selected_HSV_spectrum,
-                    "'"
-                ),
-                type = "message"
-            )
-            hide("HSV_PANEL")
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                DATA$spectrums$lower_bound <- DATA$coerced_spectrums$lower_bound
+                DATA$spectrums$upper_bound <- DATA$coerced_spectrums$upper_bound
+                removeModal()
+                showNotification(
+                    ui = str_c(
+                        "Updated values for spectrum '",
+                        input$selected_HSV_spectrum,
+                        "'"
+                    ),
+                    type = "message"
+                )
+                hide("HSV_PANEL")
+                stop("DD")
+            }, error = function(e) {
+                # DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "confirm_coerced_HSV_values_modal"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'confirm_coerced_HSV_values_modal'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         observeEvent(input$discard_coerced_HSV_values_modal, {
             ## user wants to use the default values for the respective HSV-spectrum
