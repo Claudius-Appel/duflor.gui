@@ -494,45 +494,65 @@ duflor_gui <- function() {
                 return()
             }
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
-
-            selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
-            DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
-            showNotification(
-                ui = str_c("loading ", " ", selectedrow$images_filtered),
-                duration = DATA$notification_duration,
-                type = "message"
-            )
-
-            im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
-            dims <- dim(im)
-            rect <- grabRect(im)
-            if (sum(rect)>0) {
-                # DATA$rect <- rect
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
+                DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
                 showNotification(
-                    ui = str_c(
-                        "Only pixels within the rectange defined below will be analysed:",
-                        "\nx0: ",
-                        rect["x0"],
-                        " x1: ",
-                        rect["x1"],
-                        "\n",
-                        "y0: ",
-                        rect["y0"],
-                        " y1: ",
-                        rect["y1"]
-                    ),
-                    duration = DATA$notification_duration * 5,
-                    type = "warning"
+                    ui = str_c("loading ", " ", selectedrow$images_filtered),
+                    duration = DATA$notification_duration,
+                    type = "message"
                 )
-                cl <- rect["x0"]
-                cr <- rect["x1"]
-                ct <- rect["y0"]
-                cb <- rect["y1"]
-                updateNumericInput(session,"x0",value = as.integer(cl))
-                updateNumericInput(session,"x1",value = as.integer(cr))
-                updateNumericInput(session,"y1",value = as.integer(cb))
-                updateNumericInput(session,"y0",value = as.integer(ct))
-            }
+
+                im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+                dims <- dim(im)
+                rect <- grabRect(im)
+                if (sum(rect)>0) {
+                    # DATA$rect <- rect
+                    showNotification(
+                        ui = str_c(
+                            "Only pixels within the rectange defined below will be analysed:",
+                            "\nx0: ",
+                            rect["x0"],
+                            " x1: ",
+                            rect["x1"],
+                            "\n",
+                            "y0: ",
+                            rect["y0"],
+                            " y1: ",
+                            rect["y1"]
+                        ),
+                        duration = DATA$notification_duration * 5,
+                        type = "warning"
+                    )
+                    cl <- rect["x0"]
+                    cr <- rect["x1"]
+                    ct <- rect["y0"]
+                    cb <- rect["y1"]
+                    updateNumericInput(session,"x0",value = as.integer(cl))
+                    updateNumericInput(session,"x1",value = as.integer(cr))
+                    updateNumericInput(session,"y1",value = as.integer(cb))
+                    updateNumericInput(session,"y0",value = as.integer(ct))
+                }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "select_crops"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'select_crops'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         observeEvent(input$reset_crops, {
             showModal(modalDialog(
