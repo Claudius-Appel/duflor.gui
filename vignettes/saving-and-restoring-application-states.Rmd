@@ -33,7 +33,11 @@ Let's build a hypothetical scenario, in which you perform an experiment on a set
 
 Recreating these modifications every time a set of images must be analysed for this experimental setup has an enormous potential for inducing errors along the way.
 
-To counteract this, the user may save the current configuration of all **input**-controls and settings to a file.
+To counteract this, the user may save the **current configuration of all input**-controls and settings to a file (see step (A) in figure 1.
+
+These changes can later be reloaded from the same file (step (B) in figure 1.
+
+![Fig. 1: Section of the input-GUI responsible for creating and loading a state-file](../man/figures/bookmarking_load_and_save_state.png)
 
 **Note that the following limitations apply**:
 
