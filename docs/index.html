@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9045</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9046</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,27 +78,27 @@
 <!-- badges: end -->
 <p>The <code>duflor.gui</code>-package contains a shiny-application built for the use of the <code>duflor</code>-package.</p>
 <div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="installation---from-within-rstudio">Installation - from within RStudio<a class="anchor" aria-label="anchor" href="#installation---from-within-rstudio"></a>
 </h2>
 <p>This package requires the installation of the <code>duflor</code>-package, which implements most of the back-end code for the analysis-pipelines in this application.</p>
 <div class="section level3">
 <h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h3>
+<p>As this application is quite complex, it relies on a certain number of packages to work. The package <code>renv</code> can help with managing a reproducible package environment for a project. As an additional advantage, this also prevents packages in your system-library from being updated when installing this package.</p>
+<p>For a proper documentation and information on its use-cases, refer to <a href="https://rstudio.github.io/renv/index.html" class="external-link uri">https://rstudio.github.io/renv/index.html</a>.</p>
 <div class="section level4">
 <h4 id="install-renv">Install <code>renv</code>
 <a class="anchor" aria-label="anchor" href="#install-renv"></a>
 </h4>
-<p>As this application is quite complex, it relies on a certain number of packages to work. The package <code>renv</code> can help with managing a reproducible package environment for a project. As an additional advantage, this also prevents packages in your system-library from being updated when installing this package.</p>
-<p>For a proper documentation and information on its use-cases, refer to <a href="https://rstudio.github.io/renv/index.html" class="external-link uri">https://rstudio.github.io/renv/index.html</a>.</p>
-<p>To set up a stand-alone R-project with renv, the easiest way is through R-Studio:</p>
+<p>To set up a stand-alone R-project with <code>renv</code>, the easiest way is through R-Studio:</p>
 <ol style="list-style-type: decimal">
 <li>Go to <code>File</code> &gt; <code>New Project</code>.</li>
 <li>Select <code>New Directory</code>.</li>
 <li>Select <code>New Project</code> as project-type<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;This might sound confusing, as this is a R-package wrapping a shiny-application. However, those two options are for &lt;strong&gt;&lt;em&gt;developing&lt;/em&gt;&lt;/strong&gt; either of those, not for &lt;strong&gt;&lt;em&gt;installing&lt;/em&gt;&lt;/strong&gt; them.&lt;/p&gt;"><sup>1</sup></a>.</li>
 <li>Give a distinct name to the project, e.g. <code>duflor.gui_installed</code><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;The name is not really important, but it should be distinct and indicate that this is the installed application&lt;/p&gt;"><sup>2</sup></a>.</li>
 <li>Choose a location for the R-project.</li>
-<li><u><strong>Make sure that the checkbox <code>Use renv with this project</code> is checked.</strong></u></li>
-<li>Make sure the checkbox <code>Open in new session</code> is checked.</li>
+<li><u><strong>Make sure that the check-box <code>Use renv with this project</code> is checked.</strong></u></li>
+<li>Make sure the check-box <code>Open in new session</code> is checked.</li>
 <li>Create the project.</li>
 </ol>
 <p>From now on, this project can be opened from within R-Studio via the project-selection drop-down-menu in the top-right corner of the RStudio-application.</p>
@@ -123,11 +123,11 @@
 <li>Search for and select <code>devtools</code>.</li>
 <li>Under “Install to library”, make sure the path selected is similar to the example outlined above. In other words, make sure you do <strong>not</strong> install to the library containing the string <code>R/cache/R/renv/sandbox</code>.</li>
 </ol>
-<p>Once you have installed <code>renv</code>, go on to “<a href="#installing-application-itself">Installing application itself</a>”.</p>
+<p>Once you have installed <code>renv</code>, go on to “[Installing application itself]”.</p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="installing-application-itself">Installing application itself<a class="anchor" aria-label="anchor" href="#installing-application-itself"></a>
+<h3 id="installation-steps">Installation-steps<a class="anchor" aria-label="anchor" href="#installation-steps"></a>
 </h3>
 <p>Both the <code>duflor</code>- and <code>duflor.gui</code>-packages must be installed from their respective GitHub-repositories.</p>
 <p>You can install the development and release versions of <code>duflor.gui</code> like so:</p>
@@ -151,6 +151,85 @@
 <p>Vignettes are rendered documents discussing specific topics within a package. Installing them is recommended, but not required for utilizing the package itself.</p>
 </div>
 </div>
+<div class="section level2">
+<h2 id="installation---from-the-command-line">Installation - from the command-line<a class="anchor" aria-label="anchor" href="#installation---from-the-command-line"></a>
+</h2>
+<div class="section level3">
+<h3 id="prerequisites-1">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites-1"></a>
+</h3>
+<ul>
+<li>R&gt;=4.3.3 is installed on the system, and can be launched from the command-line
+<ul>
+<li>You can try executing <code>where R</code> or <code>which R</code> to see if R this prerequisite is met. Each command will print the path to the R-installation which is used from the command-line. If no path is found, R is not acessible from the command-line.
+<ul>
+<li>In this case, check how to make it accessible from the command-line for your respective system</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="installation-steps-1">Installation-steps<a class="anchor" aria-label="anchor" href="#installation-steps-1"></a>
+</h3>
+<p>To install the application, follow the steps below:</p>
+<ol style="list-style-type: decimal">
+<li>open the terminal, and move to the location where you want to install the program</li>
+<li>create a folder to place the application in, e.g. <code>mkdir duflor_app</code>
+</li>
+<li>move into the folder via <code>cd duflor_app</code>
+</li>
+<li>launch R by excuting <code>R</code>
+</li>
+<li>executing <code>1+1</code> should now successfully return <code>[1] 2</code>
+</li>
+<li>check if the package <code>renv</code> is installed by executing <code>system.file(package='renv')</code>
+<ul>
+<li>if it is not, install it by executing <code>install.packages("renv")</code>, then follow instructions for installing it/potential dependencies</li>
+</ul>
+</li>
+<li>execute <code><a href="https://rstudio.github.io/renv/reference/init.html" class="external-link">renv::init()</a></code>
+</li>
+<li>repeat step 6) for the package <code>devtools</code>
+</li>
+<li>install <code>duflor.gui</code> by executing either:
+<ul>
+<li>release-version: <code>devtools::install_github("https://github.com/Claudius-Appel/duflor.gui@master")</code>
+</li>
+<li>development-version: <code>devtools::install_github("https://github.com/Claudius-Appel/duflor.gui@dev")</code>
+</li>
+<li>follow instructions for installing it/potential dependencies</li>
+</ul>
+</li>
+<li>once it is installed, try executing <code><a href="reference/duflor_gui.html">duflor.gui::duflor_gui()</a></code> to see if the package was installed successfully
+<ul>
+<li>If it was, the GUI should open in the default-browser, and the application can be used from now on</li>
+</ul>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="section level1">
+<h1 id="running-the-app-from-the-command-line">Running the app from the command-line<a class="anchor" aria-label="anchor" href="#running-the-app-from-the-command-line"></a>
+</h1>
+<p>After installation, the application can be launched as described below:</p>
+<ol style="list-style-type: decimal">
+<li>cd into the folder in which you have installed the application in, e.g. <code>cd duflor_app</code>
+</li>
+<li>launch R via <code>R</code>
+</li>
+<li>launch the app via <code><a href="reference/duflor_gui.html">duflor.gui::duflor_gui()</a></code>
+</li>
+</ol>
+</div>
+<div class="section level1">
+<h1 id="running-the-app-from-within-rstudio">Running the app from within RStudio<a class="anchor" aria-label="anchor" href="#running-the-app-from-within-rstudio"></a>
+</h1>
+<ol style="list-style-type: decimal">
+<li>follow the installation-steps above, beginning at step 6. Steps 6+ must be executed within the RStudio-Console</li>
+<li>run <code><a href="reference/duflor_gui.html">duflor.gui::duflor_gui()</a></code> to launch the app</li>
+</ol>
 </div>
 
 

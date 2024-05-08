@@ -23,27 +23,27 @@ knitr::opts_chunk$set(
 
 The `duflor.gui`-package contains a shiny-application built for the use of the `duflor`-package.
 
-## Installation
+## Installation - from within RStudio
 
 This package requires the installation of the `duflor`-package, which implements most of the back-end code for the analysis-pipelines in this application.
 
 ### Prerequisites
 
-#### Install `renv`
-
 As this application is quite complex, it relies on a certain number of packages to work. The package `renv` can help with managing a reproducible package environment for a project. As an additional advantage, this also prevents packages in your system-library from being updated when installing this package.
 
 For a proper documentation and information on its use-cases, refer to <https://rstudio.github.io/renv/index.html>.
 
-To set up a stand-alone R-project with renv, the easiest way is through R-Studio:
+#### Install `renv`
+
+To set up a stand-alone R-project with `renv`, the easiest way is through R-Studio:
 
 1.  Go to `File` \> `New Project`.
 2.  Select `New Directory`.
 3.  Select `New Project` as project-type[^1].
 4.  Give a distinct name to the project, e.g. `duflor.gui_installed`[^2].
 5.  Choose a location for the R-project.
-6.  [**Make sure that the checkbox `Use renv with this project` is checked.**]{.underline}
-7.  Make sure the checkbox `Open in new session` is checked.
+6.  [**Make sure that the check-box `Use renv with this project` is checked.**]{.underline}
+7.  Make sure the check-box `Open in new session` is checked.
 8.  Create the project.
 
 [^1]: This might sound confusing, as this is a R-package wrapping a shiny-application. However, those two options are for ***developing*** either of those, not for ***installing*** them.
@@ -86,7 +86,7 @@ If this is correct, you can go ahead and answer the prompt with `Y`. If this is 
 
 Once you have installed `renv`, go on to "[Installing application itself]".
 
-### Installing application itself
+### Installation-steps
 
 Both the `duflor`- and `duflor.gui`-packages must be installed from their respective GitHub-repositories.
 
@@ -115,3 +115,44 @@ devtools::install_github("https://github.com/Claudius-Appel/duflor.gui@dev"
 ```
 
 Vignettes are rendered documents discussing specific topics within a package. Installing them is recommended, but not required for utilizing the package itself.
+
+## Installation - from the command-line
+
+### Prerequisites
+
+-   R\>=4.3.3 is installed on the system, and can be launched from the command-line
+    -   You can try executing `where R` or `which R` to see if R this prerequisite is met. Each command will print the path to the R-installation which is used from the command-line. If no path is found, R is not acessible from the command-line.
+        -   In this case, check how to make it accessible from the command-line for your respective system
+
+### Installation-steps
+
+To install the application, follow the steps below:
+
+1.  open the terminal, and move to the location where you want to install the program
+2.  create a folder to place the application in, e.g. `mkdir duflor_app`
+3.  move into the folder via `cd duflor_app`
+4.  launch R by excuting `R`
+5.  executing `1+1` should now successfully return `[1] 2`
+6.  check if the package `renv` is installed by executing `system.file(package='renv')`
+    -   if it is not, install it by executing `install.packages("renv")`, then follow instructions for installing it/potential dependencies
+7.  execute `renv::init()`
+8.  repeat step 6) for the package `devtools`
+9.  install `duflor.gui` by executing either:
+    -   release-version: `devtools::install_github("https://github.com/Claudius-Appel/duflor.gui@master")`
+    -   development-version: `devtools::install_github("https://github.com/Claudius-Appel/duflor.gui@dev")`
+    -   follow instructions for installing it/potential dependencies
+10. once it is installed, try executing `duflor.gui::duflor_gui()` to see if the package was installed successfully
+    -   If it was, the GUI should open in the default-browser, and the application can be used from now on
+
+# Running the app from the command-line
+
+After installation, the application can be launched as described below:
+
+1.  cd into the folder in which you have installed the application in, e.g. `cd duflor_app`
+2.  launch R via `R`
+3.  launch the app via `duflor.gui::duflor_gui()`
+
+# Running the app from within RStudio
+
+1.  follow the installation-steps above, beginning at step 6. Steps 6+ must be executed within the RStudio-Console
+2.  run `duflor.gui::duflor_gui()` to launch the app
