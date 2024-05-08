@@ -809,34 +809,55 @@ duflor_gui <- function() {
         })
         observeEvent(input$discard_coerced_HSV_values_modal, {
             ## user wants to use the default values for the respective HSV-spectrum
-            default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
-            current_lower <- DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]]
-            current_upper <- DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]]
-            map <- c("H","S","V")
-            for (each in names(DATA$spectrum_changes$return_obj)) {
-                index_of_change <- which(map == sub(".*_(.)$", "\\1", each))
-                if (str_count(each,"lower_bound")>0) {
-                    DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_lower[[index_of_change]]
-                } else {
-                    DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_upper[[index_of_change]]
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
+                current_lower <- DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]]
+                current_upper <- DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]]
+                map <- c("H","S","V")
+                for (each in names(DATA$spectrum_changes$return_obj)) {
+                    index_of_change <- which(map == sub(".*_(.)$", "\\1", each))
+                    if (str_count(each,"lower_bound")>0) {
+                        DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_lower[[index_of_change]]
+                    } else {
+                        DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_upper[[index_of_change]]
+                    }
                 }
-            }
-            updateNumericInput(session, inputId = "lower_bound_H", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
-            updateNumericInput(session, inputId = "lower_bound_S", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
-            updateNumericInput(session, inputId = "lower_bound_V", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][3])
-            updateNumericInput(session, inputId = "upper_bound_H", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][1])
-            updateNumericInput(session, inputId = "upper_bound_S", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
-            updateNumericInput(session, inputId = "upper_bound_V", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
-            showNotification(
-                ui = str_c(
-                    "Reset values for spectrum '",
-                    input$selected_HSV_spectrum,
-                    "'"
-                ),
-                type = "message"
-            )
-            removeModal()
-            hide("HSV_PANEL")
+                updateNumericInput(session, inputId = "lower_bound_H", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
+                updateNumericInput(session, inputId = "lower_bound_S", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
+                updateNumericInput(session, inputId = "lower_bound_V", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][3])
+                updateNumericInput(session, inputId = "upper_bound_H", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][1])
+                updateNumericInput(session, inputId = "upper_bound_S", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
+                updateNumericInput(session, inputId = "upper_bound_V", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
+                showNotification(
+                    ui = str_c(
+                        "Reset values for spectrum '",
+                        input$selected_HSV_spectrum,
+                        "'"
+                    ),
+                    type = "message"
+                )
+                removeModal()
+                hide("HSV_PANEL")
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "discard_coerced_HSV_values_modal"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'discard_coerced_HSV_values_modal'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### RENDER PLOT ####
         observeEvent(input$render_plant, {
