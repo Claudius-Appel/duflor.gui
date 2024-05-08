@@ -359,7 +359,7 @@ duflor_gui <- function() {
                 )
             })
         })
-        #### REACTIVE - RESULTS_TABLE/BARPLOT, FILTERED BY SPECTRUM ####
+        #### REACTIVE - RESULTS_TABLE, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
             req(input$reinspected_spectrums)
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
@@ -397,7 +397,7 @@ duflor_gui <- function() {
                 )
             })
         })
-        output$tbl_results_filtered <- renderDataTable({
+        output$tbl_results_filtered <- renderDataTable({ # selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
             filtered_results()},
             server = TRUE,
             selection = "single",
@@ -407,7 +407,7 @@ duflor_gui <- function() {
                 autoWidth = TRUE
             )
         )
-        #### PLOT OUTPUT RESULTS ####
+        #### REACTIVE - RESULTS_PLOT, FILTERED BY SPECTRUM ####
         filtered_plot <- reactive({
             req(input$reinspected_spectrums2,input$reinspected_type2,hasName(DATA$results,"results"))
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
@@ -464,8 +464,6 @@ duflor_gui <- function() {
                 )
             })
         })
-        ### selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
-
         #### HIDE_PANELS_BY_DEFAULT ####
         hide("HSV_PANEL")
         hide("CROPPING_PANEL")
@@ -608,7 +606,7 @@ duflor_gui <- function() {
         })
         observeEvent(input$submit_reset_crops, {
             removeModal()
-            showNotification(ui = str_c("not implemented: reset crops to 0/0/0/0"),
+            showNotification(ui = str_c("Reset image-crops to 0/0/0/0"),
                              type = "message")
             updateNumericInput(session,"x0",value = 0)
             updateNumericInput(session,"x1",value = 0)
@@ -730,7 +728,7 @@ duflor_gui <- function() {
         })
         observeEvent(input$submit_reset_identifiercrops, {
             removeModal()
-            showNotification(ui = str_c("not implemented: reset crops to 0/0/0/0"),
+            showNotification(ui = str_c("Reset identifier-crops to 0/0/0/0"),
                              type = "message")
             updateNumericInput(session,"identifiersearch_x0",value = 0)
             updateNumericInput(session,"identifiersearch_x1",value = 0)
@@ -1008,13 +1006,6 @@ duflor_gui <- function() {
         observeEvent(input$execute_analysis_single, {
             isolate(FLAGS$analyse_single_image)
             FLAGS$analyse_single_image <- TRUE
-            showNotification(
-                ui = str_c(
-                    "not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."
-                ),
-                duration = DATA$notification_duration,
-                type = "warning"
-            )
             select_spectra_gui_comp(input)
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
