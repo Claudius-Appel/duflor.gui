@@ -22,7 +22,7 @@ library(duflor.gui)
 
 This app has the ability to store its configuration-state permanently across sessions, so it can be restored at a later state - or on a different machine.
 
-# Saving and Restoring common states
+# Saving and restoring common states
 
 The most common use-case for the user is to save and restore config-changes across sessions.
 

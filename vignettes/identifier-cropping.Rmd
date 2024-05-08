@@ -51,7 +51,7 @@ The difference this step can make can be observed in tables 1 and 2. Note that t
 | 796                      | 260776                | 164.7868442211055    |
 | 870                      | 262390                | 151.7036436781609    |
 
-: Table 1: Number of pixels for the 'identifer_dot', as well as the resulting area for an example-drought spectrum based on a given number of matched pixels. In this case, all qualified "identifier"-pixels were used to determine areas.
+: Table 1: Number of pixels for the 'identifier_dot', as well as the resulting area for an example-drought spectrum based on a given number of matched pixels. In this case, all qualified "identifier"-pixels were used to determine areas.
 
 | bex_identifier_dot_count | bex_drought_HSV_count | bex_drought_HSV_area |
 |--------------------------|-----------------------|----------------------|

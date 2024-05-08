@@ -20,7 +20,7 @@ library(duflor.gui)
 
 # Introduction
 
-The default values for the HSV-spectra provided via the shiny-application are set in the backend-package "[duflor](https://github.com/Claudius-Appel/duflor)", **not frontend-package "[duflor.gui](https://github.com/Claudius-Appel/duflor.gui)"**.
+The default values for the HSV-spectra provided via the shiny-application are set in the back-end-package "[duflor](https://github.com/Claudius-Appel/duflor)", **not frontend-package "[duflor.gui](https://github.com/Claudius-Appel/duflor.gui)"**.
 
 There are two methods of altering the HSV-bounds use during analysis. The first one can be performed from within the GUI, and will only take effect during the current session. **Restarting the GUI or the R-session will not purge any changes issued this way**[^1].
 
@@ -114,7 +114,7 @@ On occasion a spectrum's HSV-boundaries must be modified - and in this case, a s
 
 This method is recommended over the steps outlined in "[...pseudo-permanently by changing underlying option before opening the GUI]".
 
-The state-management system outlined in the section "Saving and restoring common states" of the vignette `vignette("saving-and-restoring-application-states", package = "duflor.gui")` can be used to save modified settings, and thus also changes to the *existing* HSV-ranges.
+The state-management system outlined in the section "Saving and restoring common states" of the vignette `vignette("saving-and-restoring-application-states", package = "duflor.gui")` can be used to save modified settings, and thus also changes to the *existing* HSV-ranges.
 
 To do so, first change the HSV-spectra as desired via the steps outlined in "[... temporarily via the GUI]". Following that, save this state of the app to a state-file.
 
