@@ -307,7 +307,28 @@ duflor_gui <- function() {
             req(isFALSE(is.na(DATA$folder_path)))
             req(dir.exists(DATA$folder_path))
             req(input$image_file_suffix) # image_files_
-            image_files_()
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                image_files_()
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "image_file_suffix"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$image_file_suffix'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         observeEvent(input$folder, {
             req(input$folder[[1]],input$image_file_suffix)
