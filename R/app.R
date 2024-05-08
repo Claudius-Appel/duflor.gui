@@ -307,17 +307,59 @@ duflor_gui <- function() {
             req(isFALSE(is.na(DATA$folder_path)))
             req(dir.exists(DATA$folder_path))
             req(input$image_file_suffix) # image_files_
-            image_files_()
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                image_files_()
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "image_file_suffix"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$image_file_suffix'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         observeEvent(input$folder, {
             req(input$folder[[1]],input$image_file_suffix)
             shinyDirChoose(input = input, 'folder', roots=volumes)
             folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
             req(dir.exists(folder_path))
-            DATA$folder_path <- folder_path
-            image_files_()
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                DATA$folder_path <- folder_path
+                image_files_()
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "folder"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$folder'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
-        #### REACTIVE - RESULTS_TABLE/BARPLOT, FILTERED BY SPECTRUM ####
+        #### REACTIVE - RESULTS_TABLE, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
             req(input$reinspected_spectrums)
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
@@ -338,7 +380,7 @@ duflor_gui <- function() {
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
-                    input_mirror,
+                    input = input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
                     FLAGS = FLAGS,
@@ -355,7 +397,7 @@ duflor_gui <- function() {
                 )
             })
         })
-        output$tbl_results_filtered <- renderDataTable({
+        output$tbl_results_filtered <- renderDataTable({ # selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
             filtered_results()},
             server = TRUE,
             selection = "single",
@@ -365,7 +407,7 @@ duflor_gui <- function() {
                 autoWidth = TRUE
             )
         )
-        #### PLOT OUTPUT RESULTS ####
+        #### REACTIVE - RESULTS_PLOT, FILTERED BY SPECTRUM ####
         filtered_plot <- reactive({
             req(input$reinspected_spectrums2,input$reinspected_type2,hasName(DATA$results,"results"))
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
@@ -377,7 +419,7 @@ duflor_gui <- function() {
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
-                    input_mirror,
+                    input = input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
                     FLAGS = FLAGS,
@@ -399,10 +441,29 @@ duflor_gui <- function() {
         })
         observeEvent(input$save_visualisation_plot, {
             req(DATA$current_KPI_plot)
-            store_KPI_plot_to_file(input, DATA)
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                store_KPI_plot_to_file(input, DATA)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "save_visualisation_plot"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$save_visualisation_plot'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
-        ### selected elements of the DT::renderDataTable() can be accessed in server via `input$tableID_rows_selected` - cf. https://clarewest.github.io/blog/post/making-tables-shiny/
-
         #### HIDE_PANELS_BY_DEFAULT ####
         hide("HSV_PANEL")
         hide("CROPPING_PANEL")
@@ -415,7 +476,7 @@ duflor_gui <- function() {
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
-                    input_mirror,
+                    input = input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
                     FLAGS = FLAGS,
@@ -473,45 +534,65 @@ duflor_gui <- function() {
                 return()
             }
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
-
-            selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
-            DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
-            showNotification(
-                ui = str_c("loading ", " ", selectedrow$images_filtered),
-                duration = DATA$notification_duration,
-                type = "message"
-            )
-
-            im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
-            dims <- dim(im)
-            rect <- grabRect(im)
-            if (sum(rect)>0) {
-                # DATA$rect <- rect
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
+                DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
                 showNotification(
-                    ui = str_c(
-                        "Only pixels within the rectange defined below will be analysed:",
-                        "\nx0: ",
-                        rect["x0"],
-                        " x1: ",
-                        rect["x1"],
-                        "\n",
-                        "y0: ",
-                        rect["y0"],
-                        " y1: ",
-                        rect["y1"]
-                    ),
-                    duration = DATA$notification_duration * 5,
-                    type = "warning"
+                    ui = str_c("loading ", " ", selectedrow$images_filtered),
+                    duration = DATA$notification_duration,
+                    type = "message"
                 )
-                cl <- rect["x0"]
-                cr <- rect["x1"]
-                ct <- rect["y0"]
-                cb <- rect["y1"]
-                updateNumericInput(session,"x0",value = as.integer(cl))
-                updateNumericInput(session,"x1",value = as.integer(cr))
-                updateNumericInput(session,"y1",value = as.integer(cb))
-                updateNumericInput(session,"y0",value = as.integer(ct))
-            }
+
+                im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+                dims <- dim(im)
+                rect <- grabRect(im)
+                if (sum(rect)>0) {
+                    # DATA$rect <- rect
+                    showNotification(
+                        ui = str_c(
+                            "Only pixels within the rectange defined below will be analysed:",
+                            "\nx0: ",
+                            rect["x0"],
+                            " x1: ",
+                            rect["x1"],
+                            "\n",
+                            "y0: ",
+                            rect["y0"],
+                            " y1: ",
+                            rect["y1"]
+                        ),
+                        duration = DATA$notification_duration * 5,
+                        type = "warning"
+                    )
+                    cl <- rect["x0"]
+                    cr <- rect["x1"]
+                    ct <- rect["y0"]
+                    cb <- rect["y1"]
+                    updateNumericInput(session,"x0",value = as.integer(cl))
+                    updateNumericInput(session,"x1",value = as.integer(cr))
+                    updateNumericInput(session,"y1",value = as.integer(cb))
+                    updateNumericInput(session,"y0",value = as.integer(ct))
+                }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "select_crops"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'select_crops'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         observeEvent(input$reset_crops, {
             showModal(modalDialog(
@@ -525,7 +606,7 @@ duflor_gui <- function() {
         })
         observeEvent(input$submit_reset_crops, {
             removeModal()
-            showNotification(ui = str_c("not implemented: reset crops to 0/0/0/0"),
+            showNotification(ui = str_c("Reset image-crops to 0/0/0/0"),
                              type = "message")
             updateNumericInput(session,"x0",value = 0)
             updateNumericInput(session,"x1",value = 0)
@@ -575,45 +656,65 @@ duflor_gui <- function() {
                 return()
             }
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
-
-            selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
-            DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
-            showNotification(
-                ui = str_c("loading ", " ", selectedrow$images_filtered),
-                duration = DATA$notification_duration,
-                type = "message"
-            )
-
-            im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
-            dims <- dim(im)
-            rect <- grabRect(im)
-            if (sum(rect)>0) {
-                # DATA$rect <- rect
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
+                DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
                 showNotification(
-                    ui = str_c(
-                        "Only pixels within the rectange defined below will be analysed:",
-                        "\nx0: ",
-                        rect["x0"],
-                        " x1: ",
-                        rect["x1"],
-                        "\n",
-                        "y0: ",
-                        rect["y0"],
-                        " y1: ",
-                        rect["y1"]
-                    ),
-                    duration = DATA$notification_duration * 5,
-                    type = "warning"
+                    ui = str_c("loading ", " ", selectedrow$images_filtered),
+                    duration = DATA$notification_duration,
+                    type = "message"
                 )
-                cl <- rect["x0"]
-                cr <- rect["x1"]
-                ct <- rect["y0"]
-                cb <- rect["y1"]
-                updateNumericInput(session,"identifiersearch_x0",value = as.integer(cl))
-                updateNumericInput(session,"identifiersearch_x1",value = as.integer(cr))
-                updateNumericInput(session,"identifiersearch_y1",value = as.integer(cb))
-                updateNumericInput(session,"identifiersearch_y0",value = as.integer(ct))
-            }
+
+                im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
+                dims <- dim(im)
+                rect <- grabRect(im)
+                if (sum(rect)>0) {
+                    # DATA$rect <- rect
+                    showNotification(
+                        ui = str_c(
+                            "Only pixels within the rectange defined below will be analysed:",
+                            "\nx0: ",
+                            rect["x0"],
+                            " x1: ",
+                            rect["x1"],
+                            "\n",
+                            "y0: ",
+                            rect["y0"],
+                            " y1: ",
+                            rect["y1"]
+                        ),
+                        duration = DATA$notification_duration * 5,
+                        type = "warning"
+                    )
+                    cl <- rect["x0"]
+                    cr <- rect["x1"]
+                    ct <- rect["y0"]
+                    cb <- rect["y1"]
+                    updateNumericInput(session,"identifiersearch_x0",value = as.integer(cl))
+                    updateNumericInput(session,"identifiersearch_x1",value = as.integer(cr))
+                    updateNumericInput(session,"identifiersearch_y1",value = as.integer(cb))
+                    updateNumericInput(session,"identifiersearch_y0",value = as.integer(ct))
+                }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "select_identifiercrops"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'select_identifiercrops'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         observeEvent(input$reset_identifiercrops, {
             showModal(modalDialog(
@@ -627,7 +728,7 @@ duflor_gui <- function() {
         })
         observeEvent(input$submit_reset_identifiercrops, {
             removeModal()
-            showNotification(ui = str_c("not implemented: reset crops to 0/0/0/0"),
+            showNotification(ui = str_c("Reset identifier-crops to 0/0/0/0"),
                              type = "message")
             updateNumericInput(session,"identifiersearch_x0",value = 0)
             updateNumericInput(session,"identifiersearch_x1",value = 0)
@@ -675,15 +776,87 @@ duflor_gui <- function() {
             hide("HSV_PANEL")
         })
         observeEvent(input$close_edit_HSV_ranges_conditionalPanel, {
-            ## check if submitted values are valid (i.e. do they exceed boundaries by being inputted as numbers manually?)
-            changes <- validate_custom_HSV_values(input, DATA, getDefaultReactiveDomain())
-            DATA$spectrum_changes <- changes
-            ## assemble the vectors of updated HSV-bounds
-            adjustments_lower <- c(input$lower_bound_H,input$lower_bound_S,input$lower_bound_V)
-            adjustments_upper <- c(input$upper_bound_H,input$upper_bound_S,input$upper_bound_V)
-            if (length(changes$return_obj)==0) { # just commit the changes (no infringing values were found - all changes were within valid range-limits)
-                DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
-                DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                ## check if submitted values are valid (i.e. do they exceed boundaries by being inputted as numbers manually?)
+                changes <- validate_custom_HSV_values(input, DATA, getDefaultReactiveDomain())
+                DATA$spectrum_changes <- changes
+                ## assemble the vectors of updated HSV-bounds
+                adjustments_lower <- c(input$lower_bound_H,input$lower_bound_S,input$lower_bound_V)
+                adjustments_upper <- c(input$upper_bound_H,input$upper_bound_S,input$upper_bound_V)
+                if (length(changes$return_obj)==0) { # just commit the changes (no infringing values were found - all changes were within valid range-limits)
+                    DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
+                    DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
+                    showNotification(
+                        ui = str_c(
+                            "Updated values for spectrum '",
+                            input$selected_HSV_spectrum,
+                            "'"
+                        ),
+                        type = "message"
+                    )
+                    hide("HSV_PANEL")
+                } else { ## ask the user if the changes are okay?
+                    ## set values which exceed their bounds to the respective bound
+                    for (each in names(changes$return_obj)) {
+                        if (str_count(each,str_c("lower_bound"))) {
+                            if (str_count(each,str_c("bound_H"))) {
+                                adjustments_lower[[1]] <- changes$return_obj[[each]]
+                            }
+                            if (str_count(each,str_c("bound_S"))) {
+                                adjustments_lower[[2]] <- changes$return_obj[[each]]
+                            }
+                            if (str_count(each,str_c("bound_V"))) {
+                                adjustments_lower[[3]] <- changes$return_obj[[each]]
+                            }
+                        }
+                        if (str_count(each,str_c("upper_bound"))) {
+                            if (str_count(each,str_c("bound_H"))) {
+                                adjustments_upper[[1]] <- changes$return_obj[[each]]
+                            }
+                            if (str_count(each,str_c("bound_S"))) {
+                                adjustments_upper[[2]] <- changes$return_obj[[each]]
+                            }
+                            if (str_count(each,str_c("bound_V"))) {
+                                adjustments_upper[[3]] <- changes$return_obj[[each]]
+                            }
+                        }
+                    }
+                    # make a copy to use when confirming the modalDialogue
+                    DATA$coerced_spectrums <- DATA$spectrums
+                    DATA$coerced_spectrums <- DATA$spectrums
+                    # then modify it, so that the changes may be applied.
+                    DATA$coerced_spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
+                    DATA$coerced_spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
+                    show_infringing_spectrum_elements_gui_comp(input, DATA, changes)
+                }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "save_visualisation_plot"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$close_edit_HSV_ranges_conditionalPanel'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
+        })
+        observeEvent(input$confirm_coerced_HSV_values_modal, {
+            ## user wants to use the range-limits for the respective HSV-parameters as their respective bounds
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                DATA$spectrums$lower_bound <- DATA$coerced_spectrums$lower_bound
+                DATA$spectrums$upper_bound <- DATA$coerced_spectrums$upper_bound
+                removeModal()
                 showNotification(
                     ui = str_c(
                         "Updated values for spectrum '",
@@ -693,86 +866,78 @@ duflor_gui <- function() {
                     type = "message"
                 )
                 hide("HSV_PANEL")
-            } else { ## ask the user if the changes are okay?
-                ## set values which exceed their bounds to the respective bound
-                for (each in names(changes$return_obj)) {
-                    if (str_count(each,str_c("lower_bound"))) {
-                        if (str_count(each,str_c("bound_H"))) {
-                            adjustments_lower[[1]] <- changes$return_obj[[each]]
-                        }
-                        if (str_count(each,str_c("bound_S"))) {
-                            adjustments_lower[[2]] <- changes$return_obj[[each]]
-                        }
-                        if (str_count(each,str_c("bound_V"))) {
-                            adjustments_lower[[3]] <- changes$return_obj[[each]]
-                        }
-                    }
-                    if (str_count(each,str_c("upper_bound"))) {
-                        if (str_count(each,str_c("bound_H"))) {
-                            adjustments_upper[[1]] <- changes$return_obj[[each]]
-                        }
-                        if (str_count(each,str_c("bound_S"))) {
-                            adjustments_upper[[2]] <- changes$return_obj[[each]]
-                        }
-                        if (str_count(each,str_c("bound_V"))) {
-                            adjustments_upper[[3]] <- changes$return_obj[[each]]
-                        }
-                    }
-                }
-                # make a copy to use when confirming the modalDialogue
-                DATA$coerced_spectrums <- DATA$spectrums
-                DATA$coerced_spectrums <- DATA$spectrums
-                # then modify it, so that the changes may be applied.
-                DATA$coerced_spectrums$lower_bound[[input$selected_HSV_spectrum]] <- adjustments_lower
-                DATA$coerced_spectrums$upper_bound[[input$selected_HSV_spectrum]] <- adjustments_upper
-                show_infringing_spectrum_elements_gui_comp(input, DATA, changes)
-            }
-        })
-        observeEvent(input$confirm_coerced_HSV_values_modal, {
-            ## user wants to use the range-limits for the respective HSV-parameters as their respective bounds
-            DATA$spectrums$lower_bound <- DATA$coerced_spectrums$lower_bound
-            DATA$spectrums$upper_bound <- DATA$coerced_spectrums$upper_bound
-            removeModal()
-            showNotification(
-                ui = str_c(
-                    "Updated values for spectrum '",
-                    input$selected_HSV_spectrum,
-                    "'"
-                ),
-                type = "message"
-            )
-            hide("HSV_PANEL")
+                stop("DD")
+            }, error = function(e) {
+                # DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "confirm_coerced_HSV_values_modal"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'confirm_coerced_HSV_values_modal'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         observeEvent(input$discard_coerced_HSV_values_modal, {
             ## user wants to use the default values for the respective HSV-spectrum
-            default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
-            current_lower <- DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]]
-            current_upper <- DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]]
-            map <- c("H","S","V")
-            for (each in names(DATA$spectrum_changes$return_obj)) {
-                index_of_change <- which(map == sub(".*_(.)$", "\\1", each))
-                if (str_count(each,"lower_bound")>0) {
-                    DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_lower[[index_of_change]]
-                } else {
-                    DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_upper[[index_of_change]]
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
+                current_lower <- DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]]
+                current_upper <- DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]]
+                map <- c("H","S","V")
+                for (each in names(DATA$spectrum_changes$return_obj)) {
+                    index_of_change <- which(map == sub(".*_(.)$", "\\1", each))
+                    if (str_count(each,"lower_bound")>0) {
+                        DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_lower[[index_of_change]]
+                    } else {
+                        DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_upper[[index_of_change]]
+                    }
                 }
-            }
-            updateNumericInput(session, inputId = "lower_bound_H", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
-            updateNumericInput(session, inputId = "lower_bound_S", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
-            updateNumericInput(session, inputId = "lower_bound_V", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][3])
-            updateNumericInput(session, inputId = "upper_bound_H", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][1])
-            updateNumericInput(session, inputId = "upper_bound_S", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
-            updateNumericInput(session, inputId = "upper_bound_V", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
-            showNotification(
-                ui = str_c(
-                    "Reset values for spectrum '",
-                    input$selected_HSV_spectrum,
-                    "'"
-                ),
-                type = "message"
-            )
-            removeModal()
-            hide("HSV_PANEL")
+                updateNumericInput(session, inputId = "lower_bound_H", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][1])
+                updateNumericInput(session, inputId = "lower_bound_S", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][2])
+                updateNumericInput(session, inputId = "lower_bound_V", value = DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][3])
+                updateNumericInput(session, inputId = "upper_bound_H", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][1])
+                updateNumericInput(session, inputId = "upper_bound_S", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
+                updateNumericInput(session, inputId = "upper_bound_V", value = DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
+                showNotification(
+                    ui = str_c(
+                        "Reset values for spectrum '",
+                        input$selected_HSV_spectrum,
+                        "'"
+                    ),
+                    type = "message"
+                )
+                removeModal()
+                hide("HSV_PANEL")
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "discard_coerced_HSV_values_modal"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'discard_coerced_HSV_values_modal'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         #### RENDER PLOT ####
         observeEvent(input$render_plant, {
@@ -820,7 +985,7 @@ duflor_gui <- function() {
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
-                    input_mirror,
+                    input = input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
                     FLAGS = FLAGS,
@@ -841,13 +1006,6 @@ duflor_gui <- function() {
         observeEvent(input$execute_analysis_single, {
             isolate(FLAGS$analyse_single_image)
             FLAGS$analyse_single_image <- TRUE
-            showNotification(
-                ui = str_c(
-                    "not implemented: in this scenario, we might consider displaying the resulting masks.\nIn normal execution, we do not display anything but the results at the end."
-                ),
-                duration = DATA$notification_duration,
-                type = "warning"
-            )
             select_spectra_gui_comp(input)
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
@@ -942,7 +1100,7 @@ duflor_gui <- function() {
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
-                    input_mirror,
+                    input = input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
                     FLAGS = FLAGS,
@@ -968,7 +1126,7 @@ duflor_gui <- function() {
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
-                    input_mirror,
+                    input = input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
                     FLAGS = FLAGS,
@@ -1029,7 +1187,7 @@ duflor_gui <- function() {
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
-                    input_mirror,
+                    input = input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
                     FLAGS = FLAGS,
@@ -1118,7 +1276,7 @@ duflor_gui <- function() {
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
-                    input_mirror,
+                    input = input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
                     FLAGS = FLAGS,
@@ -1183,7 +1341,7 @@ duflor_gui <- function() {
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
-                    input_mirror,
+                    input = input_mirror,
                     DATA = DATA,
                     DEBUGKEYS = DEBUGKEYS,
                     FLAGS = FLAGS,
