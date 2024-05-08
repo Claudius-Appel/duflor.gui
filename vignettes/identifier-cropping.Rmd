@@ -30,7 +30,7 @@ To counteract this, the GUI allows you to limit the range within which matches f
 
 To select the area, follow the steps outlined below. Each step corresponds to a number within figures 2 and 3:
 
-1.  Select an image to inspect. You may select any *one* image within the `Image Files`-Tab
+1.  Select an image to inspect. You may select any *one* image within the `Image Files`-Tab.
 2.  Check the check-box to enable this feature. This will expand a previously-hidden panel.
 3.  Next, press the button `Select area to analyse` to launch the window shown in figure 3.
 4.  Finally, left-click-and-drag over the area within which the identifier-dot resides. The selection may contain anything, and may be of any size. When you let go, the selection-GUI will close, and the bounding coordinates will be inserted into the respective numeric input controls.
