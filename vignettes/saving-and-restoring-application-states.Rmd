@@ -52,9 +52,21 @@ These changes can later be reloaded from the same file (step (B) in figure 1.
 
 Additionally to the process of manually saving the application-state, the application generates state-files if an error occurs during the execution of certain subroutines:
 
--   `input$submit_selected_spectra`: The callback which issues the analysis of images, from loading the images up to the generation of the results
+-   `input$submit_selected_spectra`: The callback which issues the analysis of images, from loading the images up to the generation of the results.
 
     -   This is **the** subroutine responsible for computing analyses, all steps required to obtain the results-table and figures branch off from here.
+
+-   `input$render_selected_mask`: The callback responsible for inspecting the mask of spectrum-matches against the respective image-file after results were computed.
+
+-   `input$save_results`: The callback responsible for saving the results-table to either a `.xlsx`-or `.csv`-file.
+
+-   `input$save_visualisation_plot`: The callback responsible for saving the selected KPI-plot in tab `Results - plots`.
+
+-   `input$render_plant`: The callback responsible for viewing the input image-file.
+
+-   reactive `filtered_plot`: The reactive which generates the KPI-plots in the tab `Results - plots`.
+
+-   reactive `filtered_results`: The reactive which generates the filtered results-table in the tab `Results - inspect`.
 
 Error-states are saved relative to the selected input-folder containing the input-images. These states are not supposed to be used manually, instead they are generated so that issues can be found easier. When issues are reported, such state-files should be supplied if available.
 
@@ -66,7 +78,7 @@ When this application is installed as a built package, its internal functions an
 
 There are a couple limitations to this system:
 
-1.  Only one state can be loaded at one time. \
-    You may leverage this system to save and restore changed HSV-spectra, and thus generate a state-file with these modified spectra. \
-    You may additionally generate a *different* state-file with a predefined set of allocated cores for parallelisation. \
+1.  Only one state can be loaded at one time.\
+    You may leverage this system to save and restore changed HSV-spectra, and thus generate a state-file with these modified spectra.\
+    You may additionally generate a *different* state-file with a predefined set of allocated cores for parallelisation.\
     Now, you have two different state-files, but when loading both in succession, the latter will overwrite all changes made by the former one. First loading the "parallelisation"-state, then loading the "spectra"-state will discard the changes made by the "parallelisation"-state.
