@@ -145,6 +145,7 @@ An in-depth guide and further details can be found in `vignette("modifying-hsv-b
 # (Advanced) Debugging
 
 Generally, the app tries to give reasonable warnings and status-messages via small red/yellow/blue message boxes. These should be fairly self-explanatory, and will pop up where the author thought them sensible or necessary.
+If the app runs into an error, in most cases the configuration required for triggering said error is preserved. For further info, see the section "Saving states when errors occur during analysis" in `vignette("saving-and-restoring-application-states", package = "duflor.gui")`.
 
 # Development, Modifications, Issues
 
