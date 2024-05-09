@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9047</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9048</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,10 +85,10 @@
 <h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h3>
 <p>As this application is quite complex, it relies on a certain number of packages to work. The package <code>renv</code> can help with managing a reproducible package environment for a project. As an additional advantage, this also prevents packages in your system-library from being updated when installing this package.</p>
-<p>For a proper documentation and information on its use-cases, refer to <a href="https://rstudio.github.io/renv/index.html" class="external-link uri">https://rstudio.github.io/renv/index.html</a>.</p>
+<p>For a proper documentation and information on its use-cases, refer to “<a href="https://rstudio.github.io/renv/index.html" class="external-link uri">https://rstudio.github.io/renv/index.html</a>”.</p>
 <div class="section level4">
-<h4 id="install-renv">Install <code>renv</code>
-<a class="anchor" aria-label="anchor" href="#install-renv"></a>
+<h4 id="setup-r-project-with-renv">Setup r-project with <code>renv</code>
+<a class="anchor" aria-label="anchor" href="#setup-r-project-with-renv"></a>
 </h4>
 <p>To set up a stand-alone R-project with <code>renv</code>, the easiest way is through R-Studio:</p>
 <ol style="list-style-type: decimal">
@@ -97,7 +97,9 @@
 <li>Select <code>New Project</code> as project-type<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;This might sound confusing, as this is a R-package wrapping a shiny-application. However, those two options are for &lt;strong&gt;&lt;em&gt;developing&lt;/em&gt;&lt;/strong&gt; either of those, not for &lt;strong&gt;&lt;em&gt;installing&lt;/em&gt;&lt;/strong&gt; them.&lt;/p&gt;"><sup>1</sup></a>.</li>
 <li>Give a distinct name to the project, e.g. <code>duflor.gui_installed</code><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;The name is not really important, but it should be distinct and indicate that this is the installed application&lt;/p&gt;"><sup>2</sup></a>.</li>
 <li>Choose a location for the R-project.</li>
-<li><u><strong>Make sure that the check-box <code>Use renv with this project</code> is checked.</strong></u></li>
+<li>
+<u><strong>Make sure that the check-box <code>Use renv with this project</code> is checked.</strong></u><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;If &lt;code&gt;renv&lt;/code&gt; is not installed/must be updated, you should be prompted to install it here.&lt;/p&gt;"><sup>3</sup></a>
+</li>
 <li>Make sure the check-box <code>Open in new session</code> is checked.</li>
 <li>Create the project.</li>
 </ol>
@@ -108,12 +110,12 @@
 <h4 id="install-devtools">Install <code>devtools</code>
 <a class="anchor" aria-label="anchor" href="#install-devtools"></a>
 </h4>
-<p>First of all, make sure to have followed the steps outlined in “[Install renv]”, and that RStudio is currently in your created project.</p>
+<p>First of all, make sure to have followed the steps outlined in “[Setup r-project with renv]”, and that RStudio is currently in your created project.</p>
 <p>Installing this package from GitHub requires the installation of the R-package <code>devtools</code>. <code>devtools</code> can be used to compile source-packages to installed binaries.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span></code></pre></div>
 <p>When being asked to proceed, make sure that the installation-path is in the R-project you created:</p>
-<p>If I created my R-project with <code>renv</code> at</p>
+<p>If you created your R-project with <code>renv</code> at</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>C<span class="sc">:</span><span class="er">/</span>Users<span class="sc">/</span>User_Main<span class="sc">/</span>Desktop<span class="sc">/</span>TempTemporal<span class="sc">/</span>test_duflorgui_install</span></code></pre></div>
 <p>, the path would look something like</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>C<span class="sc">:</span><span class="er">/</span>Users<span class="sc">/</span>User_Main<span class="sc">/</span>Desktop<span class="sc">/</span>TempTemporal<span class="sc">/</span>test_duflorgui_install<span class="sc">/</span>renv<span class="sc">/</span>library<span class="sc">/</span>R<span class="sc">-</span>X.Y<span class="sc">/</span>....</span></code></pre></div>
@@ -123,7 +125,18 @@
 <li>Search for and select <code>devtools</code>.</li>
 <li>Under “Install to library”, make sure the path selected is similar to the example outlined above. In other words, make sure you do <strong>not</strong> install to the library containing the string <code>R/cache/R/renv/sandbox</code>.</li>
 </ol>
-<p>Once you have installed <code>renv</code>, go on to “[Installing application itself]”.</p>
+<p>Once you have installed <code>devtools</code>, go on to the next step.</p>
+</div>
+<div class="section level4">
+<h4 id="install-rtools-windows-only">Install Rtools (windows-only)<a class="anchor" aria-label="anchor" href="#install-rtools-windows-only"></a>
+</h4>
+<p>On windows, Rtools must be installed for your respective R-Version in order to compile packages from source. For more information, refer to “<a href="https://r-pkgs.org/setup.html#setup-tools" class="external-link uri">https://r-pkgs.org/setup.html#setup-tools</a>”.</p>
+<p>If you are not on windows, you can skip this step. There are certain scenarios in which you will be unable to build packages from source on MacOS and linux machines as well. In these cases, refer to the documentation provided for the respective platform in the link above.</p>
+<p>The R-package <code>installr</code> can be installed to check if Rtools is already installed, and whether or not it has been found by R. Additionally, it will notify the user if a new R-update is available (major and minor versions only, ignores patch versions):</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"installr"</span><span class="op">)</span></span>
+<span><span class="co"># once pkgbuild is installed, run:</span></span>
+<span><span class="fu">installr</span><span class="fu">::</span><span class="fu"><a href="https://talgalili.github.io/installr/reference/install.Rtools.html" class="external-link">install.Rtools</a></span><span class="op">(</span>check <span class="op">=</span> <span class="cn">T</span>,check_r_update <span class="op">=</span> <span class="cn">T</span>,GUI <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -131,7 +144,7 @@
 </h3>
 <p>Both the <code>duflor</code>- and <code>duflor.gui</code>-packages must be installed from their respective GitHub-repositories.</p>
 <p>You can install the development and release versions of <code>duflor.gui</code> like so:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># release:</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"https://github.com/Claudius-Appel/duflor.gui@master"</span><span class="op">)</span></span>
 <span><span class="co"># development version:</span></span>
@@ -143,7 +156,7 @@
 </h3>
 <p>The application is documented in detail via pkgdown, and its site can be reached from the github-repository.</p>
 <p>Most of the articles outlined on the site may also be viewed as vignettes from within RStudio. To do so, you must explicitly declare vignettes to be installed:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"https://github.com/Claudius-Appel/duflor.gui@master"</span></span>
 <span>  ,build_vignettes <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"https://github.com/Claudius-Appel/duflor.gui@dev"</span></span>
@@ -160,18 +173,15 @@
 <ul>
 <li>R&gt;=4.3.3 is installed on the system, and can be launched from the command-line
 <ul>
-<li>You can try executing <code>where R</code> or <code>which R</code> to see if R this prerequisite is met. Each command will print the path to the R-installation which is used from the command-line. If no path is found, R is not acessible from the command-line.
+<li>You can try executing <code>where R</code> or <code>which R</code> to see if R this prerequisite is met. Each command will print the path to the R-installation which is used from the command-line. If no path is found, R is not accessible from the command-line.
 <ul>
 <li>In this case, check how to make it accessible from the command-line for your respective system</li>
 </ul>
 </li>
 </ul>
 </li>
+<li>On windows “Rtools” must be installed for your corresponding R-Version in order to compile packages from source. For more information, refer to “<a href="https://r-pkgs.org/setup.html#setup-tools" class="external-link uri">https://r-pkgs.org/setup.html#setup-tools</a>”. Note that this package contains <code>C++</code>-code. Refer to the section “<a href="#install-rtools-windows-only">Install Rtools (windows-only)</a>” for instructions to install Rtools on windows.</li>
 </ul>
-</div>
-<div class="section level3">
-<h3 id="installation-steps-1">Installation-steps<a class="anchor" aria-label="anchor" href="#installation-steps-1"></a>
-</h3>
 <p>To install the application, follow the steps below:</p>
 <ol style="list-style-type: decimal">
 <li>open the terminal, and move to the location where you want to install the program</li>
@@ -215,7 +225,8 @@
 </h1>
 <p>After installation, the application can be launched as described below:</p>
 <ol style="list-style-type: decimal">
-<li>cd into the folder in which you have installed the application in, e.g. <code>cd duflor_app</code>
+<li>
+<code>cd</code> into the folder in which you have installed the application in, e.g. <code>cd duflor_app</code>
 </li>
 <li>launch R via <code>R</code>
 </li>
