@@ -28,9 +28,9 @@ advantage, this also prevents packages in your system-library from being
 updated when installing this package.
 
 For a proper documentation and information on its use-cases, refer to
-<https://rstudio.github.io/renv/index.html>.
+“<https://rstudio.github.io/renv/index.html>”.
 
-#### Install `renv`
+#### Setup r-project with `renv`
 
 To set up a stand-alone R-project with `renv`, the easiest way is
 through R-Studio:
@@ -42,7 +42,7 @@ through R-Studio:
     e.g. `duflor.gui_installed`[^2].
 5.  Choose a location for the R-project.
 6.  <u>**Make sure that the check-box `Use renv with this project` is
-    checked.**</u>
+    checked.**</u>[^3]
 7.  Make sure the check-box `Open in new session` is checked.
 8.  Create the project.
 
@@ -54,8 +54,8 @@ Before continuing, open this project if you did not do so.
 
 #### Install `devtools`
 
-First of all, make sure to have followed the steps outlined in
-“\[Install renv\]”, and that RStudio is currently in your created
+First of all, make sure to have followed the steps outlined in “\[Setup
+r-project with renv\]”, and that RStudio is currently in your created
 project.
 
 Installing this package from GitHub requires the installation of the
@@ -69,7 +69,7 @@ install.packages("devtools")
 When being asked to proceed, make sure that the installation-path is in
 the R-project you created:
 
-If I created my R-project with `renv` at
+If you created your R-project with `renv` at
 
     C:/Users/User_Main/Desktop/TempTemporal/test_duflorgui_install
 
@@ -87,8 +87,29 @@ this is not the case, install devtools via the RStudio-GUI:
     **not** install to the library containing the string
     `R/cache/R/renv/sandbox`.
 
-Once you have installed `renv`, go on to “\[Installing application
-itself\]”.
+Once you have installed `devtools`, go on to the next step.
+
+#### Install Rtools (windows-only)
+
+On windows, Rtools must be installed for your respective R-Version in
+order to compile packages from source. For more information, refer to
+“<https://r-pkgs.org/setup.html#setup-tools>”.
+
+If you are not on windows, you can skip this step. There are certain
+scenarios in which you will be unable to build packages from source on
+MacOS and linux machines as well. In these cases, refer to the
+documentation provided for the respective platform in the link above.
+
+The R-package `installr` can be installed to check if Rtools is already
+installed, and whether or not it has been found by R. Additionally, it
+will notify the user if a new R-update is available (major and minor
+versions only, ignores patch versions):
+
+``` r
+install.packages("installr")
+# once pkgbuild is installed, run:
+installr::install.Rtools(check = T,check_r_update = T,GUI = T)
+```
 
 ### Installation-steps
 
@@ -137,11 +158,15 @@ the package itself.
   - You can try executing `where R` or `which R` to see if R this
     prerequisite is met. Each command will print the path to the
     R-installation which is used from the command-line. If no path is
-    found, R is not acessible from the command-line.
+    found, R is not accessible from the command-line.
     - In this case, check how to make it accessible from the
       command-line for your respective system
-
-### Installation-steps
+- On windows “Rtools” must be installed for your corresponding R-Version
+  in order to compile packages from source. For more information, refer
+  to “<https://r-pkgs.org/setup.html#setup-tools>”. Note that this
+  package contains `C++`-code. Refer to the section “[Install Rtools
+  (windows-only)](#install-rtools-windows-only)” for instructions to
+  install Rtools on windows.
 
 To install the application, follow the steps below:
 
@@ -172,7 +197,7 @@ To install the application, follow the steps below:
 
 After installation, the application can be launched as described below:
 
-1.  cd into the folder in which you have installed the application in,
+1.  `cd` into the folder in which you have installed the application in,
     e.g. `cd duflor_app`
 2.  launch R via `R`
 3.  launch the app via `duflor.gui::duflor_gui()`
@@ -189,3 +214,6 @@ After installation, the application can be launched as described below:
 
 [^2]: The name is not really important, but it should be distinct and
     indicate that this is the installed application
+
+[^3]: If `renv` is not installed/must be updated, you should be prompted
+    to install it here.

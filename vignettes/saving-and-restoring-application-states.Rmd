@@ -2,7 +2,7 @@
 title: "Saving and restoring application-states"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{saving-and-restoring-application-states}
+  %\VignetteIndexEntry{Saving and restoring application-states}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
