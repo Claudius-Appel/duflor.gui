@@ -866,7 +866,6 @@ duflor_gui <- function() {
                     type = "message"
                 )
                 hide("HSV_PANEL")
-                stop("DD")
             }, error = function(e) {
                 # DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
