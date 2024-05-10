@@ -1005,12 +1005,12 @@ duflor_gui <- function() {
         observeEvent(input$execute_analysis_single, {
             isolate(FLAGS$analyse_single_image)
             FLAGS$analyse_single_image <- TRUE
-            select_spectra_gui_comp(input)
+            select_spectra_gui_comp(input, DATA)
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
             isolate(FLAGS$analyse_single_image)
             FLAGS$analyse_single_image <- FALSE
-            select_spectra_gui_comp(input)
+            select_spectra_gui_comp(input, DATA)
         })
         observeEvent(input$submit_selected_spectra, {
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state

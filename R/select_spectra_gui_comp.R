@@ -3,6 +3,7 @@
 #' Additionally, it queries the component `radio_analysis_type` to preselect common results for different types of analyses
 #'
 #' @param input `input`-shiny-component
+#' @param DATA `DATA`-shiny-component
 #'
 #' @return .
 #' @keywords internal
@@ -14,8 +15,8 @@
 #' @importFrom shiny actionButton
 #' @importFrom shiny modalButton
 #'
-select_spectra_gui_comp <- function(input) {
-    all_choices <- names(getOption("duflor.default_hsv_spectrums")$upper_bound)
+select_spectra_gui_comp <- function(input, DATA) {
+    all_choices <- names(DATA$spectrums$upper_bound)
     if (input$radio_analysis_type==1) { # GFA
         choices <- c("bex_identifier_dot","bex_green_HSV","bex_drought_HSV","bex_complete_HSV")
     } else {                            # WFA
