@@ -37,7 +37,8 @@ convert_pixels_to_area_gui <- function(pixel.counts, identifier_area)
         idx <- grep("identifier",names(pixel.counts))
         ret[[names(pixel.counts)[idx]]] = identifier_area
     }
-    for (each in c("green","drought","complete","root")) {
+    other_spectra <- names(pixel.counts)[-idx]
+    for (each in other_spectra) {
         if (any(grep(each,names(pixel.counts)))) {
             idx <- grep(each,names(pixel.counts))
             ret[[names(pixel.counts)[idx]]] <- area_per_pixel * pixel.counts[[idx]]
