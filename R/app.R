@@ -108,6 +108,7 @@ duflor_gui <- function() {
                     conditionalPanel(
                         condition = "input.open_edit_HSV_ranges_conditionalPanel %% 2 == 1", # Condition to open the panel
                         id = "HSV_PANEL",
+                        actionButton(inputId = "add_HSV_range", label = "Add HSV Range"),
                         selectInput("selected_HSV_spectrum", "Select spectrum to edit.", choices = names(getOption("duflor.default_hsv_spectrums")$lower_bound)),
                         numericInput(inputId = "lower_bound_H",label = "Lower Bound (H_0)", value = 0, min = 0, max = 359, step = 0.01),
                         numericInput(inputId = "lower_bound_S",label = "Lower Bound (S_0)", value = 0, min = 0, max = 1, step = 0.01),
@@ -912,6 +913,130 @@ duflor_gui <- function() {
                     ui = str_c(
                         "Reset values for spectrum '",
                         input$selected_HSV_spectrum,
+                        "'"
+                    ),
+                    type = "message"
+                )
+                removeModal()
+                hide("HSV_PANEL")
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "discard_coerced_HSV_values_modal"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'discard_coerced_HSV_values_modal'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
+        })
+        #### ADD HSV-RANGE ####
+        observeEvent(input$add_HSV_range, {
+            # guicomponent, must edit
+            add_HSV_range_gui_comp(input = input)
+        })
+        observeEvent(input$submit_added_HSV_range, {
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                submit_added_HSV_range(input, DATA, DEBUGKEYS, FLAGS)
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "selected_HSV_spectrum",label = "Select spectrum to edit",choices = names(DATA$spectrums$lower_bound))
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(DATA$spectrums$lower_bound))
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(DATA$spectrums$lower_bound))
+                hide("HSV_PANEL")
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "submit_added_HSV_range"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'submit_added_HSV_range'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
+        })
+        observeEvent(input$confirm_coerced_added_HSV_values_modal, {
+            ## user wants to use the range-limits for the respective HSV-parameters as their respective bounds
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                removeModal()
+                DATA$spectrums$lower_bound[[input$added_HSV_range_name]] <- DATA$coerced_spectrums$lower_bound[[input$added_HSV_range_name]]
+                DATA$spectrums$upper_bound[[input$added_HSV_range_name]] <- DATA$coerced_spectrums$upper_bound[[input$added_HSV_range_name]]
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "selected_HSV_spectrum",label = "Select spectrum to edit",choices = names(DATA$spectrums$lower_bound))
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums",label = "Select spectrum to inspect",choices = names(DATA$spectrums$lower_bound))
+                updateSelectInput(session = getDefaultReactiveDomain(), inputId = "reinspected_spectrums2",label = "Select spectrum to inspect",choices = names(DATA$spectrums$lower_bound))
+                showNotification(
+                    ui = str_c(
+                        "Added values for spectrum '",
+                        input$added_HSV_range_name,
+                        "'"
+                    ),
+                    type = "message"
+                )
+                hide("HSV_PANEL")
+            }, error = function(e) {
+                # DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "confirm_coerced_added_HSV_values_modal"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'confirm_coerced_added_HSV_values_modal'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
+        })
+        observeEvent(input$discard_coerced_added_HSV_values_modal, {
+            ## user wants to use the default values for the respective HSV-spectrum
+            input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            tryCatch({
+                default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
+                current_lower <- DATA$spectrums$lower_bound[[input$added_HSV_range_name]]
+                current_upper <- DATA$spectrums$upper_bound[[input$added_HSV_range_name]]
+                map <- c("H","S","V")
+                for (each in names(DATA$added_spectrum_changes$return_obj)) {
+                    index_of_change <- which(map == sub(".*_(.)$", "\\1", each))
+                    if (str_count(each,"lower_bound")>0) {
+                        DATA$spectrums$lower_bound[[input$added_HSV_range_name]][[index_of_change]] <- current_lower[[index_of_change]]
+                    } else {
+                        DATA$spectrums$upper_bound[[input$added_HSV_range_name]][[index_of_change]] <- current_upper[[index_of_change]]
+                    }
+                }
+                updateNumericInput(session, inputId = "lower_bound_H", value = DATA$spectrums$lower_bound[[input$added_HSV_range_name]][1])
+                updateNumericInput(session, inputId = "lower_bound_S", value = DATA$spectrums$lower_bound[[input$added_HSV_range_name]][2])
+                updateNumericInput(session, inputId = "lower_bound_V", value = DATA$spectrums$lower_bound[[input$added_HSV_range_name]][3])
+                updateNumericInput(session, inputId = "upper_bound_H", value = DATA$spectrums$upper_bound[[input$added_HSV_range_name]][1])
+                updateNumericInput(session, inputId = "upper_bound_S", value = DATA$spectrums$upper_bound[[input$added_HSV_range_name]][2])
+                updateNumericInput(session, inputId = "upper_bound_V", value = DATA$spectrums$upper_bound[[input$added_HSV_range_name]][3])
+                showNotification(
+                    ui = str_c(
+                        "Reset values for spectrum '",
+                        input$added_HSV_range_name,
                         "'"
                     ),
                     type = "message"
