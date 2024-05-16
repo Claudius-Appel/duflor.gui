@@ -506,7 +506,6 @@ duflor_gui <- function() {
                     ui = str_c(
                         "Enabled cropping. After being loaded, the image-matrix will be cropped by the values selected below before being processed."
                     ),
-                    action = a(href = "https://www.google.com", "google"),
                     type = "message"
                 )
             } else {
@@ -621,7 +620,6 @@ duflor_gui <- function() {
                     ui = str_c(
                         "Limited search-range for the identifier-dot. After being loaded, only pixels within this range may be checked for the HSV-ranges of the identifier-dot. All other spectrums are unaffected."
                     ),
-                    action = a(href = "https://www.google.com", "google"),
                     type = "message"
                 )
             } else {
