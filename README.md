@@ -89,21 +89,18 @@ this is not the case, install devtools via the RStudio-GUI:
 
 Once you have installed `devtools`, go on to the next step.
 
-#### Install Rtools (windows-only)
+#### Install R-build-toolchain
 
-On windows, Rtools must be installed for your respective R-Version in
-order to compile packages from source. For more information, refer to
+The underlying package `duflor` contains C++ code. As it is distributed
+as source-code, users will require the appropriate R-build-toolchain for
+their respective operating system. For further information and
+setup-instructions, refer to
 “<https://r-pkgs.org/setup.html#setup-tools>”.
 
-If you are not on windows, you can skip this step. There are certain
-scenarios in which you will be unable to build packages from source on
-MacOS and linux machines as well. In these cases, refer to the
-documentation provided for the respective platform in the link above.
-
-The R-package `installr` can be installed to check if Rtools is already
-installed, and whether or not it has been found by R. Additionally, it
-will notify the user if a new R-update is available (major and minor
-versions only, ignores patch versions):
+For windows, the R-package `installr` may be used to check if Rtools is
+already installed, and whether or not it has been found by R.
+Additionally, it will notify the user if a new R-update is available
+(major and minor versions only, ignores patch versions):
 
 ``` r
 install.packages("installr")
@@ -161,12 +158,13 @@ the package itself.
     found, R is not accessible from the command-line.
     - In this case, check how to make it accessible from the
       command-line for your respective system
-- On windows “Rtools” must be installed for your corresponding R-Version
-  in order to compile packages from source. For more information, refer
-  to “<https://r-pkgs.org/setup.html#setup-tools>”. Note that this
-  package contains `C++`-code. Refer to the section “[Install Rtools
-  (windows-only)](#install-rtools-windows-only)” for instructions to
-  install Rtools on windows.
+- The underlying package `duflor` contains C++ code. As it is
+  distributed as source-code, users will require the appropriate
+  R-build-toolchain for their respective operating system. For further
+  information and setup-instructions, refer to
+  “<https://r-pkgs.org/setup.html#setup-tools>”.
+
+### CLI-Installation-steps
 
 To install the application, follow the steps below:
 
@@ -174,7 +172,7 @@ To install the application, follow the steps below:
     install the program
 2.  create a folder to place the application in, e.g. `mkdir duflor_app`
 3.  move into the folder via `cd duflor_app`
-4.  launch R by excuting `R`
+4.  launch R by executing `R`
 5.  executing `1+1` should now successfully return `[1] 2`
 6.  check if the package `renv` is installed by executing
     `system.file(package='renv')`
@@ -193,6 +191,25 @@ To install the application, follow the steps below:
     - If it was, the GUI should open in the default-browser, and the
       application can be used from now on
 
+### Installing help-vignettes
+
+The application is documented in detail via pkgdown, and its site can be
+reached from the github-repository.
+
+Most of the articles outlined on the site may also be viewed as
+vignettes from within RStudio. To do so, you must explicitly declare
+vignettes to be installed when performing step 9 in
+“[CLI-Installation-steps](#cli-installation-steps)”:
+
+``` r
+devtools::install_github("https://github.com/Claudius-Appel/duflor.gui@master",build_vignettes = T)
+devtools::install_github("https://github.com/Claudius-Appel/duflor.gui@dev",build_vignettes = T)
+```
+
+Vignettes are rendered documents discussing specific topics within a
+package. Installing them is recommended, but not required for utilizing
+the package itself.
+
 # Running the app from the command-line
 
 After installation, the application can be launched as described below:
@@ -204,9 +221,12 @@ After installation, the application can be launched as described below:
 
 # Running the app from within RStudio
 
-1.  follow the installation-steps above, beginning at step 6. Steps 6+
-    must be executed within the RStudio-Console
-2.  run `duflor.gui::duflor_gui()` to launch the app
+1.  Follow the installation-steps outlined in “[Installation - from
+    within RStudio](#installation---from-within-rstudio)”
+2.  Open the project via the drop-down-menu in the top-right corner of
+    the RStudio-application.
+3.  Launch the app by executing `duflor.gui::duflor_gui()` in the
+    console.
 
 [^1]: This might sound confusing, as this is a R-package wrapping a
     shiny-application. However, those two options are for
