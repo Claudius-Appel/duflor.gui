@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9049</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9050</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,11 +128,10 @@
 <p>Once you have installed <code>devtools</code>, go on to the next step.</p>
 </div>
 <div class="section level4">
-<h4 id="install-rtools-windows-only">Install Rtools (windows-only)<a class="anchor" aria-label="anchor" href="#install-rtools-windows-only"></a>
+<h4 id="install-r-build-toolchain">Install R-build-toolchain<a class="anchor" aria-label="anchor" href="#install-r-build-toolchain"></a>
 </h4>
-<p>On windows, Rtools must be installed for your respective R-Version in order to compile packages from source. For more information, refer to “<a href="https://r-pkgs.org/setup.html#setup-tools" class="external-link uri">https://r-pkgs.org/setup.html#setup-tools</a>”.</p>
-<p>If you are not on windows, you can skip this step. There are certain scenarios in which you will be unable to build packages from source on MacOS and linux machines as well. In these cases, refer to the documentation provided for the respective platform in the link above.</p>
-<p>The R-package <code>installr</code> can be installed to check if Rtools is already installed, and whether or not it has been found by R. Additionally, it will notify the user if a new R-update is available (major and minor versions only, ignores patch versions):</p>
+<p>The underlying package <code>duflor</code> contains C++ code. As it is distributed as source-code, users will require the appropriate R-build-toolchain for their respective operating system. For further information and setup-instructions, refer to “<a href="https://r-pkgs.org/setup.html#setup-tools" class="external-link uri">https://r-pkgs.org/setup.html#setup-tools</a>”.</p>
+<p>For windows, the R-package <code>installr</code> may be used to check if Rtools is already installed, and whether or not it has been found by R. Additionally, it will notify the user if a new R-update is available (major and minor versions only, ignores patch versions):</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"installr"</span><span class="op">)</span></span>
 <span><span class="co"># once pkgbuild is installed, run:</span></span>
@@ -180,8 +179,12 @@
 </li>
 </ul>
 </li>
-<li>On windows “Rtools” must be installed for your corresponding R-Version in order to compile packages from source. For more information, refer to “<a href="https://r-pkgs.org/setup.html#setup-tools" class="external-link uri">https://r-pkgs.org/setup.html#setup-tools</a>”. Note that this package contains <code>C++</code>-code. Refer to the section “<a href="#install-rtools-windows-only">Install Rtools (windows-only)</a>” for instructions to install Rtools on windows.</li>
+<li>The underlying package <code>duflor</code> contains C++ code. As it is distributed as source-code, users will require the appropriate R-build-toolchain for their respective operating system. For further information and setup-instructions, refer to “<a href="https://r-pkgs.org/setup.html#setup-tools" class="external-link uri">https://r-pkgs.org/setup.html#setup-tools</a>”.</li>
 </ul>
+</div>
+<div class="section level3">
+<h3 id="cli-installation-steps">CLI-Installation-steps<a class="anchor" aria-label="anchor" href="#cli-installation-steps"></a>
+</h3>
 <p>To install the application, follow the steps below:</p>
 <ol style="list-style-type: decimal">
 <li>open the terminal, and move to the location where you want to install the program</li>
@@ -189,7 +192,7 @@
 </li>
 <li>move into the folder via <code>cd duflor_app</code>
 </li>
-<li>launch R by excuting <code>R</code>
+<li>launch R by executing <code>R</code>
 </li>
 <li>executing <code>1+1</code> should now successfully return <code>[1] 2</code>
 </li>
@@ -218,6 +221,16 @@
 </li>
 </ol>
 </div>
+<div class="section level3">
+<h3 id="installing-help-vignettes-1">Installing help-vignettes<a class="anchor" aria-label="anchor" href="#installing-help-vignettes-1"></a>
+</h3>
+<p>The application is documented in detail via pkgdown, and its site can be reached from the github-repository.</p>
+<p>Most of the articles outlined on the site may also be viewed as vignettes from within RStudio. To do so, you must explicitly declare vignettes to be installed when performing step 9 in “<a href="#cli-installation-steps">CLI-Installation-steps</a>”:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"https://github.com/Claudius-Appel/duflor.gui@master"</span>,build_vignettes <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"https://github.com/Claudius-Appel/duflor.gui@dev"</span>,build_vignettes <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<p>Vignettes are rendered documents discussing specific topics within a package. Installing them is recommended, but not required for utilizing the package itself.</p>
+</div>
 </div>
 </div>
 <div class="section level1">
@@ -238,8 +251,9 @@
 <h1 id="running-the-app-from-within-rstudio">Running the app from within RStudio<a class="anchor" aria-label="anchor" href="#running-the-app-from-within-rstudio"></a>
 </h1>
 <ol style="list-style-type: decimal">
-<li>follow the installation-steps above, beginning at step 6. Steps 6+ must be executed within the RStudio-Console</li>
-<li>run <code><a href="reference/duflor_gui.html">duflor.gui::duflor_gui()</a></code> to launch the app</li>
+<li>Follow the installation-steps outlined in “<a href="#installation---from-within-rstudio">Installation - from within RStudio</a>”</li>
+<li>Open the project via the drop-down-menu in the top-right corner of the RStudio-application.</li>
+<li>Launch the app by executing <code><a href="reference/duflor_gui.html">duflor.gui::duflor_gui()</a></code> in the console.</li>
 </ol>
 </div>
 
