@@ -2,3 +2,44 @@ url: https://Claudius-Appel.github.io/duflor.gui/
 template:
   bootstrap: 5
 
+reference:
+  - title: GUI-Starter function
+    contents:
+      - '`duflor_gui`'
+  - title: Main Utility
+    contents:
+      - '`execute_analysis`'
+      - '`execute_multiple`'
+      - '`execute_single`'
+  - title: gui components
+    contents:
+      - '`open_parallelPanel_event`'
+      - '`select_spectra_gui_comp`'
+      - '`show_infringing_spectrum_elements_gui_comp`'
+      - '`render_selected_mask`'
+  - title: Miscellaneous internals
+    contents:
+      - '`dev_key_handler`'
+      - '`key_handle_cores`'
+      - '`convert_pixels_to_area_gui`'
+      - '`get_group`'
+      - '`get_image_dimensions`'
+      - '`get_KPI_plot`'
+      - '`limit_identifier_coordinates`'
+      - '`limit_to_range`'
+      - '`prepare_resultsObject`'
+      - '`validate_custom_HSV_values`'
+  - title: State management
+    contents:
+      - '`restore_state`'
+      - '`save_error_state`'
+      - '`save_state`'
+  - title: Parallelisation
+    contents:
+      - '`setup_parallel`'
+      - '`shutdown_parallel`'
+  - title: Saving results
+    contents:
+      - '`store_KPI_plot_to_file`'
+      - '`store_results_to_file`'
+      - '`update_resultsObject`'
