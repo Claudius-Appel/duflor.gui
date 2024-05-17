@@ -15,7 +15,6 @@
 #' @importFrom shiny showNotification
 #'
 setup_parallel <- function(used_cores, cluster_type) {
-    print("THIS MUST SET UP THE PAR CLUST")
     cluster_type <- NA
     if (is.na(cluster_type)) {
         if (.Platform$OS.type == "windows") {
