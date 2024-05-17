@@ -30,20 +30,20 @@
 #'
 dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) {
     # add valid keys here
-    # private, undocumentable keys must be prefixed with 3 `-`
-    Arr <- str_split("--force-prints,--force-log,---set-author,---set-cores,-h",",")
-    # then add them to the reactive 'DEBUGKEYS' so that it can be accessed elsewhere as well.
+    keys_array <- str_split("---set-cores,-h",",")
+    # then add them to the reactive 'DEBUGKEYS' (see 'app.R', search for 'DEBUGKEYS <- reactiveValues(')
+    # so that it can be accessed elsewhere as well.
     Keys <- unlist(str_split(input$dev_pass,","))
     for (each in Keys) {
         each_ <- str_remove_all(each,"=(1|0|FALSE|TRUE)")
         each_ <- str_remove_all(each,"=(F|T)")
         each__ <- str_remove_all(each,"=.*")
-        if ((each %in% Arr[[1]]) || (each_ %in% Arr[[1]]) || (each__ %in% Arr[[1]])) { # BUG: this bool returns an array if `each` is a char-vector itself.
+        if ((each %in% keys_array[[1]]) || (each_ %in% keys_array[[1]]) || (each__ %in% keys_array[[1]])) { # BUG: this bool returns an array if `each` is a char-vector itself.
             if (each=="-h") {
                 showNotification(
                     ui = str_c(
                         "Available dev Keys (see documentation): ",
-                        str_flatten_comma(Arr[[1]][!str_count(Arr[[1]], "---")])
+                        str_flatten_comma(keys_array[[1]])
                     ),
                     duration = DATA$notification_duration,
                     type = "message"
