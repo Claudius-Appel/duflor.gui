@@ -34,7 +34,6 @@ open_parallelPanel_event <- function(input, DATA, FLAGS, use_logical_cores, sess
         )
         if (isFALSE(FLAGS$restoring_state)) {
             updateNumericInput(session,inputId = "parallel_cores",value = 2)
-            print("executing 'input$open_parallelPanel")
         }
     } else {
         hide("PARALLEL_PANEL")
