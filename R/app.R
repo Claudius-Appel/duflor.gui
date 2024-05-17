@@ -634,7 +634,7 @@ duflor_gui <- function() {
                 } else {
                     showNotification(
                         ui = str_c(
-                            "Disabled cropping. All pixels will be considered for the size of the identifier."
+                            "Disabled identifier-cropping. All pixels will be considered for the size of the identifier."
                         ),
                         type = "message"
                     )
