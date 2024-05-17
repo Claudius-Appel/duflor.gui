@@ -227,10 +227,10 @@ duflor_gui <- function() {
             folder_path = NA
         )
         DEBUGKEYS <- reactiveValues(
-            force.prints = FALSE,
-            force.log = FALSE,
+            # if you want to have functionality blocked by the dev-console, add
+            # the key here with its default value.
+            # Next, update the logic within the function `dev_key_handler`
             set.author = TRUE
-
         )
         FLAGS <- reactiveValues(
             analyse_single_image = FALSE,
