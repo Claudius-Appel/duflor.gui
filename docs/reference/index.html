@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9051</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9052</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="gui-starter-function">GUI-Starter function<a class="anchor" aria-label="anchor" href="#gui-starter-function"></a></h2>
       
       
 
@@ -69,8 +69,200 @@
           <code><a href="duflor_gui.html">duflor_gui()</a></code> 
         </dt>
         <dd>Start the duflor-gui via this function</dd>
+      </dl></div><div class="section level2">
+      <h2 id="main-utility">Main Utility<a class="anchor" aria-label="anchor" href="#main-utility"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="execute_analysis.html">execute_analysis()</a></code> 
+        </dt>
+        <dd>wrapper-function facilitating single- and multi-image analysis.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="execute_multiple.html">execute_multiple()</a></code> 
+        </dt>
+        <dd>execute analysis on multiple images, and return their results</dd>
+      </dl><dl><dt>
+          
+          <code><a href="execute_single.html">execute_single()</a></code> 
+        </dt>
+        <dd>execute analysis on a single image, and return its results</dd>
+      </dl></div><div class="section level2">
+      <h2 id="gui-components">gui components<a class="anchor" aria-label="anchor" href="#gui-components"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="open_parallelPanel_event.html">open_parallelPanel_event()</a></code> 
+        </dt>
+        <dd>internal callback function for the checkbox opening the parallelisation-panel</dd>
+      </dl><dl><dt>
+          
+          <code><a href="select_spectra_gui_comp.html">select_spectra_gui_comp()</a></code> 
+        </dt>
+        <dd>generate and call a modal-dialogue which lets you select which spectrums to analyse.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="show_infringing_spectrum_elements_gui_comp.html">show_infringing_spectrum_elements_gui_comp()</a></code> 
+        </dt>
+        <dd>generate and call a modal-dialogue which displays the prospective changes in HSV-spectrums</dd>
+      </dl><dl><dt>
+          
+          <code><a href="render_selected_mask.html">render_selected_mask()</a></code> 
+        </dt>
+        <dd>render mask based on input data</dd>
+      </dl></div><div class="section level2">
+      <h2 id="miscellaneous-internals">Miscellaneous internals<a class="anchor" aria-label="anchor" href="#miscellaneous-internals"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="dev_key_handler.html">dev_key_handler()</a></code> 
+        </dt>
+        <dd>handles the setting and unsetting of debug-keys</dd>
+      </dl><dl><dt>
+          
+          <code><a href="key_handle_cores.html">key_handle_cores()</a></code> 
+        </dt>
+        <dd>internal function handling dev-key <code>---set.cores=XX</code></dd>
+      </dl><dl><dt>
+          
+          <code><a href="convert_pixels_to_area_gui.html">convert_pixels_to_area_gui()</a></code> 
+        </dt>
+        <dd>convert pixel counts to an area based on the known area of an identifier-dot.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_group.html">get_group()</a></code> 
+        </dt>
+        <dd>trims numbers from groups from character-vector</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_image_dimensions.html">get_image_dimensions()</a></code> 
+        </dt>
+        <dd>retrieves image dimension via call to system interface</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_KPI_plot.html">get_KPI_plot()</a></code> 
+        </dt>
+        <dd>generate a ggplot for a given KPI</dd>
+      </dl><dl><dt>
+          
+          <code><a href="limit_identifier_coordinates.html">limit_identifier_coordinates()</a></code> 
+        </dt>
+        <dd>restrict area in which <code>identifier</code>-pixels are considered "valid"</dd>
+      </dl><dl><dt>
+          
+          <code><a href="limit_to_range.html">limit_to_range()</a></code> 
+        </dt>
+        <dd>replace values outside of boundaries with respective boundary</dd>
+      </dl><dl><dt>
+          
+          <code><a href="prepare_resultsObject.html">prepare_resultsObject()</a></code> 
+        </dt>
+        <dd>prepare the dataframe-object into which all results are to be merged.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="validate_custom_HSV_values.html">validate_custom_HSV_values()</a></code> 
+        </dt>
+        <dd>ensure that custom HSV values are within required range</dd>
+      </dl></div><div class="section level2">
+      <h2 id="state-management">State management<a class="anchor" aria-label="anchor" href="#state-management"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="restore_state.html">restore_state()</a></code> 
+        </dt>
+        <dd>restore application state from stored <code>.RDS</code>-file</dd>
+      </dl><dl><dt>
+          
+          <code><a href="save_error_state.html">save_error_state()</a></code> 
+        </dt>
+        <dd>Handle saving application-state to file</dd>
+      </dl><dl><dt>
+          
+          <code><a href="save_state.html">save_state()</a></code> 
+        </dt>
+        <dd>Handle saving application-state to file</dd>
+      </dl></div><div class="section level2">
+      <h2 id="parallelisation">Parallelisation<a class="anchor" aria-label="anchor" href="#parallelisation"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="setup_parallel.html">setup_parallel()</a></code> 
+        </dt>
+        <dd>setup parallel backend for a given number of cores.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="shutdown_parallel.html">shutdown_parallel()</a></code> 
+        </dt>
+        <dd>shut down existing parallel cluster</dd>
+      </dl></div><div class="section level2">
+      <h2 id="saving-results">Saving results<a class="anchor" aria-label="anchor" href="#saving-results"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="store_KPI_plot_to_file.html">store_KPI_plot_to_file()</a></code> 
+        </dt>
+        <dd>save KPI-plot to file</dd>
+      </dl><dl><dt>
+          
+          <code><a href="store_results_to_file.html">store_results_to_file()</a></code> 
+        </dt>
+        <dd>write results of the analysis to file</dd>
+      </dl><dl><dt>
+          
+          <code><a href="update_resultsObject.html">update_resultsObject()</a></code> 
+        </dt>
+        <dd>adds a line of values <code>newline</code> to a df <code>resultsObject</code></dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
