@@ -28,7 +28,7 @@ render_selected_mask <- function(input, DATA, FLAGS) {
         file <- DATA$r__tbl_dir_files$images_filtered[[input$tbl_results_filtered_rows_selected]]
     }
     image_dimensions <- as.integer(get_image_dimensions(file))
-    ## LOAD IMAGE
+    # load image
     if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=file)) {
         if (input$do_crop_image) {
             im <- load_image(
@@ -54,9 +54,10 @@ render_selected_mask <- function(input, DATA, FLAGS) {
     } else {
         im <- DATA$last_im
     }
+    # get mask
     mask <- input$reinspected_spectrums
 
-    # get the spectrum's HSV scope
+    # get the mask's HSV-bounds
     lower_bound <- DATA$spectrums$lower_bound[[mask]]
     upper_bound <- DATA$spectrums$upper_bound[[mask]]
 

@@ -212,7 +212,7 @@ duflor_gui <- function() {
             type = "message"
         )
         #### INIT VARIABLES ####
-        DATA <- reactiveValues(          #  nomenclature: reactives start with "r__"
+        DATA <- reactiveValues( #  nomenclature: reactives start with "r__"
             r__tbl_dir_files  = NA,
             r__img_type = "PNG",
             r__KPI_type = 1,
@@ -233,6 +233,9 @@ duflor_gui <- function() {
             set.author = TRUE
         )
         FLAGS <- reactiveValues(
+            # various flags used somewhere in the code. These default-values are
+            # generally not supposed to be modified, unless you are very aware
+            # of what said modifications will incur.
             analyse_single_image = FALSE,
             restoring_state = FALSE
         )
@@ -257,7 +260,7 @@ duflor_gui <- function() {
                     "execute_analysis",
                     "execute_analysis_single"
                 )
-            for (each in buttons_to_toggle) {
+            for (each in buttons_to_toggle) { ## disable all buttons which are dependent on the input-table to contain images
                 updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = TRUE)
             }
             if (dir.exists(folder_path)) {
@@ -268,11 +271,11 @@ duflor_gui <- function() {
                     ret <- as.data.frame(images_filtered)
                     ret$index <- c(1:1:dim(ret)[1])
                     DATA$r__tbl_dir_files <- ret
-                    for (each in buttons_to_toggle) {
+                    for (each in buttons_to_toggle) { ## enable all buttons which are dependent on the input-table to contain images
                         updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = FALSE)
                     }
                     image_files$image_files <- ret
-                } else {
+                } else { ## no images found for the current settings
                     showNotification(
                         ui = str_c(
                             "No '.",
@@ -528,13 +531,14 @@ duflor_gui <- function() {
                     ),
                     duration = DATA$notification_duration * 5,
                     type = "warning"
-
                 )
                 return()
             }
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             tryCatch({
+                ## get the currently selected row-index and respective row
+                ## in the 'output$tbl_dir_files'-data-table
                 selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
                 DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
                 showNotification(
@@ -656,6 +660,8 @@ duflor_gui <- function() {
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             tryCatch({
+                ## get the currently selected row-index and respective row
+                ## in the 'output$tbl_dir_files'-data-table
                 selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
                 DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
                 showNotification(
@@ -849,9 +855,10 @@ duflor_gui <- function() {
             })
         })
         observeEvent(input$confirm_coerced_HSV_values_modal, {
-            ## user wants to use the range-limits for the respective HSV-parameters as their respective bounds
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             tryCatch({
+                ## user wants to use the range-limits for the respective HSV-
+                ## parameters as their respective bounds
                 DATA$spectrums$lower_bound <- DATA$coerced_spectrums$lower_bound
                 DATA$spectrums$upper_bound <- DATA$coerced_spectrums$upper_bound
                 removeModal()
@@ -885,14 +892,19 @@ duflor_gui <- function() {
             })
         })
         observeEvent(input$discard_coerced_HSV_values_modal, {
-            ## user wants to use the default values for the respective HSV-spectrum
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             tryCatch({
+                ## user wants to use the default values for the respective HSV-
+                ## spectrum
                 default_HSV_spectrums <- getOption("duflor.default_hsv_spectrums")
                 current_lower <- DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]]
                 current_upper <- DATA$spectrums$upper_bound[[input$selected_HSV_spectrum]]
                 map <- c("H","S","V")
                 for (each in names(DATA$spectrum_changes$return_obj)) {
+                    # for the haystack `lower_bound_H`/`upper_bound_S`/..., find
+                    # the type of HSV-element (either H/S/V), and get its index
+                    # based on the map before, so that the correct position of
+                    # the `DATA$spectrums$*_bound$*`-triplet vector is modified
                     index_of_change <- which(map == sub(".*_(.)$", "\\1", each))
                     if (str_count(each,"lower_bound")>0) {
                         DATA$spectrums$lower_bound[[input$selected_HSV_spectrum]][[index_of_change]] <- current_lower[[index_of_change]]
@@ -941,6 +953,8 @@ duflor_gui <- function() {
             req(DATA$r__tbl_dir_files,input$tbl_dir_files_rows_selected)
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             tryCatch({
+                ## get the currently selected row-index and respective row
+                ## in the 'output$tbl_dir_files'-data-table
                 selectedrowindex <- as.numeric(input$tbl_dir_files_rows_selected[length(input$tbl_dir_files_rows_selected)])
                 DATA$r__tbl_dir_files_selectedrow <- selectedrow <- (DATA$r__tbl_dir_files[selectedrowindex,])
                 showNotification(
@@ -948,12 +962,19 @@ duflor_gui <- function() {
                     duration = DATA$notification_duration,
                     type = "message"
                 )
+                ## load the image
+                ## - if the row has changed
+                ## - if this is the first time an image is loaded
+                ##
+                ## otherwhise, just use the previously loaded (still correct)
+                ## image and save the time required for explicitly loading it.
                 if (is.na(DATA$last_masked_image) || (DATA$last_masked_image!=selectedrow$images_filtered)) {
                     im <- load_image(selectedrow$images_filtered,subset_only = F,return_hsv = F)
                 } else {
                     im <- DATA$last_im
                 }
                 dims <- dim(im)
+                ## render cropping and identifier-cropping where applicable
                 if ((input$x0!=0) && (input$x1!=0)  && (input$y0!=0)  && (input$y1!=0))  { # add selected cropping_rect to image
                     im <- draw_rect(
                         im,
@@ -1026,6 +1047,7 @@ duflor_gui <- function() {
                 }
                 removeModal()
                 spectrums <- DATA$spectrums
+                # remove all spectra not selected in `input$selected_spectra`
                 spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
                 spectrums$upper_bound <- duflor:::remove_key_from_list(DATA$spectrums$upper_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
                 # update the spectrum-selection DDLs in tabs `Results - inspect` and `Results - plots`
@@ -1092,6 +1114,8 @@ duflor_gui <- function() {
                 )
                 if (isFALSE(FLAGS$analyse_single_image)) { ## disallow save-to-file when running single-analysis
                     updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = FALSE)
+                } else {
+                    updateActionButton(session = getDefaultReactiveDomain(),inputId = "save_results",disabled = TRUE)
                 }
                 updateActionButton(session = getDefaultReactiveDomain(),inputId = "render_selected_mask",disabled = FALSE)
             }, error = function(e) {
@@ -1146,11 +1170,16 @@ duflor_gui <- function() {
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             tryCatch({
                 if (is.na(DATA$results)) {
-                    #TODO: add warning: results are empty, could not save.
+                    showNotification(
+                        ui = str_c(
+                            "Object 'DATA$results' is empty, could not be saved."
+                        ),
+                        duration = DATA$notification_duration * 5,
+                        type = "warning"
+
+                    )
                     return()
                 } else {
-                    # shinyDirChoose() #TODO: do I want to allow choosing of output-directory?
-
                     results_path <- str_c(
                         dirname(DATA$results$results$full_path[[1]]),
                         "/results/results_",
@@ -1162,7 +1191,7 @@ duflor_gui <- function() {
                         save_to_xlsx = input$save_as_xlsx,
                         set_author_xlsx =  DEBUGKEYS$set.author
                     )
-                    ## verify save was successfull
+                    ## verify save was successful
                     if (out$success) {
                         showNotification(
                             ui = "Analysis completed. Results have been written to '",
@@ -1223,16 +1252,16 @@ duflor_gui <- function() {
             )
         )
         onBookmark(function(state) {
-
+            ## this is a placeholder for future usage, if necessary.
+            ## Currently not implemented.
         })
-        # Load button action
         observeEvent(input$restore_state, {
+            # Load button action
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
+            # comments show the callbacks/functions/reactives which created the
+            # respective object
             req(input$restore_state$datapath!="") # restore_state()
             req(file.exists(input$restore_state$datapath)) # restore_state()
-            # req(isFALSE(is.na(DATA$folder_path)))
-            # folder_path <- DATA$folder_path  # image_files_ # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
-            # req(dir.exists(folder_path)) # image_files_
             req(input$image_file_suffix) # image_files_
             tryCatch({
                 showNotification(
@@ -1241,7 +1270,6 @@ duflor_gui <- function() {
                     duration = NA,
                     type = "warning"
                 )
-                state_file <- input$restore_state$datapath
                 loaded_path <- restore_state(
                     input = input,
                     output = output,
@@ -1250,9 +1278,10 @@ duflor_gui <- function() {
                     DEBUGKEYS = DEBUGKEYS,
                     session = getDefaultReactiveDomain(),
                     volumes = getVolumes(),
-                    state_file = state_file
+                    state_file = input$restore_state$datapath
                 )
                 DATA$folder_path <- loaded_path
+                # once the loaded-path was updated, recompute the input-table
                 image_files_()
                 removeNotification(id = "restore_state.ongoing")
                 if (file.exists(loaded_path)) {
@@ -1290,8 +1319,8 @@ duflor_gui <- function() {
                 )
             })
         })
-        # Save directory selection
         observeEvent(input$save_state, {
+            # Save directory selection
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             shinyFileSave(
                 input,
