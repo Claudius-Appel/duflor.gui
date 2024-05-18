@@ -3,11 +3,10 @@
 #' - assumes `input$save_state` to be properly formatted, as returned by [shinyFiles::shinyFileSave()]
 #' - assumes `volumes` to be the return-value of [shinyFiles::getVolumes()]
 #'
-#' @param input .
-#' @param DATA .
-#' @param DEBUGKEYS .
-#' @param FLAGS .
-#' @param volumes .
+#' @param input - `input` respective shiny-component
+#' @param DATA - `DATA` respective shiny-component
+#' @param DEBUGKEYS - shiny-app `DEBUGKEYS`-reactives
+#' @param volumes - volume letters available
 #' @return path to the saved state-file
 #'
 #' @keywords internal

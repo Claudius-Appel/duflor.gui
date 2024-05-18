@@ -7,15 +7,21 @@
 save_state(input, DATA, DEBUGKEYS, FLAGS, volumes)
 }
 \arguments{
-\item{input}{.}
+\item{input}{\itemize{
+\item \code{input} respective shiny-component
+}}
 
-\item{DATA}{.}
+\item{DATA}{\itemize{
+\item \code{DATA} respective shiny-component
+}}
 
-\item{DEBUGKEYS}{.}
+\item{DEBUGKEYS}{\itemize{
+\item shiny-app \code{DEBUGKEYS}-reactives
+}}
 
-\item{FLAGS}{.}
-
-\item{volumes}{.}
+\item{volumes}{\itemize{
+\item volume letters available
+}}
 }
 \value{
 path to the saved state-file
