@@ -1,9 +1,6 @@
 #' wrapper-function facilitating single- and multi-image analysis.
 #'
-#' @param input - `input` respective shiny-component
-#' @param DATA - `DATA` respective shiny-component
-#' @param DEBUGKEYS - `DEBUGKEYS` respective shiny-component
-#' @param FLAGS - `FLAGS` respective shiny-component
+#' @inheritParams .main_args
 #'
 #' @return list with components
 #' - `results`: results-data passed-through from [execute_multiple()] or [execute_single()]

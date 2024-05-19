@@ -1,7 +1,7 @@
 
 #' convert pixel counts to an area based on the known area of an identifier-dot.
 #'
-#' @param identifier_area - declared size of the identifier area, in `[cm^2]`
+#' @param identifier_area declared size of the identifier area, in `[cm^2]`
 #' @param pixel.counts list containing any of the following pixel-counts:
 #'
 #' - "bex_green_HSV"

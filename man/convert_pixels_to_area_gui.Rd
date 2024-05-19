@@ -23,9 +23,7 @@ function is also in [cm^2].
 The assumed area of the identifier can be modified by excuting
 \verb{options(duflor.default_identifier_area = <value_in_square_centimeters>)} \emph{prior} to calling this function}
 
-\item{identifier_area}{\itemize{
-\item declared size of the identifier area, in \verb{[cm^2]}
-}}
+\item{identifier_area}{declared size of the identifier area, in \verb{[cm^2]}}
 }
 \value{
 list of computed areas for any key listed in \code{pixel.counts}.

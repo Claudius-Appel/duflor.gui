@@ -2,13 +2,7 @@
 #'
 #' This function is responsible for
 #'
-#' @param input - `input` respective shiny-component
-#' @param output - `output` respective shiny-component
-#' @param DATA - `DATA` respective shiny-component
-#' @param FLAGS - `FLAGS` respective shiny-component
-#' @param DEBUGKEYS - shiny-app `DEBUGKEYS`-reactives
-#' @param session - shiny session
-#' @param volumes - volume letters available
+#' @inheritParams .main_args
 #' @param state_file filepath for to-be-loaded state_file
 #' @keywords internal
 #' @return path to the loaded file.

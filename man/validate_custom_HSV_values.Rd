@@ -7,17 +7,11 @@
 validate_custom_HSV_values(input, DATA, session)
 }
 \arguments{
-\item{input}{\itemize{
-\item \code{input} respective shiny-component
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item \code{DATA} respective shiny-component
-}}
+\item{DATA}{respective shiny-component}
 
-\item{session}{\itemize{
-\item shiny session
-}}
+\item{session}{shiny session-object}
 }
 \value{
 list containing
@@ -28,7 +22,7 @@ list containing
 }
 \description{
 For \code{HUE}, value must be within \verb{[0, 359]}
-For \code{SATURATIOn}, value must be within \verb{[0, 1]}
+For \code{SATURATION}, value must be within \verb{[0, 1]}
 For \code{VALUE}, value must be within \verb{[0, 1]}
 }
 \keyword{internal}

@@ -2,9 +2,8 @@
 #'
 #' Additionally, it queries whether or not they should be applied, or reset to previous value.
 #'
-#' @param input - `input` respective shiny-component
-#' @param DATA - `DATA` respective shiny-component
-#' @param changes - results-object from [validate_custom_HSV_values()]
+#' @inheritParams .main_args
+#' @param changes results-object from [validate_custom_HSV_values()]
 #'
 #' @return .
 #' @keywords internal

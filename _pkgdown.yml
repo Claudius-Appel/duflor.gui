@@ -29,6 +29,7 @@ reference:
       - '`limit_to_range`'
       - '`prepare_resultsObject`'
       - '`validate_custom_HSV_values`'
+      - '`.main_args`'
   - title: State management
     contents:
       - '`restore_state`'

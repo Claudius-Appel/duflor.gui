@@ -15,29 +15,17 @@ open_parallelPanel_event(
 )
 }
 \arguments{
-\item{input}{\itemize{
-\item \code{input} respective shiny-component
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item \code{DATA} respective shiny-component
-}}
+\item{DATA}{respective shiny-component}
 
-\item{FLAGS}{\itemize{
-\item \code{FLAGS} respective shiny-component
-}}
+\item{FLAGS}{respective shiny-component}
 
-\item{use_logical_cores}{\itemize{
-\item internal flag
-}}
+\item{use_logical_cores}{internal flag}
 
-\item{session}{\itemize{
-\item shiny session
-}}
+\item{session}{shiny session-object}
 
-\item{STARTUP}{\itemize{
-\item \code{STARTUP} respective shiny-component
-}}
+\item{STARTUP}{respective shiny-component}
 }
 \description{
 internal callback function for the checkbox opening the parallelisation-panel

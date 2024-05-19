@@ -7,7 +7,7 @@
 select_spectra_gui_comp(input)
 }
 \arguments{
-\item{input}{\code{input}-shiny-component}
+\item{input}{respective shiny-component}
 }
 \value{
 .

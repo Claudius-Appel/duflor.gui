@@ -7,17 +7,11 @@
 show_infringing_spectrum_elements_gui_comp(input, DATA, changes)
 }
 \arguments{
-\item{input}{\itemize{
-\item \code{input} respective shiny-component
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item \code{DATA} respective shiny-component
-}}
+\item{DATA}{respective shiny-component}
 
-\item{changes}{\itemize{
-\item results-object from \code{\link[=validate_custom_HSV_values]{validate_custom_HSV_values()}}
-}}
+\item{changes}{results-object from \code{\link[=validate_custom_HSV_values]{validate_custom_HSV_values()}}}
 }
 \value{
 .

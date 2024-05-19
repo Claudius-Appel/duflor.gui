@@ -16,21 +16,15 @@ save_error_state(
 )
 }
 \arguments{
-\item{input}{\itemize{
-\item \code{input} respective shiny-component
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item \code{DATA} respective shiny-component
-}}
+\item{DATA}{respective shiny-component}
 
-\item{DEBUGKEYS}{\itemize{
-\item shiny-app \code{DEBUGKEYS}-reactives
-}}
+\item{DEBUGKEYS}{respective shiny-component}
 
-\item{volumes}{\itemize{
-\item volume letters available
-}}
+\item{FLAGS}{respective shiny-component}
+
+\item{volumes}{volumes present on the machine}
 
 \item{error}{error-object}
 
