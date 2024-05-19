@@ -2,7 +2,7 @@
 #'
 #' Additionally, it queries the component `radio_analysis_type` to preselect common results for different types of analyses
 #'
-#' @param input `input`-shiny-component
+#' @inheritParams .main_args
 #'
 #' @return .
 #' @keywords internal

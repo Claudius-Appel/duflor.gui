@@ -1,12 +1,10 @@
 #' ensure that custom HSV values are within required range
 #'
 #' For `HUE`, value must be within `[0, 359]`
-#' For `SATURATIOn`, value must be within `[0, 1]`
+#' For `SATURATION`, value must be within `[0, 1]`
 #' For `VALUE`, value must be within `[0, 1]`
 #'
-#' @param input - `input` respective shiny-component
-#' @param DATA - `DATA` respective shiny-component
-#' @param session - shiny session
+#' @inheritParams .main_args
 #'
 #' @return list containing
 #' - expected bounds

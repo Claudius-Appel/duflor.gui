@@ -1,11 +1,8 @@
 #' internal callback function for the checkbox opening the parallelisation-panel
 #'
-#' @param input respective shiny-component
-#' @param DATA respective shiny-component
-#' @param FLAGS respective shiny-component
-#' @param use_logical_cores - internal flag
-#' @param session - shiny session
-#' @param STARTUP - respective shiny-component
+#' @inheritParams .main_args
+#' @param use_logical_cores internal flag
+#' @param STARTUP respective shiny-component
 #'
 #' @keywords internal
 #' @importFrom stringr str_c

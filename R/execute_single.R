@@ -2,11 +2,8 @@
 #'
 #' For single-image analysis, see [execute_multiple()]
 #'
-#' @param file - file to analyse
-#' @param input respective shiny-component
-#' @param DATA respective shiny-component
-#' @param DEBUGKEYS respective shiny-component
-#' @param FLAGS respective shiny-component
+#' @inheritParams .main_args
+#' @param file file to analyse
 #'
 #' @return results_object, see [update_resultsObject()]
 #' @keywords internal

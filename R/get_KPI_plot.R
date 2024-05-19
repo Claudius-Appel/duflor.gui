@@ -2,8 +2,7 @@
 #'
 #' Function generates a ggplot-object base on the selected choices in the DDLs
 #'
-#' @param input respective shiny-component
-#' @param DATA respective shiny-component
+#' @inheritParams .main_args
 #'
 #' @return ggplot-object for the respective KPI
 #' @keywords internal
