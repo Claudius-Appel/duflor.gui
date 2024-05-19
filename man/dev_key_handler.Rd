@@ -7,25 +7,15 @@
 dev_key_handler(input, DATA, DEBUGKEYS, session, use_logical_cores)
 }
 \arguments{
-\item{input}{\itemize{
-\item shiny-app \code{input}-object
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item shiny-app \code{DATA}-reactives
-}}
+\item{DATA}{respective shiny-component}
 
-\item{DEBUGKEYS}{\itemize{
-\item shiny-app \code{DEBUGKEYS}-reactives
-}}
+\item{DEBUGKEYS}{respective shiny-component}
 
-\item{session}{\itemize{
-\item shiny session
-}}
+\item{session}{shiny session-object}
 
-\item{use_logical_cores}{\itemize{
-\item internal flag
-}}
+\item{use_logical_cores}{internal flag}
 }
 \value{
 modified \code{DEBUGKEYS}?

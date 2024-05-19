@@ -7,13 +7,9 @@
 get_KPI_plot(input, DATA)
 }
 \arguments{
-\item{input}{\itemize{
-\item \code{input} respective shiny-component
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item \code{DATA} respective shiny-component
-}}
+\item{DATA}{respective shiny-component}
 }
 \value{
 ggplot-object for the respective KPI

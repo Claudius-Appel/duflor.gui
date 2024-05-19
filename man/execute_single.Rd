@@ -7,25 +7,15 @@
 execute_single(file, input, DATA, DEBUGKEYS, FLAGS)
 }
 \arguments{
-\item{file}{\itemize{
-\item file to analyse
-}}
+\item{file}{file to analyse}
 
-\item{input}{\itemize{
-\item \code{input} respective shiny-component
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item \code{DATA} respective shiny-component
-}}
+\item{DATA}{respective shiny-component}
 
-\item{DEBUGKEYS}{\itemize{
-\item \code{DEBUGKEYS} respective shiny-component
-}}
+\item{DEBUGKEYS}{respective shiny-component}
 
-\item{FLAGS}{\itemize{
-\item \code{FLAGS} respective shiny-component
-}}
+\item{FLAGS}{respective shiny-component}
 }
 \value{
 results_object, see \code{\link[=update_resultsObject]{update_resultsObject()}}
