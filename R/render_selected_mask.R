@@ -1,8 +1,8 @@
 #' render mask based on input data
 #'
-#' @param input - `input` respective shiny-component
-#' @param DATA - `DATA` respective shiny-component
-#' @param FLAGS - `FLAGS` respective shiny-component
+#' @param input respective shiny-component
+#' @param DATA respective shiny-component
+#' @param FLAGS respective shiny-component
 #'
 #' @keywords internal
 render_selected_mask <- function(input, DATA, FLAGS) {

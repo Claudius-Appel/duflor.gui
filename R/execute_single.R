@@ -3,10 +3,10 @@
 #' For single-image analysis, see [execute_multiple()]
 #'
 #' @param file - file to analyse
-#' @param input - `input` respective shiny-component
-#' @param DATA - `DATA` respective shiny-component
-#' @param DEBUGKEYS - `DEBUGKEYS` respective shiny-component
-#' @param FLAGS - `FLAGS` respective shiny-component
+#' @param input respective shiny-component
+#' @param DATA respective shiny-component
+#' @param DEBUGKEYS respective shiny-component
+#' @param FLAGS respective shiny-component
 #'
 #' @return results_object, see [update_resultsObject()]
 #' @keywords internal

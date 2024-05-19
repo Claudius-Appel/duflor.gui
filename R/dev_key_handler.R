@@ -108,10 +108,10 @@ dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) 
 
 #' internal function handling dev-key `---set.cores=XX`
 #'
-#' @param value .
-#' @param DATA .
-#' @param use_logical_cores .
-#' @param session .
+#' @param value - number of cores to assign
+#' @param DATA respective shiny-component
+#' @param use_logical_cores - whether or not to use logical cores
+#' @param session - shiny session
 #'
 #' @importFrom stringr str_c
 #' @importFrom stringr str_trim
