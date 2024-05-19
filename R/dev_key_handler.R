@@ -9,11 +9,8 @@
 #' Keys which begin with 3 `-` are expecting non-boolean, custom input, which will differ
 #' based on the respective key.
 #'
-#' @param input - shiny-app `input`-object
-#' @param DATA - shiny-app `DATA`-reactives
-#' @param DEBUGKEYS - shiny-app `DEBUGKEYS`-reactives
-#' @param session - shiny session
-#' @param use_logical_cores - internal flag
+#' @inheritParams .main_args
+#' @param use_logical_cores internal flag
 #'
 #' @importFrom stringr str_replace_all
 #' @importFrom stringr str_remove_all
@@ -108,10 +105,9 @@ dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) 
 
 #' internal function handling dev-key `---set.cores=XX`
 #'
-#' @param value .
-#' @param DATA .
-#' @param use_logical_cores .
-#' @param session .
+#' @inheritParams .main_args
+#' @param value number of cores to assign
+#' @param use_logical_cores whether or not to use logical cores
 #'
 #' @importFrom stringr str_c
 #' @importFrom stringr str_trim

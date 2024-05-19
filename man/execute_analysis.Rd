@@ -7,21 +7,13 @@
 execute_analysis(input, DATA, DEBUGKEYS, FLAGS)
 }
 \arguments{
-\item{input}{\itemize{
-\item \code{input} respective shiny-component
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item \code{DATA} respective shiny-component
-}}
+\item{DATA}{respective shiny-component}
 
-\item{DEBUGKEYS}{\itemize{
-\item \code{DEBUGKEYS} respective shiny-component
-}}
+\item{DEBUGKEYS}{respective shiny-component}
 
-\item{FLAGS}{\itemize{
-\item \code{FLAGS} respective shiny-component
-}}
+\item{FLAGS}{respective shiny-component}
 }
 \value{
 list with components

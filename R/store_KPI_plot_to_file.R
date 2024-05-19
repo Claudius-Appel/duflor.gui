@@ -1,7 +1,6 @@
 #' save KPI-plot to file
 #'
-#' @param input - `input` respective shiny-component
-#' @param DATA - `DATA` respective shiny-component
+#' @inheritParams .main_args
 #'
 #' @keywords internal
 #' @importFrom shiny showNotification

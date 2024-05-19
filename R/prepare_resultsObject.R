@@ -12,9 +12,7 @@
 #'     - %spectrum%_area (as results of duflor::convert_pixels_to_area())
 #'     - %spectrum%_fraction (as defined as `%spectrum%_count/(sum(<all_plant_spectrums>_count)`)
 #'
-#' @param input - shiny-app `input`-object
-#' @param DATA - shiny-app `DATA`-reactives
-#' @param DEBUGKEYS - shiny-app `DEBUGKEYS`-reactives
+#' @inheritParams .main_args
 #'
 #' @return results-csv-framework.
 #' @keywords internal

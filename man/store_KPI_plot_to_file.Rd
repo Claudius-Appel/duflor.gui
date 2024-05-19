@@ -7,13 +7,9 @@
 store_KPI_plot_to_file(input, DATA)
 }
 \arguments{
-\item{input}{\itemize{
-\item \code{input} respective shiny-component
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item \code{DATA} respective shiny-component
-}}
+\item{DATA}{respective shiny-component}
 }
 \description{
 save KPI-plot to file

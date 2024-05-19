@@ -7,17 +7,11 @@
 prepare_resultsObject(input, DATA, DEBUGKEYS)
 }
 \arguments{
-\item{input}{\itemize{
-\item shiny-app \code{input}-object
-}}
+\item{input}{respective shiny-component}
 
-\item{DATA}{\itemize{
-\item shiny-app \code{DATA}-reactives
-}}
+\item{DATA}{respective shiny-component}
 
-\item{DEBUGKEYS}{\itemize{
-\item shiny-app \code{DEBUGKEYS}-reactives
-}}
+\item{DEBUGKEYS}{respective shiny-component}
 }
 \value{
 results-csv-framework.

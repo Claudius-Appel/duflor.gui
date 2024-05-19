@@ -7,13 +7,13 @@
 key_handle_cores(value, DATA, use_logical_cores, session)
 }
 \arguments{
-\item{value}{.}
+\item{value}{number of cores to assign}
 
-\item{DATA}{.}
+\item{DATA}{respective shiny-component}
 
-\item{use_logical_cores}{.}
+\item{use_logical_cores}{whether or not to use logical cores}
 
-\item{session}{.}
+\item{session}{shiny session-object}
 }
 \description{
 internal function handling dev-key \code{---set.cores=XX}
