@@ -19,15 +19,21 @@
 #' @importFrom stringr str_flatten_comma
 #' @importFrom stringr str_count
 #' @importFrom shiny showNotification
+#' @importFrom shiny showModal
+#' @importFrom shiny modalDialog
+#' @importFrom shiny h3
+#' @importFrom shiny h5
+#' @importFrom shiny h6
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
+#' @importFrom utils packageDescription
 #'
 #' @return modified `DEBUGKEYS`?
 #' @keywords internal
 #'
 dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) {
     # add valid keys here
-    keys_array <- str_split("---set-cores,-h",",")
+    keys_array <- str_split("---set-cores,-h,-v",",")
     # then add them to the reactive 'DEBUGKEYS' (see 'app.R', search for 'DEBUGKEYS <- reactiveValues(')
     # so that it can be accessed elsewhere as well.
     Keys <- unlist(str_split(input$dev_pass,","))
@@ -45,6 +51,18 @@ dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) 
                     duration = DATA$notification_duration,
                     type = "message"
                 )
+            } else if (each=="-v") {
+                version1 <- str_c("duflor.gui v.",packageDescription("duflor.gui")$Version)
+                version2 <- str_c("duflor v.",packageDescription("duflor")$Version)
+                showModal(modalDialog(
+                    tags$h3('Software versions:'),
+                    tags$h5(version1),
+                    tags$h5(version2),
+                    tags$h6('developed by Claudius Appel'),
+                    footer=tagList(
+                        modalButton('cancel')
+                    )
+                ))
             } else {
                 if (str_count(each,"---")) { # non-boolean flags
                     key <- str_replace_all(str_replace_all(each,"---",""),"--","")
