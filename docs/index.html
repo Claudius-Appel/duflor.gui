@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9058</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9059</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -255,6 +255,12 @@
 <li>Open the project via the drop-down-menu in the top-right corner of the RStudio-application.</li>
 <li>Launch the app by executing <code><a href="reference/duflor_gui.html">duflor.gui::duflor_gui()</a></code> in the console.</li>
 </ol>
+</div>
+<div class="section level1">
+<h1 id="parallelisation-requires-installation-of-package-not-just-loading">Parallelisation requires installation of package, <strong>not just loading</strong>
+<a class="anchor" aria-label="anchor" href="#parallelisation-requires-installation-of-package-not-just-loading"></a>
+</h1>
+<p>In order for the shiny application to be able to run the analysis in parallel, the packages <code>duflor</code> and <code>duflor.gui</code> <strong>must</strong> be installed. If this package is developed locally, executing <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code> will not be sufficient. To counteract this, make sure that both packages are actually installed as such, and show up in the listed packages.</p>
 </div>
 
 
