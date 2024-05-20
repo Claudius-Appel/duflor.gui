@@ -185,3 +185,7 @@ After installation, the application can be launched as described below:
 1.  Follow the installation-steps outlined in "[Installation - from within RStudio]"
 2.  Open the project via the drop-down-menu in the top-right corner of the RStudio-application.
 3.  Launch the app by executing `duflor.gui::duflor_gui()` in the console.
+
+# Parallelisation requires installation of package, **not just loading**
+
+In order for the shiny application to be able to run the analysis in parallel, the packages `duflor` and `duflor.gui` **must** be installed. If this package is developed locally, executing `devtools::load_all()` will not be sufficient. To counteract this, make sure that both packages are actually installed as such, and show up in the listed packages.

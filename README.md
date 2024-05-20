@@ -228,6 +228,14 @@ After installation, the application can be launched as described below:
 3.  Launch the app by executing `duflor.gui::duflor_gui()` in the
     console.
 
+# Parallelisation requires installation of package, **not just loading**
+
+In order for the shiny application to be able to run the analysis in
+parallel, the packages `duflor` and `duflor.gui` **must** be installed.
+If this package is developed locally, executing `devtools::load_all()`
+will not be sufficient. To counteract this, make sure that both packages
+are actually installed as such, and show up in the listed packages.
+
 [^1]: This might sound confusing, as this is a R-package wrapping a
     shiny-application. However, those two options are for
     ***developing*** either of those, not for ***installing*** them.
