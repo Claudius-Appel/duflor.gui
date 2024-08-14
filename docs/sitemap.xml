@@ -1,135 +1,47 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/404.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/articles/general-user-manual.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/articles/optimising-speed.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/general-user-manual.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/identifier-cropping.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/image-cropping.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/modifying-hsv-bounds.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/optimising-speed.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/parallelisation.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/raising-issues.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/articles/saving-and-restoring-application-states.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/index.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/convert_pixels_to_area_gui.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/dev_key_handler.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/dot-main_args.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/duflor_gui.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/execute_analysis.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/execute_multiple.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/execute_single.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/get_group.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/get_image_dimensions.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/get_KPI_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/key_handle_cores.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/limit_identifier_coordinates.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/limit_to_range.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/open_parallelPanel_event.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/prepare_resultsObject.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/render_selected_mask.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/restore_state.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/save_error_state.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/save_state.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/select_spectra_gui_comp.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/setup_parallel.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/show_infringing_spectrum_elements_gui_comp.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/shutdown_parallel.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/store_KPI_plot_to_file.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/store_results_to_file.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/update_resultsObject.html</loc>
-  </url>
-  <url>
-    <loc>https://Claudius-Appel.github.io/duflor.gui/reference/validate_custom_HSV_values.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/404.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/articles/general-user-manual.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/articles/optimising-speed.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/general-user-manual.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/identifier-cropping.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/image-cropping.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/index.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/modifying-hsv-bounds.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/optimising-speed.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/parallelisation.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/raising-issues.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/articles/saving-and-restoring-application-states.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/authors.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/index.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/LICENSE-text.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/LICENSE.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/convert_pixels_to_area_gui.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/dev_key_handler.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/dot-main_args.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/duflor_gui.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/execute_analysis.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/execute_multiple.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/execute_single.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/get_group.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/get_image_dimensions.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/get_KPI_plot.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/index.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/key_handle_cores.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/limit_identifier_coordinates.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/limit_to_range.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/open_parallelPanel_event.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/prepare_resultsObject.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/render_selected_mask.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/restore_state.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/save_error_state.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/save_state.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/select_spectra_gui_comp.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/setup_parallel.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/show_infringing_spectrum_elements_gui_comp.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/shutdown_parallel.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/store_KPI_plot_to_file.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/store_results_to_file.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/update_resultsObject.html</loc></url>
+<url><loc>https://Claudius-Appel.github.io/duflor.gui/reference/validate_custom_HSV_values.html</loc></url>
 </urlset>
+
