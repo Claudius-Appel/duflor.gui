@@ -1,6 +1,6 @@
 Package: duflor.gui
 Title: Frontend for duflor-package
-Version: 1.0.0
+Version: 1.0.1
 Author: Claudius Appel
 Authors@R: c(
     person("Claudius", "Appel", email =   "claudius.appel@freenet.de" , role = c("aut", "cre"))
@@ -10,7 +10,7 @@ Description: This package provides a shiny-based front-end GUI interface to the
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports:
     DT,
     doParallel,
