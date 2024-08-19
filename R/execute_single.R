@@ -44,6 +44,10 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     }
     current_results$processed_width <- width(im)
     current_results$processed_height <- height(im)
+    current_results$crop_x0 <- input$x0
+    current_results$crop_x1 <- input$x1
+    current_results$crop_y0 <- input$y0
+    current_results$crop_y1 <- input$y1
     ## EXTRACT RESULTS
     hsv_results <- extract_pixels_HSV(
         pixel.array = im,
@@ -77,7 +81,17 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
             identifiersearch_y0 = identifiersearch_y0,
             identifiersearch_y1 = identifiersearch_y1
         )
+    } else {
+        # make sure that when not cropping the whole range is saved.
+        identifiersearch_x0 <- input$x0
+        identifiersearch_x1 <- input$x1
+        identifiersearch_y0 <- input$y0
+        identifiersearch_y1 <- input$y1
     }
+    current_results$identifiercrop_x0 <- identifiersearch_x0
+    current_results$identifiercrop_x1 <- identifiersearch_x1
+    current_results$identifiercrop_y0 <- identifiersearch_y0
+    current_results$identifiercrop_y1 <- identifiersearch_y1
     ## CALCULATE AREA FROM PIXEL_COUNTS
     repackaged_pixel_counts <- list()
     for (name in names(hsv_results)) {

@@ -5,6 +5,10 @@ image_date
 image_name
 processed_width
 processed_height
+crop_x0/1\*
+crop_y0/1\*
+identifiercrop_x0/1\*
+identifiercrop_y0/1\*
 for each in  names(DATA$spectrums$lower_bound):
 %spectrum%_count
 img.fraction (maybe not that valuable?)
@@ -18,6 +22,10 @@ image_date
 image_name
 processed_width
 processed_height
+crop_x0/1\*
+crop_y0/1\*
+identifiercrop_x0/1\*
+identifiercrop_y0/1\*
 for each in  names(DATA$spectrums$lower_bound):
 %spectrum%_count
 img.fraction (maybe not that valuable?)
@@ -33,7 +41,7 @@ img.fraction (maybe not that valuable?)
 
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,6 +83,10 @@ img.fraction (maybe not that valuable?)
 <li><p>image_name</p></li>
 <li><p>processed_width</p></li>
 <li><p>processed_height</p></li>
+<li><p>crop_x0/1\*</p></li>
+<li><p>crop_y0/1\*</p></li>
+<li><p>identifiercrop_x0/1\*</p></li>
+<li><p>identifiercrop_y0/1\*</p></li>
 <li><p>for each in  <code>names(DATA$spectrums$lower_bound)</code>:</p><ul><li><p>%spectrum%_count</p></li>
 <li><p>img.fraction (maybe not that valuable?)</p></li>
 <li><p>%spectrum%_area (as results of duflor::convert_pixels_to_area())</p></li>
@@ -106,6 +118,13 @@ img.fraction (maybe not that valuable?)
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>results-csv-framework.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+    <p>The results-fields <code>crop_x0</code>, <code>crop_x1</code>,... encode the x- and y-coordinates
+of the selected cropping (for both image-crops and identifier-crops.)
+Due to how <code><a href="https://rdrr.io/pkg/imager/man/grab.html" class="external-link">imager::grabRect()</a></code> functions, the <strong>origin</strong> of the coordinate-system
+is the <strong>top-left corner of the image</strong>.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
