@@ -353,14 +353,14 @@
     },
     "duflor": {
       "Package": "duflor",
-      "Version": "1.0.0",
+      "Version": "1.0.1",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteUsername": "Claudius-Appel",
       "RemoteRepo": "duflor",
-      "RemoteRef": "master",
-      "RemoteSha": "864c2470e31fa34f6a816d0bcb7e566fea2c0e82",
+      "RemoteUsername": "Claudius-Appel",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "e2e0d26b2bf5234f4f1ad69e763737be7a8aa8d7",
       "Requirements": [
         "R",
         "Rcpp",
@@ -368,7 +368,7 @@
         "lifecycle",
         "stringr"
       ],
-      "Hash": "ea85ca478fc8e8d1036b71b7d305a1a7"
+      "Hash": "396a7b39d8c11a15f76a29d510640e7d"
     },
     "evaluate": {
       "Package": "evaluate",
@@ -1034,7 +1034,7 @@
     },
     "rmarkdown": {
       "Package": "rmarkdown",
-      "Version": "2.27",
+      "Version": "2.28",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1053,7 +1053,7 @@
         "xfun",
         "yaml"
       ],
-      "Hash": "27f9502e1cdbfa195f94e03b0f517484"
+      "Hash": "062470668513dcda416927085ee9bdc7"
     },
     "sass": {
       "Package": "sass",
