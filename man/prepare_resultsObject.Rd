@@ -24,6 +24,10 @@ results requires fields
 \item image_name
 \item processed_width
 \item processed_height
+\item crop_x0/1\*
+\item crop_y0/1\*
+\item identifiercrop_x0/1\*
+\item identifiercrop_y0/1\*
 \item for each in  \code{names(DATA$spectrums$lower_bound)}:
 \itemize{
 \item \%spectrum\%_count
@@ -32,5 +36,11 @@ results requires fields
 \item \%spectrum\%_fraction (as defined as \verb{\%spectrum\%_count/(sum(<all_plant_spectrums>_count)})
 }
 }
+}
+\note{
+The results-fields \code{crop_x0}, \code{crop_x1},... encode the x- and y-coordinates
+of the selected cropping (for both image-crops and identifier-crops.)
+Due to how \code{\link[imager:grab]{imager::grabRect()}} functions, the \strong{origin} of the coordinate-system
+is the \strong{top-left corner of the image}.
 }
 \keyword{internal}
