@@ -33,7 +33,7 @@
 #'
 dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) {
     # add valid keys here
-    keys_array <- str_split("---set-cores,-h,-v",",")
+    keys_array <- str_split("---set-cores,-h,-v,---ca",",")
     # then add them to the reactive 'DEBUGKEYS' (see 'app.R', search for 'DEBUGKEYS <- reactiveValues(')
     # so that it can be accessed elsewhere as well.
     Keys <- unlist(str_split(input$dev_pass,","))
@@ -51,6 +51,8 @@ dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) 
                     duration = DATA$notification_duration,
                     type = "message"
                 )
+            } else if (each=="---ca") {
+                key_handle_identifierArea(input,DATA,session)
             } else if (each=="-v") {
                 version1 <- str_c("duflor.gui v.",packageDescription("duflor.gui")$Version)
                 version2 <- str_c("duflor v.",packageDescription("duflor")$Version)
@@ -130,6 +132,7 @@ dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) 
 #' @importFrom stringr str_c
 #' @importFrom stringr str_trim
 #' @importFrom shiny showNotification
+#' @importFrom shiny updateNumericInput
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
 #' @importFrom parallel detectCores
@@ -167,4 +170,29 @@ key_handle_cores <- function(value, DATA, use_logical_cores, session) {
             )
         }
     }
+}
+#' internal function handling dev-key `---ca`
+#'
+#' @inheritParams .main_args
+#'
+#' @importFrom stringr str_c
+#' @importFrom shiny updateNumericInput
+#'
+#' @noRd
+#' @keywords internal
+#'
+key_handle_identifierArea <- function(input, DATA, session) {
+    current_id_area <- input$identifier_area
+    if (current_id_area==0.503) {
+        v <- as.numeric(14.535)
+        updateNumericInput(session,inputId = "identifier_area",value = v)
+    } else {
+        v <- as.numeric(0.503)
+        updateNumericInput(session,inputId = "identifier_area",value = v)
+    }
+    showNotification(
+        ui = str_c("The identifier-area has been set to '",v,"'"),
+        duration = DATA$notification_duration,
+        type = "warning"
+    )
 }
