@@ -113,10 +113,10 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 )
             } else {
                 # make sure that when not cropping the whole range is saved.
-                identifiersearch_x0 <- x0
-                identifiersearch_x1 <- x1
-                identifiersearch_y0 <- y0
-                identifiersearch_y1 <- y1
+                identifiersearch_x0_ <- x0
+                identifiersearch_x1_ <- x1
+                identifiersearch_y0_ <- y0
+                identifiersearch_y1_ <- y1
             }
             current_results$identifiercrop_x0 <- identifiersearch_x0_
             current_results$identifiercrop_x1 <- identifiersearch_x1_
