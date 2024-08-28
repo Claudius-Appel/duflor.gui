@@ -33,7 +33,7 @@
 #'
 dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) {
     # add valid keys here
-    keys_array <- str_split("---set-cores,-h,-v,---ca",",")
+    keys_array <- str_split("---set-cores,-h,-v,---ca,---sf",",")
     # then add them to the reactive 'DEBUGKEYS' (see 'app.R', search for 'DEBUGKEYS <- reactiveValues(')
     # so that it can be accessed elsewhere as well.
     Keys <- unlist(str_split(input$dev_pass,","))
@@ -53,6 +53,8 @@ dev_key_handler <- function(input, DATA, DEBUGKEYS, session, use_logical_cores) 
                 )
             } else if (each=="---ca") {
                 key_handle_identifierArea(input,DATA,session)
+            } else if (each=="---sf") {
+                key_handle_setSearchFolder(input,DATA,session)
             } else if (each=="-v") {
                 version1 <- str_c("duflor.gui v.",packageDescription("duflor.gui")$Version)
                 version2 <- str_c("duflor v.",packageDescription("duflor")$Version)
@@ -192,6 +194,22 @@ key_handle_identifierArea <- function(input, DATA, session) {
     }
     showNotification(
         ui = str_c("The identifier-area has been set to '",v,"'"),
+        duration = DATA$notification_duration,
+        type = "warning"
+    )
+}
+
+#' internal function exposing the custom search-root for myself.
+#'
+#' @inheritParams .main_args
+#'
+#' @noRd
+#' @keywords internal
+#'
+key_handle_setSearchFolder <- function(input, DATA, session) {
+    DATA$search_root <- normalizePath("D:\\Dokumente neu\\Obsidian NoteTaking\\BE31-Thesis-quarto\\assets\\data")
+    showNotification(
+        ui = str_c("Changed 'Search_root'"),
         duration = DATA$notification_duration,
         type = "warning"
     )
