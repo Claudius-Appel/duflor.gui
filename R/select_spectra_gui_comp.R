@@ -26,6 +26,8 @@ select_spectra_gui_comp <- function(input) {
         # tags$h5('As a result, all images will be processed at full resolution. This is safer, but slower.'),
         footer=tagList(
             checkboxGroupInput("selected_spectra","Select spectra to analyse",choices = all_choices,selected = choices),
+            checkboxInput("do_save_masks","Save the spectrum-masks?"),
+            checkboxInput("do_save_high_contrast_masks","Save the high-contrast-masks instead?"),
             actionButton('submit_selected_spectra', 'Submit choices'),
             modalButton('cancel')
         )

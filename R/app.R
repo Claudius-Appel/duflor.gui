@@ -70,10 +70,10 @@
 #' @importFrom imager draw_rect
 #' @importFrom imager grabRect
 #' @importFrom imager display
+#' @importFrom imager HSVtoRGB
 #' @importFrom duflor load_image
 #' @importFrom duflor extract_pixels_HSV
 #' @importFrom duflor apply_HSV_color_by_mask
-#' @importFrom duflor HSVtoRGB
 #' @importFrom utils packageDescription
 #' @return .
 #' @export

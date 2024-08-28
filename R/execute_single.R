@@ -19,11 +19,21 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     colnames(current_results) <- names(results_object)
     #TODO: decide if these paths must be sanitized still?
     current_results$full_path <- file
+    bnf <- file_path_sans_ext(basename(file))
     current_results$image_name <- basename(file)
     ## DATE_OF_ANALYSIS
     current_results$date_of_analysis <- input$date_of_image_shooting
     ## IMAGE DIMENSIONS
     image_dimensions <- as.integer(get_image_dimensions(file))
+    if (input$do_save_masks) {
+        results_path <- normalizePath(str_c(
+            dirname(file),
+            "/results"
+        ))
+        if (isFALSE(dir.exists(results_path))) {
+            dir.create(results_path)
+        }
+    }
     ## LOAD IMAGE
     if (input$do_crop_image) {
         im <- load_image(
@@ -103,6 +113,17 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
         current_results[[str_c(name,"_area")]] <- areas[[name]]
         current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
         current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
+        if (input$do_save_masks) {
+            mask_path <- normalizePath(str_c(results_path, "/", bnf, "_", name, ".png"))
+            save.image(RGBtosRGB(HSVtoRGB(
+                apply_HSV_color_by_mask(
+                    pixel.array = im,
+                    pixel.idx = hsv_results[[name]]$pixel.idx,
+                    target.color = "red",
+                    mask_extreme = input$do_save_high_contrast_masks
+                )
+            )),file = mask_path)
+        }
     }
     current_results$area_per_pixel <- areas$area_per_pixel
     ## UPDATE RESULTS_OBJECT
