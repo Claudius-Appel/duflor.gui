@@ -8,7 +8,7 @@
 #' @importFrom stringr str_c
 #'
 store_KPI_plot_to_file <- function(input, DATA) {
-    results_path <- str_c(dirname(DATA$results$results$full_path[[1]]),"/results/")
+    results_path <- normalizePath(str_c(dirname(DATA$results$results$full_path[[1]]),"/results/"))
     dir <- dirname(results_path)
     if (isFALSE(dir.exists(dir))) {
         dir.create(dir)
