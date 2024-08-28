@@ -31,6 +31,7 @@ store_results_to_file <- function(results, results_path, save_to_xlsx=FALSE, set
     }
     if (isTRUE(save_to_xlsx)) {
         results_path <- str_c(results_path,".xlsx")
+        results_path <- normalizePath(results_path)
         dir <- dirname(results_path)
         if (isFALSE(dir.exists(dir))) {
             dir.create(dir)
@@ -51,6 +52,7 @@ store_results_to_file <- function(results, results_path, save_to_xlsx=FALSE, set
         ) ## sign the file with being created by this username on this machine.
     } else {
         results_path <- str_c(results_path,".csv")
+        results_path <- normalizePath(results_path)
         dir <- dirname(results_path)
         if (isFALSE(dir.exists(dir))) {
             dir.create(dir)

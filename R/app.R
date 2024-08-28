@@ -1180,11 +1180,11 @@ duflor_gui <- function() {
                     )
                     return()
                 } else {
-                    results_path <- str_c(
+                    results_path <- normalizePath(str_c(
                         dirname(DATA$results$results$full_path[[1]]),
                         "/results/results_",
                         input$date_of_image_shooting
-                    )
+                    ))
                     out <- store_results_to_file(
                         results = DATA$results,
                         results_path = results_path,
