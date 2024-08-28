@@ -13,6 +13,11 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom imager width
 #' @importFrom imager height
+#' @importFrom imager save.image
+#' @importFrom imager RGBtosRGB
+#' @importFrom stringr str_c
+#' @importFrom imager HSVtoRGB
+#' @importFrom tools file_path_sans_ext
 #'
 execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
     #### INPUT VALIDATION ####
@@ -42,12 +47,24 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
         identifiersearch_y0 = input$identifiersearch_y0
         identifiersearch_y1 = input$identifiersearch_y1
         identifier_area <- input$identifier_area
+        do_save_masks <- input$do_save_masks
+        if (do_save_masks) {
+            results_path <- normalizePath(str_c(
+                dirname(files$images_filtered[1]),
+                "/results"
+            ))
+            if (isFALSE(dir.exists(results_path))) {
+                dir.create(results_path)
+            }
+        }
+        do_save_high_contrast_masks <- input$do_save_high_contrast_masks
         foreach_result <- foreach(index = 1:length(files$index),.packages = c("duflor","duflor.gui"), .verbose = T,.inorder = F) %dopar% {
         # stop(simpleError("parallelisation is not implemented yet. figure out how to do so!!"))
             current_results <- data.frame(matrix(NA, nrow = 1, ncol = length(names(results_object))))
             colnames(current_results) <- names(results_object)
             ## NAME
             file <- files$images_filtered[index]
+            bnf <- file_path_sans_ext(basename(file))
             current_results$full_path <- file
             current_results$image_name <- basename(file)
             ## DATE_OF_ANALYSIS
@@ -133,6 +150,17 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 current_results[[str_c(name,"_area")]] <- areas[[name]]
                 current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
                 current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
+                if (do_save_masks) {
+                    mask_path <- normalizePath(str_c(results_path, "/", bnf, "_", name, ".png"))
+                    save.image(RGBtosRGB(HSVtoRGB(
+                        apply_HSV_color_by_mask(
+                            pixel.array = im,
+                            pixel.idx = hsv_results[[name]]$pixel.idx,
+                            target.color = "red",
+                            mask_extreme = do_save_high_contrast_masks
+                        )
+                    )),file = mask_path)
+                }
             }
             ## UPDATE RESULTS_OBJECT
             # results_object <- update_resultsObject(results_object,current_results)
@@ -141,12 +169,22 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
         }
         results_object <- bind_rows(foreach_result,.id = NULL)
     } else {
+        if (input$do_save_masks) {
+            results_path <- normalizePath(str_c(
+                dirname(files$images_filtered[1]),
+                "/results"
+            ))
+            if (isFALSE(dir.exists(results_path))) {
+                dir.create(results_path)
+            }
+        }
         for (index in files$index) {
             # create a results-row to be merged into the `results_object`
             current_results <- data.frame(matrix(NA, nrow = 1, ncol = length(names(results_object))))
             colnames(current_results) <- names(results_object)
             ## NAME
             file <- files$images_filtered[index]
+            bnf <- file_path_sans_ext(basename(file))
             current_results$full_path <- file
             current_results$image_name <- basename(file)
             ## DATE_OF_ANALYSIS
@@ -232,6 +270,17 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 current_results[[str_c(name,"_area")]] <- areas[[name]]
                 current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
                 current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
+                if (input$do_save_masks) {
+                    mask_path <- normalizePath(str_c(results_path, "/", bnf, "_", name, ".png"))
+                    save.image(RGBtosRGB(HSVtoRGB(
+                        apply_HSV_color_by_mask(
+                            pixel.array = im,
+                            pixel.idx = hsv_results[[name]]$pixel.idx,
+                            target.color = "red",
+                            mask_extreme = input$do_save_high_contrast_masks
+                        )
+                    )),file = mask_path)
+                }
             }
             ## UPDATE RESULTS_OBJECT
             current_results$area_per_pixel <- areas$area_per_pixel
