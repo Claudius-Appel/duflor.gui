@@ -60,8 +60,11 @@ Let's model a reasonable likely worst-case scenario:
 To obtain all results, 250 images must be loaded. Without parallelisation (i.e. in sequential execution mode), every subsequent step requires its previous step to have concluded. Using the formula above, a total of
 
 $$
-\text{Iterations}_{total} = \text{Checked pixels}_\text{total} = N_{Images}\times({Width}_{Image}\times{Height}_{Image})\times N_{spectra}\\
- = 250\times(6000\times4000)\times2=1.2\times 10^{10}
+\begin{aligned}
+\text{Iterations}_{total} &= \text{Checked pixels}_\text{total}= N_{Images}\times({Width}_{Image}\times{Height}_{Image})\times N_{spectra}\\
+&= 250\times(6000\times4000)\times2\\
+&=1.2\times 10^{10}
+\end{aligned}
 $$
 
 comparisons between a pixel's HSV-triplet and a lower- and upper-bound's HSV-triplet must be performed. Note: the above calculation is for a hypothetical root-area analysis of 250 images, where two spectra must be quantified (roots and the identifier-area itself).
