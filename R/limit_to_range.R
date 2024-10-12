@@ -5,7 +5,7 @@
 #' are not modified.
 #'
 #'
-#' @param value vector to normalise
+#' @param x vector to normalise
 #' @param replace_lower value to insert in place of elements of `value` below this bound.
 #' @param replace_upper see `replace_lower`
 #'
