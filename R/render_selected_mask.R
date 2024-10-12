@@ -117,12 +117,24 @@ render_selected_mask <- function(input, DATA, FLAGS) {
         }
     }
     # make a mask
-    mask <- apply_HSV_color_by_mask(
-        pixel.array = im,
-        pixel.idx = hsv_results[[1]]$pixel.idx,
-        target.color = "red",
-        mask_extreme = input$mask_extreme
-    )
-    # display the mask
-    display(HSVtoRGB(mask))
+    # only save images for masks which matched at least
+    # 1 pixel
+    if (hsv_results[[1]]$pixel.count>0) {
+        mask <- apply_HSV_color_by_mask(
+            pixel.array = im,
+            pixel.idx = hsv_results[[1]]$pixel.idx,
+            target.color = "red",
+            mask_extreme = input$mask_extreme
+        )
+        # display the mask
+        display(HSVtoRGB(mask))
+    } else {
+        showNotification(
+            ui = str_c("No pixels found for the spectrum '",mask,"'."),
+            duration = DATA$notification_duration * 4,
+            type = "warning"
+        )
+        return()
+
+    }
 }
