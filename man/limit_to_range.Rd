@@ -7,11 +7,11 @@
 limit_to_range(x, replace_lower, replace_upper)
 }
 \arguments{
+\item{x}{vector to normalise}
+
 \item{replace_lower}{value to insert in place of elements of \code{value} below this bound.}
 
 \item{replace_upper}{see \code{replace_lower}}
-
-\item{value}{vector to normalise}
 }
 \value{
 vector, normalised to range \verb{[replace_lower, replace_upper]}
