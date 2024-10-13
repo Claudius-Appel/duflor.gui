@@ -58,8 +58,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             }
         }
         do_save_high_contrast_masks <- input$do_save_high_contrast_masks
-        foreach_result <- foreach(index = 1:length(files$index),.packages = c("duflor","duflor.gui"), .verbose = T,.inorder = F) %dopar% {
-        # stop(simpleError("parallelisation is not implemented yet. figure out how to do so!!"))
+        foreach_result <- foreach(index = 1:length(files$index),.packages = c("duflor","duflor.gui"), .verbose = T,.inorder = T,.errorhandling = "pass") %dopar% {
             current_results <- data.frame(matrix(NA, nrow = 1, ncol = length(names(results_object))))
             colnames(current_results) <- names(results_object)
             ## NAME
@@ -140,32 +139,56 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             current_results$identifiercrop_y0 <- identifiersearch_y0_
             current_results$identifiercrop_y1 <- identifiersearch_y1_
             ## CALCULATE AREA FROM PIXEL_COUNTS
+            # Calculating the area based on pixel counts for each spectrum vs. the identifier-spectrum
+            # but first, ensure calculations are possible:
             repackaged_pixel_counts <- list()
             for (name in names(hsv_results)) {
                 repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
             }
-            # we use the duflor.gui-version of this function because we need a different structure.
-            areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, identifier_area)
-            for (name in names(hsv_results)) {
-                current_results[[str_c(name,"_area")]] <- areas[[name]]
-                current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
-                current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
-                if (do_save_masks) {
-                    mask_path <- normalizePath(str_c(results_path, "/", bnf, "_", name, ".png"))
-                    save.image(RGBtosRGB(HSVtoRGB(
-                        apply_HSV_color_by_mask(
-                            pixel.array = im,
-                            pixel.idx = hsv_results[[name]]$pixel.idx,
-                            target.color = "red",
-                            mask_extreme = do_save_high_contrast_masks
-                        )
-                    )),file = mask_path)
+            # Calculating the area based on pixel counts for each spectrum vs. the identifier-spectrum
+            # but first, ensure calculations are possible:
+            #TODO: figure out why this fix fails in parallel instance
+            if (repackaged_pixel_counts[[grep("identifier",names(repackaged_pixel_counts))]]==0) {
+                # note: because we cannot warn here, the warning is performed
+                # after foreach has concluded and the results are combined.
+                # Unfortunately this means that executing multiple images via
+                # parallelisation and without parallelisation will yield
+                # different output data - I think?
+                # TODO: verify the above
+                return(current_results)
+            } else {
+                # in this case, the identifier has at least 1 pixel, so we can actually calculate areas now.
+
+
+                # we use the duflor.gui-version of this function because we need a different structure.
+                areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, identifier_area)
+                for (name in names(hsv_results)) {
+                    current_results[[str_c(name,"_area")]] <- areas[[name]]
+                    current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
+                    current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
+                    if (do_save_masks) {
+                        mask_path <- normalizePath(str_c(results_path, "/", bnf, "_", name, ".png"))
+                        # only save images for masks which matched at least
+                        # 1 pixel
+                        if (hsv_results[[name]]$pixel.count>0) {
+                            save.image(RGBtosRGB(HSVtoRGB(
+                                apply_HSV_color_by_mask(
+                                    pixel.array = im,
+                                    pixel.idx = hsv_results[[name]]$pixel.idx,
+                                    target.color = "red",
+                                    mask_extreme = do_save_high_contrast_masks
+                                )
+                            )),file = mask_path)
+                        } else {
+                            message(str_c("No mask saved for spectrum '",name,"' of image '",bnf,"': 0 Hits."))
+                        }
+                    }
                 }
+                ## UPDATE RESULTS_OBJECT
+                # results_object <- update_resultsObject(results_object,current_results)
+                current_results$area_per_pixel <- areas$area_per_pixel
+                return(current_results)
             }
-            ## UPDATE RESULTS_OBJECT
-            # results_object <- update_resultsObject(results_object,current_results)
-            current_results$area_per_pixel <- areas$area_per_pixel
-            return(current_results)
         }
         results_object <- bind_rows(foreach_result,.id = NULL)
     } else {
@@ -264,28 +287,67 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             for (name in names(hsv_results)) {
                 repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
             }
-            # we use the duflor.gui-version of this function because we need a different structure.
-            areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, input$identifier_area)
-            for (name in names(hsv_results)) {
-                current_results[[str_c(name,"_area")]] <- areas[[name]]
-                current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
-                current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
-                if (input$do_save_masks) {
-                    mask_path <- normalizePath(str_c(results_path, "/", bnf, "_", name, ".png"))
-                    save.image(RGBtosRGB(HSVtoRGB(
-                        apply_HSV_color_by_mask(
-                            pixel.array = im,
-                            pixel.idx = hsv_results[[name]]$pixel.idx,
-                            target.color = "red",
-                            mask_extreme = input$do_save_high_contrast_masks
-                        )
-                    )),file = mask_path)
+            # Calculating the area based on pixel counts for each spectrum vs. the identifier-spectrum
+            # but first, ensure calculations are possible:
+            if (repackaged_pixel_counts[[grep("identifier",names(repackaged_pixel_counts))]]==0) {
+                # Mote: because the warning cannot happen in this place for the
+                # parallelised case, it is also not performed here. Instead,
+                # checking and warning is performed at the end, before returning
+                # out of this function.
+            } else {
+                # in this case, the identifier has at least 1 pixel, so we can actually calculate areas now.
+
+
+                # we use the duflor.gui-version of this function because we need a different structure.
+                areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, input$identifier_area)
+                for (name in names(hsv_results)) {
+                    current_results[[str_c(name,"_area")]] <- areas[[name]]
+                    current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
+                    current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
+                    if (input$do_save_masks) {
+                        mask_path <- normalizePath(str_c(results_path, "/", bnf, "_", name, ".png"))
+                        # only save images for masks which matched at least
+                        # 1 pixel
+                        if (hsv_results[[name]]$pixel.count>0) {
+                            save.image(RGBtosRGB(HSVtoRGB(
+                                apply_HSV_color_by_mask(
+                                    pixel.array = im,
+                                    pixel.idx = hsv_results[[name]]$pixel.idx,
+                                    target.color = "red",
+                                    mask_extreme = input$do_save_high_contrast_masks
+                                )
+                            )),file = mask_path)
+                        } else {
+                            message(str_c("No mask saved for spectrum '",name,"' of image '",bnf,"': 0 Hits."))
+                        }
+                    }
                 }
+                ## UPDATE RESULTS_OBJECT
+                current_results$area_per_pixel <- areas$area_per_pixel
             }
-            ## UPDATE RESULTS_OBJECT
-            current_results$area_per_pixel <- areas$area_per_pixel
             results_object <- update_resultsObject(results_object,current_results)
         }
+    }
+    images_without_identifier_pixels_count <- 0
+    for (each in 1:nrow(results_object)) {
+        if (is.na(results_object[each, grep("identifier.*count", names(results_object))])) {
+                str_no_ID_pixels_warning <- str_c(
+                    "Image '",
+                    results_object[each, "image_name"],
+                    "' contains no pixels for the identifier.",
+                    "\n'NA's are returned for pixel-count, area and image-fraction for all spectra of this image."
+                )
+                warning(simpleWarning(str_no_ID_pixels_warning))
+                images_without_identifier_pixels_count <- images_without_identifier_pixels_count + 1
+        }
+    }
+    if (images_without_identifier_pixels_count>0) {
+        showNotification(
+            ui = "No identifier found in some images. See console for more details.",
+            id = "no_id.multiple",
+            duration = NULL,
+            type = "error"
+        )
     }
     return(results_object)
 }

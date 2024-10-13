@@ -107,25 +107,57 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     for (name in names(hsv_results)) {
         repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
     }
-    # we use the duflor.gui-version of this function because we need a different structure.
-    areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, input$identifier_area)
-    for (name in names(hsv_results)) {
-        current_results[[str_c(name,"_area")]] <- areas[[name]]
-        current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
-        current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
-        if (input$do_save_masks) {
-            mask_path <- normalizePath(str_c(results_path, "/", bnf, "_", name, ".png"))
-            save.image(RGBtosRGB(HSVtoRGB(
-                apply_HSV_color_by_mask(
-                    pixel.array = im,
-                    pixel.idx = hsv_results[[name]]$pixel.idx,
-                    target.color = "red",
-                    mask_extreme = input$do_save_high_contrast_masks
-                )
-            )),file = mask_path)
+    if (repackaged_pixel_counts[[grep("identifier",names(repackaged_pixel_counts))]]==0) {
+
+    } else {
+        # we use the duflor.gui-version of this function because we need a different structure.
+        areas <- convert_pixels_to_area_gui(repackaged_pixel_counts, input$identifier_area)
+        for (name in names(hsv_results)) {
+            current_results[[str_c(name,"_area")]] <- areas[[name]]
+            current_results[[str_c(name,"_count")]] <- hsv_results[[name]]$pixel.count
+            current_results[[str_c(name,"_fraction")]] <- hsv_results[[name]]$pixel.count/(prod(image_dimensions))
+            if (input$do_save_masks) {
+                mask_path <- normalizePath(str_c(results_path, "/", bnf, "_", name, ".png"))
+                # only save images for masks which matched at least
+                # 1 pixel
+                if (hsv_results[[name]]$pixel.count>0) {
+                    save.image(RGBtosRGB(HSVtoRGB(
+                        apply_HSV_color_by_mask(
+                            pixel.array = im,
+                            pixel.idx = hsv_results[[name]]$pixel.idx,
+                            target.color = "red",
+                            mask_extreme = input$do_save_high_contrast_masks
+                        )
+                    )),file = mask_path)
+                } else {
+                    message(str_c("No mask saved for spectrum '",name,"' of image '",bnf,"': 0 Hits."))
+                }
+            }
+        }
+        current_results$area_per_pixel <- areas$area_per_pixel
+        ## UPDATE RESULTS_OBJECT
+    }
+    results_object <- update_resultsObject(results_object,current_results)
+    images_without_identifier_pixels_count <- 0
+    for (each in 1:nrow(results_object)) {
+        if (is.na(results_object[each, grep("identifier.*count", names(results_object))])) {
+            str_no_ID_pixels_warning <- str_c(
+                "Image '",
+                results_object[each, "image_name"],
+                "' contains no pixels for the identifier.",
+                "\n'NA's are returned for pixel-count, area and image-fraction for all spectra of this image."
+            )
+            warning(simpleWarning(str_no_ID_pixels_warning))
+            images_without_identifier_pixels_count <- images_without_identifier_pixels_count + 1
         }
     }
-    current_results$area_per_pixel <- areas$area_per_pixel
-    ## UPDATE RESULTS_OBJECT
-    results_object <- update_resultsObject(results_object,current_results)
+    if (images_without_identifier_pixels_count>0) {
+        showNotification(
+            ui = "No identifier found in this image. See console for more details.",
+            id = "no_id.single",
+            duration = NULL,
+            type = "error"
+        )
+    }
+    return(results_object)
 }
