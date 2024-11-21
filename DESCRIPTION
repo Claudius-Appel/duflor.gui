@@ -1,6 +1,6 @@
 Package: duflor.gui
 Title: Frontend for duflor-package
-Version: 1.0.7
+Version: 1.0.8
 Author: Claudius Appel
 Authors@R: c(
     person("Claudius", "Appel", email =   "claudius.appel@freenet.de" , role = c("aut", "cre"))
