@@ -155,6 +155,14 @@ duflor_gui <- function() {
                         id = "PARALLEL_PANEL",
                         numericInput(inputId = "parallel_cores",label = "Designate number of cores",value = 1, min = 1,max = (detectCores(logical = use_logical_cores) - 1)),
                     ),
+                    ## DISTORTION
+                    h4("Distortion Correction"),
+                    checkboxInput(inputId = "do_correct_distortion",label = "Correct Distortion?"),
+                    conditionalPanel(
+                        condition = "input.do_correct_distortion %% 2 == 1",
+                        id = "DISTORTION_PANEL",
+                        numericInput(inputId = "barrel_correction_factor",label = "Describe the lens' **maximum** barrel-distortion",value = -1.2, min = -100,max = 100),
+                    ),
                     ## MISCELLANEOUS STUFF
                     h5("Misc"),
                     textInput(inputId = "dev_pass",label = "Dev-console",placeholder = "enter '-h' for a list of valid commands"),
@@ -481,6 +489,7 @@ duflor_gui <- function() {
         hide("HSV_PANEL")
         hide("CROPPING_PANEL")
         hide("PARALLEL_PANEL")
+        hide("DISTORTION_PANEL")
         #### DEV TOGGLES ####
         observeEvent(input$dev_pass, {
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
@@ -510,6 +519,41 @@ duflor_gui <- function() {
         observeEvent(input$open_parallelPanel, {
             open_parallelPanel_event(input, DATA, FLAGS, use_logical_cores, session, STARTUP)
             FLAGS$restoring_state <- FALSE
+        })
+        #### SETUP DISTORTION ####
+        observeEvent(input$do_correct_distortion, {
+            if (input$do_correct_distortion) {
+                show("DISTORTION_PANEL")
+                showNotification(
+                    ui = str_c(
+                        "Provide maximum distortion-parameter of your lens."
+                    ),
+                    type = "message"
+                )
+                if (isFALSE(FLAGS$restoring_state)) {
+                    updateNumericInput(session,inputId = "barrel_correction_factor", value = 0)
+                }
+            } else {
+                hide("DISTORTION_PANEL")
+                if (isFALSE(FLAGS$restoring_state)) {
+                    updateNumericInput(session,inputId = "barrel_correction_factor", value = 0)
+                }
+                if (isTRUE(STARTUP$startup)) {
+                    STARTUP$startup <- FALSE
+                    # this line must be executed instead of the *last* message
+                    # which you want to suppress on startup. To be more precise,
+                    # if another `conditionalPanel` is added, the event-callback
+                    # for its notifications should be placed _above_ this
+                    # event-callback.
+                } else {
+                    showNotification(
+                        ui = str_c(
+                            "Disabled correction of barrel-distortion."
+                        ),
+                        type = "message"
+                    )
+                }
+            }
         })
         #### EDIT CROPPING ####
         observeEvent(input$do_crop_image, {

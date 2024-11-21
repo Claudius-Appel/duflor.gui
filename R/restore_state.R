@@ -112,6 +112,17 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
         updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "open_parallelPanel",value = input_state$input$open_parallelPanel)
         updateNumericInput(session = getDefaultReactiveDomain(),inputId = "parallel_cores",value = 1)
     }
+    ## restore DISTORTION
+    FLAGS$restoring_state <- TRUE
+    if (input_state$input$do_correct_distortion) {
+        show("DISTORTION_PANEL")
+        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_correct_distortion",value = input_state$input$do_correct_distortion)
+        updateNumericInput(session = getDefaultReactiveDomain(),inputId = "barrel_correction_factor",value = input_state$input$barrel_correction_factor)
+    } else {
+        hide("DISTORTION_PANEL")
+        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_correct_distortion",value = input_state$input$do_correct_distortion)
+        updateNumericInput(session = getDefaultReactiveDomain(),inputId = "barrel_correction_factor",value = 1)
+    }
     ## restore dateofshooting
     updateDateInput(
         session = getDefaultReactiveDomain(),

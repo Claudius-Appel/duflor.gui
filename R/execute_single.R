@@ -102,6 +102,11 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     current_results$identifiercrop_x1 <- identifiersearch_x1
     current_results$identifiercrop_y0 <- identifiersearch_y0
     current_results$identifiercrop_y1 <- identifiersearch_y1
+    if (isTRUE(input$do_correct_distortion)) { # experimental distortion-correction.
+        for (name in names(hsv_results)) {
+            hsv_results[[name]]$pixel.count <- correct_distortion(hsv_results[[name]]$pixel.idx,distortions = list("barrel"=-1.2),image_dimensions = image_dimensions,input = input)
+        }
+    }
     ## CALCULATE AREA FROM PIXEL_COUNTS
     repackaged_pixel_counts <- list()
     for (name in names(hsv_results)) {

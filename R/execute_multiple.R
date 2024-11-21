@@ -48,6 +48,8 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
         identifiersearch_y1 = input$identifiersearch_y1
         identifier_area <- input$identifier_area
         do_save_masks <- input$do_save_masks
+        do_correct_distortion <- input$do_correct_distortion
+        barrel_correction_factor <- input$barrel_correction_factor
         if (do_save_masks) {
             results_path <- normalizePath(str_c(
                 dirname(files$images_filtered[1]),
@@ -141,6 +143,11 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             ## CALCULATE AREA FROM PIXEL_COUNTS
             # Calculating the area based on pixel counts for each spectrum vs. the identifier-spectrum
             # but first, ensure calculations are possible:
+            if (isTRUE(do_correct_distortion)) { # experimental distortion-correction.
+                for (name in names(hsv_results)) {
+                    hsv_results[[name]]$pixel.count <- correct_distortion(hsv_results[[name]]$pixel.idx,distortions = list("barrel" = barrel_correction_factor),image_dimensions = image_dimensions, do_crop_image = do_crop_image,x0 = x0,y0 = y0)
+                }
+            }
             repackaged_pixel_counts <- list()
             for (name in names(hsv_results)) {
                 repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
@@ -283,6 +290,11 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             current_results$identifiercrop_y0 <- identifiersearch_y0
             current_results$identifiercrop_y1 <- identifiersearch_y1
             ## CALCULATE AREA FROM PIXEL_COUNTS
+            if (isTRUE(input$do_correct_distortion)) { # experimental distortion-correction.
+                for (name in names(hsv_results)) {
+                    hsv_results[[name]]$pixel.count <- correct_distortion(hsv_results[[name]]$pixel.idx,distortions = list("barrel" = input$barrel_correction_factor),image_dimensions = image_dimensions, do_crop_image = input$do_crop_image,x0 = input$x0,y0 = input$y0)
+                }
+            }
             repackaged_pixel_counts <- list()
             for (name in names(hsv_results)) {
                 repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
