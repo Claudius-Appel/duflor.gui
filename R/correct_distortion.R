@@ -8,10 +8,9 @@
 #' @param x0 coordinates of the cropping top left corner. Necessary to correct coordinate-space for cropping.
 #' @param y0 coordinates of the
 #'
-#' @return
-#' @export
+#' @return sum of distortion-corrected pixels, rounded to the closest integer value.
+#' @keywords internal
 #'
-#' @examples
 correct_distortion <- function(pixel.idx, distortions, image_dimensions, do_crop_image,x0,y0) {
 
     # calculates the euclidean distance
