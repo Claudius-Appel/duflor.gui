@@ -77,7 +77,7 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
     updateNumericInput(session = getDefaultReactiveDomain(), inputId = "upper_bound_S", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
     updateNumericInput(session = getDefaultReactiveDomain(), inputId = "upper_bound_V", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
     ## restore CROPPING
-    if (input_state$input$do_crop_image) {
+    if (hasName(input_state$input,"do_crop_image") && input_state$input$do_crop_image) {
         show("CROPPING_PANEL")
         updateNumericInput(session = getDefaultReactiveDomain(),"x0",value = input_state$input$x0)
         updateNumericInput(session = getDefaultReactiveDomain(),"x1",value = input_state$input$x1)
@@ -89,7 +89,7 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
         updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_crop_image",value = input_state$input$do_crop_image)
     }
     ## restore IDENTCROPPING
-    if (input_state$input$do_crop_identifier_range) {
+    if (hasName(input_state$input,"do_crop_identifier_range") && input_state$input$do_crop_identifier_range) {
         show("IDENTIFIERCROPPING_PANEL")
         updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_x0",value = input_state$input$identifiersearch_x0)
         updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_x1",value = input_state$input$identifiersearch_x1)
@@ -103,7 +103,7 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
 
     ## restore PARALLEL
     FLAGS$restoring_state <- TRUE
-    if (input_state$input$open_parallelPanel) {
+    if (hasName(input_state$input,"open_parallelPanel") && input_state$input$open_parallelPanel) {
         show("PARALLEL_PANEL")
         updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "open_parallelPanel",value = input_state$input$open_parallelPanel)
         updateNumericInput(session = getDefaultReactiveDomain(),inputId = "parallel_cores",value = input_state$input$parallel_cores)
@@ -114,7 +114,7 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
     }
     ## restore DISTORTION
     FLAGS$restoring_state <- TRUE
-    if (input_state$input$do_correct_distortion) {
+    if (hasName(input_state$input,"do_correct_distortion") && input_state$input$do_correct_distortion) {
         show("DISTORTION_PANEL")
         updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_correct_distortion",value = input_state$input$do_correct_distortion)
         updateNumericInput(session = getDefaultReactiveDomain(),inputId = "barrel_correction_factor",value = input_state$input$barrel_correction_factor)
