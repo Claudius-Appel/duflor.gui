@@ -143,8 +143,8 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             ## CALCULATE AREA FROM PIXEL_COUNTS
             # Calculating the area based on pixel counts for each spectrum vs. the identifier-spectrum
             # but first, ensure calculations are possible:
-            if (isTRUE(do_correct_distortion)) { # experimental distortion-correction.
-                for (name in names(hsv_results)) {
+            for (name in names(hsv_results)) {
+                if (isTRUE(do_correct_distortion)) { # experimental distortion-correction.
                     hsv_results[[name]]$pixel.count_undistorted <- correct_distortion(
                         hsv_results[[name]]$pixel.idx,
                         distortions = list("barrel" = barrel_correction_factor),
@@ -153,6 +153,8 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                         x0 = x0,
                         y0 = y0
                     )
+                } else {
+                    hsv_results[[name]]$pixel.count_undistorted <- NA
                 }
             }
             repackaged_pixel_counts <- list()
@@ -171,7 +173,6 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 # parallelisation and without parallelisation will yield
                 # different output data - I think?
                 # TODO: verify the above
-                return(current_results)
             } else {
                 # in this case, the identifier has at least 1 pixel, so we can actually calculate areas now.
 
@@ -203,7 +204,6 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                 ## UPDATE RESULTS_OBJECT
                 # results_object <- update_resultsObject(results_object,current_results)
                 current_results$area_per_pixel <- areas$area_per_pixel
-                return(current_results)
             }
             ## UNDISTORTED RESULTS
             if (repackaged_pixel_counts_undistorted[[grep("identifier",names(repackaged_pixel_counts_undistorted))]]==0) {
@@ -322,17 +322,19 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
             current_results$identifiercrop_y0 <- identifiersearch_y0
             current_results$identifiercrop_y1 <- identifiersearch_y1
             ## CALCULATE AREA FROM PIXEL_COUNTS
-            if (isTRUE(input$do_correct_distortion)) { # experimental distortion-correction.
                 for (name in names(hsv_results)) {
-                    hsv_results[[name]]$pixel.count_undistorted <- correct_distortion(
-                        hsv_results[[name]]$pixel.idx,
-                        distortions = list("barrel" = input$barrel_correction_factor),
-                        image_dimensions = image_dimensions,
-                        do_crop_image = input$do_crop_image,
-                        x0 = input$x0,
-                        y0 = input$y0
-                    )
-                }
+                    if (isTRUE(input$do_correct_distortion)) { # experimental distortion-correction.
+                        hsv_results[[name]]$pixel.count_undistorted <- correct_distortion(
+                            hsv_results[[name]]$pixel.idx,
+                            distortions = list("barrel" = input$barrel_correction_factor),
+                            image_dimensions = image_dimensions,
+                            do_crop_image = input$do_crop_image,
+                            x0 = input$x0,
+                            y0 = input$y0
+                        )
+                    } else {
+                        hsv_results[[name]]$pixel.count_undistorted <- NA
+                    }
             }
             repackaged_pixel_counts <- list()
             repackaged_pixel_counts_undistorted <- list()

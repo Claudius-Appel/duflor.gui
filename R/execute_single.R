@@ -102,8 +102,8 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     current_results$identifiercrop_x1 <- identifiersearch_x1
     current_results$identifiercrop_y0 <- identifiersearch_y0
     current_results$identifiercrop_y1 <- identifiersearch_y1
-    if (isTRUE(input$do_correct_distortion)) { # experimental distortion-correction.
-        for (name in names(hsv_results)) {
+    for (name in names(hsv_results)) {
+        if (isTRUE(input$do_correct_distortion)) { # experimental distortion-correction.
             hsv_results[[name]]$pixel.count_undistorted <- correct_distortion(
                 hsv_results[[name]]$pixel.idx,
                 distortions = list("barrel" = input$barrel_correction_factor),
@@ -112,6 +112,8 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
                 x0 = input$x0,
                 y0 = input$y0
             )
+        } else {
+            hsv_results[[name]]$pixel.count_undistorted <- NA
         }
     }
     ## CALCULATE AREA FROM PIXEL_COUNTS
