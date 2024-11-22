@@ -104,13 +104,22 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     current_results$identifiercrop_y1 <- identifiersearch_y1
     if (isTRUE(input$do_correct_distortion)) { # experimental distortion-correction.
         for (name in names(hsv_results)) {
-            hsv_results[[name]]$pixel.count <- correct_distortion(hsv_results[[name]]$pixel.idx,distortions = list("barrel"=-1.2),image_dimensions = image_dimensions,input = input)
+            hsv_results[[name]]$pixel.count_undistorted <- correct_distortion(
+                hsv_results[[name]]$pixel.idx,
+                distortions = list("barrel" = input$barrel_correction_factor),
+                image_dimensions = image_dimensions,
+                do_crop_image = input$do_crop_image,
+                x0 = input$x0,
+                y0 = input$y0
+            )
         }
     }
     ## CALCULATE AREA FROM PIXEL_COUNTS
     repackaged_pixel_counts <- list()
+    repackaged_pixel_counts_undistorted <- list()
     for (name in names(hsv_results)) {
         repackaged_pixel_counts[[name]] <- hsv_results[[name]]$pixel.count
+        repackaged_pixel_counts_undistorted[[name]] <- hsv_results[[name]]$pixel.count_undistorted
     }
     if (repackaged_pixel_counts[[grep("identifier",names(repackaged_pixel_counts))]]==0) {
 
@@ -142,10 +151,31 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
         current_results$area_per_pixel <- areas$area_per_pixel
         ## UPDATE RESULTS_OBJECT
     }
+    ## UNDISTORTED RESULTS
+    if (repackaged_pixel_counts_undistorted[[grep("identifier",names(repackaged_pixel_counts_undistorted))]]==0) {
+
+    } else {
+        # we use the duflor.gui-version of this function because we need a different structure.
+        areas_undistorted <- convert_pixels_to_area_gui(repackaged_pixel_counts_undistorted, input$identifier_area)
+        for (name in names(hsv_results)) {
+            current_results[[str_c(name,"_area_undistorted")]] <- areas_undistorted[[name]]
+            current_results[[str_c(name,"_count_undistorted")]] <- hsv_results[[name]]$pixel.count_undistorted
+            current_results[[str_c(name,"_fraction_undistorted")]] <- hsv_results[[name]]$pixel.count_undistorted/(prod(image_dimensions))
+            if (input$do_save_masks) {
+                if (hsv_results[[name]]$pixel.count>0) {
+                    message(str_c("The undistorted mask for spectrum '",name,"' of image '",bnf,"' cannot be saved."))
+                } else {
+                    message(str_c("No mask saved for spectrum '",name,"' of image '",bnf,"': 0 Hits."))
+                }
+            }
+        }
+        current_results$area_per_pixel_undistorted <- areas_undistorted$area_per_pixel
+        ## UPDATE RESULTS_OBJECT
+    }
     results_object <- update_resultsObject(results_object,current_results)
     images_without_identifier_pixels_count <- 0
     for (each in 1:nrow(results_object)) {
-        if (is.na(results_object[each, grep("identifier.*count", names(results_object))])) {
+        if (any(is.na(results_object[each, grep("identifier.*count", names(results_object))]))) {
             str_no_ID_pixels_warning <- str_c(
                 "Image '",
                 results_object[each, "image_name"],

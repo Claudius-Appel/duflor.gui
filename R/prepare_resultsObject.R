@@ -49,7 +49,10 @@ prepare_resultsObject <- function(input, DATA, DEBUGKEYS) {
     for (spectrum in names(DATA$spectrums$lower_bound)) {
         column_names <- c(column_names, paste0(spectrum, "_count"),
                           paste0(spectrum, "_area"),
-                          paste0(spectrum, "_fraction"))
+                          paste0(spectrum, "_fraction"),
+                          paste0(spectrum, "_count_undistorted"),
+                          paste0(spectrum, "_area_undistorted"),
+                          paste0(spectrum, "_fraction_undistorted"))
     }
 
     # init a NA-filled df, assign the column-names and return it out of the func.
