@@ -15,6 +15,8 @@
 #'     - img.fraction (maybe not that valuable?)
 #'     - %spectrum%_area (as results of duflor::convert_pixels_to_area())
 #'     - %spectrum%_fraction (as defined as `%spectrum%_count/(sum(<all_plant_spectrums>_count)`)
+#'     - if the distortion-correction is enabled, the de-distorted instances of
+#'       these values are recorded as well. Otherwhise, these will be set to `NA`.
 #'
 #' @note
 #' The results-fields `crop_x0`, `crop_x1`,... encode the x- and y-coordinates
