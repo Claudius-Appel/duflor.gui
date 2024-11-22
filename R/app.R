@@ -161,7 +161,7 @@ duflor_gui <- function() {
                     conditionalPanel(
                         condition = "input.do_correct_distortion %% 2 == 1",
                         id = "DISTORTION_PANEL",
-                        numericInput(inputId = "barrel_correction_factor",label = "Describe the lens' **maximum** barrel-distortion",value = -1.2, min = -100,max = 100),
+                        numericInput(inputId = "barrel_correction_factor",label = "Describe the lens' **maximum** barrel-distortion",value = -1.2, min = -100,max = 100,step = 0.00001),
                     ),
                     ## MISCELLANEOUS STUFF
                     h5("Misc"),
