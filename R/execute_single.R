@@ -154,25 +154,28 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
         ## UPDATE RESULTS_OBJECT
     }
     ## UNDISTORTED RESULTS
-    if (repackaged_pixel_counts_undistorted[[grep("identifier",names(repackaged_pixel_counts_undistorted))]]==0) {
+    # if distortion-fixing is disabled, we skip this section; and inherit the entries in 'current_results' be 'NA'
+    if (isTRUE(do_correct_distortion)) {
+        if (repackaged_pixel_counts_undistorted[[grep("identifier",names(repackaged_pixel_counts_undistorted))]]==0) {
 
-    } else {
-        # we use the duflor.gui-version of this function because we need a different structure.
-        areas_undistorted <- convert_pixels_to_area_gui(repackaged_pixel_counts_undistorted, input$identifier_area)
-        for (name in names(hsv_results)) {
-            current_results[[str_c(name,"_area_undistorted")]] <- areas_undistorted[[name]]
-            current_results[[str_c(name,"_count_undistorted")]] <- hsv_results[[name]]$pixel.count_undistorted
-            current_results[[str_c(name,"_fraction_undistorted")]] <- hsv_results[[name]]$pixel.count_undistorted/(prod(image_dimensions))
-            if (input$do_save_masks) {
-                if (hsv_results[[name]]$pixel.count>0) {
-                    message(str_c("The undistorted mask for spectrum '",name,"' of image '",bnf,"' cannot be saved."))
-                } else {
-                    message(str_c("No mask saved for spectrum '",name,"' of image '",bnf,"': 0 Hits."))
+        } else {
+            # we use the duflor.gui-version of this function because we need a different structure.
+            areas_undistorted <- convert_pixels_to_area_gui(repackaged_pixel_counts_undistorted, input$identifier_area)
+            for (name in names(hsv_results)) {
+                current_results[[str_c(name,"_area_undistorted")]] <- areas_undistorted[[name]]
+                current_results[[str_c(name,"_count_undistorted")]] <- hsv_results[[name]]$pixel.count_undistorted
+                current_results[[str_c(name,"_fraction_undistorted")]] <- hsv_results[[name]]$pixel.count_undistorted/(prod(image_dimensions))
+                if (input$do_save_masks) {
+                    if (hsv_results[[name]]$pixel.count>0) {
+                        message(str_c("The undistorted mask for spectrum '",name,"' of image '",bnf,"' cannot be saved."))
+                    } else {
+                        message(str_c("No mask saved for spectrum '",name,"' of image '",bnf,"': 0 Hits."))
+                    }
                 }
             }
+            current_results$area_per_pixel_undistorted <- areas_undistorted$area_per_pixel
+            ## UPDATE RESULTS_OBJECT
         }
-        current_results$area_per_pixel_undistorted <- areas_undistorted$area_per_pixel
-        ## UPDATE RESULTS_OBJECT
     }
     results_object <- update_resultsObject(results_object,current_results)
     images_without_identifier_pixels_count <- 0
