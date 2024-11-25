@@ -15,6 +15,8 @@
 #'     - img.fraction (maybe not that valuable?)
 #'     - %spectrum%_area (as results of duflor::convert_pixels_to_area())
 #'     - %spectrum%_fraction (as defined as `%spectrum%_count/(sum(<all_plant_spectrums>_count)`)
+#'     - if the distortion-correction is enabled, the de-distorted instances of
+#'       these values are recorded as well. Otherwhise, these will be set to `NA`.
 #'
 #' @note
 #' The results-fields `crop_x0`, `crop_x1`,... encode the x- and y-coordinates
@@ -49,7 +51,10 @@ prepare_resultsObject <- function(input, DATA, DEBUGKEYS) {
     for (spectrum in names(DATA$spectrums$lower_bound)) {
         column_names <- c(column_names, paste0(spectrum, "_count"),
                           paste0(spectrum, "_area"),
-                          paste0(spectrum, "_fraction"))
+                          paste0(spectrum, "_fraction"),
+                          paste0(spectrum, "_count_undistorted"),
+                          paste0(spectrum, "_area_undistorted"),
+                          paste0(spectrum, "_fraction_undistorted"))
     }
 
     # init a NA-filled df, assign the column-names and return it out of the func.
