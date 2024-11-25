@@ -11,47 +11,46 @@
 #' @return sum of distortion-corrected pixels, rounded to the closest integer value.
 #' @keywords internal
 #'
-correct_distortion <- function(pixel.idx, distortions, image_dimensions, do_crop_image,x0,y0) {
+correct_distortion <- function(pixel.idx, distortions, image_dimensions, do_crop_image, x0, y0) {
 
-    # calculates the euclidean distance
+    # calculate the euclidean distance vectorized
     euclidean_distance <- function(p1, p2) {
-        sqrt((p2[1] - p1[1])^2 + (p2[2] - p1[2])^2)
+        sqrt((p2[, 1] - p1[1])^2 + (p2[, 2] - p1[2])^2)
     }
 
-    radius <- max(image_dimensions)
+    # Image dimensions and center
+    center_coords <- c(round(image_dimensions[1] / 2), round(image_dimensions[2] / 2))
+    euclidean_distance_edge <- sqrt((image_dimensions[1] - center_coords[1])^2 +
+                                        (image_dimensions[2] - center_coords[2])^2)
 
-    # Correct coordinates if cropped, so that the distance actually works.
+    # correct coordinates if cropped
     if (do_crop_image) {
         pixel.idx_real_coords <- pixel.idx + c(x0, y0)
     } else {
-        pixel.idx_real_coords <- pixel.idx + c(0, 0)
+        pixel.idx_real_coords <- pixel.idx
     }
 
-    center_coords <- c(round(image_dimensions[1] / 2), round(image_dimensions[2] / 2))
+    # calculate Euclidean distances for all pixels
+    euclidean_distances <- euclidean_distance(center_coords, pixel.idx_real_coords)
 
-    # 2. Get maximum possible Euclidean distance from the center to the edge
-    euclidean_distance_edge <- euclidean_distance(center_coords, c(image_dimensions[1], image_dimensions[2]))
+    # normalize distances
+    normalized_distances <- euclidean_distances / euclidean_distance_edge
 
-    distortion_sum <- numeric(nrow(pixel.idx_real_coords))
-    distortion_percentage <- distortions$barrel / 100  # Convert percentage to decimal (e.g., -1.2% -> -0.012)
+    # apply barrel distortion
+    distortion_percentage <- distortions$barrel / 100  # Convert to decimal
+    if (distortion_type == "barrel") {
+        distortion_factors <- 1 + (distortion_percentage * normalized_distances)
+    } else {
+        # suggested factor calculation for pincushion:
+        # distortion_factors <- 1 - (distortion_percentage * normalized_distances)
 
-    # 3. Calculate distortion for each pixel
-    for (i in seq(1, nrow(pixel.idx_real_coords))) {
-        # Calculate the Euclidean distance from the image center to the current pixel
-        euclidean_distance_pixel <- euclidean_distance(center_coords, c(as.numeric(pixel.idx_real_coords[i, "x"]), as.numeric(pixel.idx_real_coords[i, "y"])))
 
-        # normalise distance to 0->1
-        normalised_distance <- euclidean_distance_pixel / euclidean_distance_edge
-
-        # apply distortion
-        distortion_factor <- 1 + (distortion_percentage * normalised_distance)
-
-        # get its area (must be validated that this is correct)
-        area_change <- distortion_factor^2
-
-        # and store the correction magnitude
-        distortion_sum[i] <- area_change
+        stop("Invalid distortion type. Implemented types: 'barrel'.")
     }
 
-    return(round(sum(distortion_sum)))  # Return the sum of the distortion-adjusted area for each pixel
+    # calculate area change (distortion factor squared)
+    area_changes <- distortion_factors^2
+
+    # return the sum of corrected areas
+    return(round(sum(area_changes)))
 }
