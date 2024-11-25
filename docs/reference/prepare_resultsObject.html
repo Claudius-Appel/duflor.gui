@@ -14,6 +14,8 @@ for each in  names(DATA$spectrums$lower_bound):
 img.fraction (maybe not that valuable?)
 %spectrum%_area (as results of duflor::convert_pixels_to_area())
 %spectrum%_fraction (as defined as %spectrum%_count/(sum(&amp;lt;all_plant_spectrums&amp;gt;_count))
+if the distortion-correction is enabled, the de-distorted instances of
+these values are recorded as well. Otherwhise, these will be set to NA.
 
 
 "><meta property="og:description" content="results requires fields
@@ -31,6 +33,8 @@ for each in  names(DATA$spectrums$lower_bound):
 img.fraction (maybe not that valuable?)
 %spectrum%_area (as results of duflor::convert_pixels_to_area())
 %spectrum%_fraction (as defined as %spectrum%_count/(sum(&amp;lt;all_plant_spectrums&amp;gt;_count))
+if the distortion-correction is enabled, the de-distorted instances of
+these values are recorded as well. Otherwhise, these will be set to NA.
 
 
 "></head><body>
@@ -41,7 +45,7 @@ img.fraction (maybe not that valuable?)
 
     <a class="navbar-brand me-2" href="../index.html">duflor.gui</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,6 +95,8 @@ img.fraction (maybe not that valuable?)
 <li><p>img.fraction (maybe not that valuable?)</p></li>
 <li><p>%spectrum%_area (as results of duflor::convert_pixels_to_area())</p></li>
 <li><p>%spectrum%_fraction (as defined as <code>%spectrum%_count/(sum(&lt;all_plant_spectrums&gt;_count)</code>)</p></li>
+<li><p>if the distortion-correction is enabled, the de-distorted instances of
+these values are recorded as well. Otherwhise, these will be set to <code>NA</code>.</p></li>
 </ul></li>
 </ul></div>
 
