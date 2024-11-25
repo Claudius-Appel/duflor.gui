@@ -34,6 +34,8 @@ results requires fields
 \item img.fraction (maybe not that valuable?)
 \item \%spectrum\%_area (as results of duflor::convert_pixels_to_area())
 \item \%spectrum\%_fraction (as defined as \verb{\%spectrum\%_count/(sum(<all_plant_spectrums>_count)})
+\item if the distortion-correction is enabled, the de-distorted instances of
+these values are recorded as well. Otherwhise, these will be set to \code{NA}.
 }
 }
 }
