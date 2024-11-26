@@ -20,8 +20,12 @@ correct_distortion <- function(pixel.idx, distortions, image_dimensions, do_crop
 
     # Image dimensions and center
     center_coords <- c(round(image_dimensions[1] / 2), round(image_dimensions[2] / 2))
-    euclidean_distance_edge <- sqrt((image_dimensions[1] - center_coords[1])^2 +
-                                        (image_dimensions[2] - center_coords[2])^2)
+    corners <- matrix(c(0, 0,
+                        0, image_dimensions[2],
+                        image_dimensions[1], 0,
+                        image_dimensions[1], image_dimensions[2]),
+                      ncol = 2, byrow = TRUE)
+    euclidean_distance_edge <- max(euclidean_distance(center_coords, corners))
 
     # correct coordinates if cropped
     if (do_crop_image) {
