@@ -1324,7 +1324,7 @@ duflor_gui <- function() {
                     duration = NA,
                     type = "warning"
                 )
-                loaded_path <- restore_state(
+                state_unpack <- restore_state(
                     input = input,
                     output = output,
                     DATA = DATA,
@@ -1334,20 +1334,22 @@ duflor_gui <- function() {
                     volumes = getVolumes(),
                     state_file = input$restore_state$datapath
                 )
-                DATA$folder_path <- loaded_path
+
+                DATA$spectrums <- state_unpack$spectrums
+                DATA$folder_path <- state_unpack$loaded_path
                 # once the loaded-path was updated, recompute the input-table
                 image_files_()
                 removeNotification(id = "restore_state.ongoing")
-                if (file.exists(loaded_path)) {
+                if (file.exists(DATA$folder_path)) {
                     showNotification(
-                        ui = str_c("State successfully restored from '",loaded_path,"'."),
+                        ui = str_c("State successfully restored from '",DATA$folder_path,"'."),
                         id = "restore_state.done",
                         duration = DATA$notification_duration * 4,
                         type = "message"
                     )
                 } else {
                     showNotification(
-                        ui = str_c("State was not successfully restored from '",loaded_path,"'."),
+                        ui = str_c("State was not successfully restored from '",DATA$folder_path,"'."),
                         id = "restore_state.error",
                         duration = DATA$notification_duration * 4,
                         type = "error"

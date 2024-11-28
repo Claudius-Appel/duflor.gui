@@ -135,5 +135,5 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
         inputId = "identifier_area",
         value = input_state$input$identifier_area
     )
-    return(loaded_path)
+    return(list(loaded_path=loaded_path,spectrums=DATA$spectrums))
 }
