@@ -234,6 +234,7 @@ duflor_gui <- function() {
             last_im = NA,
             folder_path = NA,
             search_root = NA,
+            selected_spectra = NA
         )
         DEBUGKEYS <- reactiveValues(
             # if you want to have functionality blocked by the dev-console, add
@@ -1078,12 +1079,12 @@ duflor_gui <- function() {
         observeEvent(input$execute_analysis_single, {
             isolate(FLAGS$analyse_single_image)
             FLAGS$analyse_single_image <- TRUE
-            select_spectra_gui_comp(input)
+            select_spectra_gui_comp(input,DATA,FLAGS)
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
             isolate(FLAGS$analyse_single_image)
             FLAGS$analyse_single_image <- FALSE
-            select_spectra_gui_comp(input)
+            select_spectra_gui_comp(input,DATA,FLAGS)
         })
         observeEvent(input$submit_selected_spectra, {
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
@@ -1100,6 +1101,7 @@ duflor_gui <- function() {
                     return()
                 }
                 removeModal()
+                DATA$selected_spectra <- input$selected_spectra
                 spectrums <- DATA$spectrums
                 # remove all spectra not selected in `input$selected_spectra`
                 spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
@@ -1324,7 +1326,7 @@ duflor_gui <- function() {
                     duration = NA,
                     type = "warning"
                 )
-                loaded_path <- restore_state(
+                state_unpack <- restore_state(
                     input = input,
                     output = output,
                     DATA = DATA,
@@ -1334,20 +1336,23 @@ duflor_gui <- function() {
                     volumes = getVolumes(),
                     state_file = input$restore_state$datapath
                 )
-                DATA$folder_path <- loaded_path
+
+                DATA$spectrums <- state_unpack$spectrums
+                DATA$folder_path <- state_unpack$loaded_path
+                DATA$selected_spectra <- state_unpack$selected_spectra
                 # once the loaded-path was updated, recompute the input-table
                 image_files_()
                 removeNotification(id = "restore_state.ongoing")
-                if (file.exists(loaded_path)) {
+                if (file.exists(DATA$folder_path)) {
                     showNotification(
-                        ui = str_c("State successfully restored from '",loaded_path,"'."),
+                        ui = str_c("State successfully restored from '",DATA$folder_path,"'."),
                         id = "restore_state.done",
                         duration = DATA$notification_duration * 4,
                         type = "message"
                     )
                 } else {
                     showNotification(
-                        ui = str_c("State was not successfully restored from '",loaded_path,"'."),
+                        ui = str_c("State was not successfully restored from '",DATA$folder_path,"'."),
                         id = "restore_state.error",
                         duration = DATA$notification_duration * 4,
                         type = "error"
