@@ -4,10 +4,14 @@
 \alias{select_spectra_gui_comp}
 \title{generate and call a modal-dialogue which lets you select which spectrums to analyse.}
 \usage{
-select_spectra_gui_comp(input)
+select_spectra_gui_comp(input, DATA, FLAGS)
 }
 \arguments{
 \item{input}{respective shiny-component}
+
+\item{DATA}{respective shiny-component}
+
+\item{FLAGS}{respective shiny-component}
 }
 \value{
 .

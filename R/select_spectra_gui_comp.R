@@ -14,12 +14,18 @@
 #' @importFrom shiny actionButton
 #' @importFrom shiny modalButton
 #'
-select_spectra_gui_comp <- function(input) {
+select_spectra_gui_comp <- function(input, DATA, FLAGS) {
     all_choices <- names(getOption("duflor.default_hsv_spectrums")$upper_bound)
-    if (input$radio_analysis_type==1) { # GFA
-        choices <- c("bex_identifier_dot","bex_green_HSV","bex_drought_HSV","bex_complete_HSV")
-    } else {                            # WFA
-        choices <- c("bex_identifier_dot","bex_root_HSV")
+    if (isTRUE(is.na(DATA$selected_spectra))) {
+        if (input$radio_analysis_type==1) { # GFA
+            choices <- c("bex_identifier_dot","bex_green_HSV","bex_drought_HSV","bex_complete_HSV")
+        } else {                            # WFA
+            choices <- c("bex_identifier_dot","bex_root_HSV")
+        }
+    } else { # restoring a state - pre-select the spectra saved into the state.
+        choices <- DATA$selected_spectra
+        all_choices <- unique(all_choices,DATA$selected_spectra)
+        # DATA$selected_spectra <- NA # and finally, purge the field again so that the state is uniform
     }
     showModal(modalDialog(
         tags$h3('Choose which ranges to analyse'),

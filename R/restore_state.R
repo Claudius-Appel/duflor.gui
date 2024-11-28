@@ -23,7 +23,19 @@
 restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volumes, state_file) {
     input_state <- readRDS(state_file)
     ## Restore DATA
-    DATA <- input_state$DATA
+    DATA_spectr <- DATA$spectrums # save the original spectra
+    DATA <- input_state$DATA # overwrite the spectra in full
+    for (name in names(input_state$DATA$spectrums$lower_bound)) {
+        if (isFALSE(hasName(DATA_spectr$lower_bound,name))) { # overwrite a spectrum which was saved.
+            DATA_spectr$lower_bound[[name]] <- input_state$DATA$spectrums$lower_bound[[name]]
+            DATA_spectr$upper_bound[[name]] <- input_state$DATA$spectrums$upper_bound[[name]]
+        } else { # the spectrum is new, wasn't in the DATA$spectrums yet
+            DATA_spectr$lower_bound[[name]] <- input_state$DATA$spectrums$lower_bound[[name]]
+            DATA_spectr$upper_bound[[name]] <- input_state$DATA$spectrums$upper_bound[[name]]
+        }
+    }
+    DATA$spectrums <- DATA_spectr
+    selected_spectra <- input_state$input$selected_spectra
     DATA$r__tbl_dir_files <- input_state$DATA$r__tbl_dir_files
     DEBUGKEYS <- input_state$DEBUGKEYS
     FLAGS <- input_state$FLAGS
@@ -135,5 +147,5 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
         inputId = "identifier_area",
         value = input_state$input$identifier_area
     )
-    return(loaded_path)
+    return(list(loaded_path=loaded_path,spectrums=DATA$spectrums,selected_spectra = selected_spectra))
 }
