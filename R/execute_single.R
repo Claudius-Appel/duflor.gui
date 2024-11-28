@@ -155,7 +155,7 @@ execute_single <- function(file, input, DATA, DEBUGKEYS, FLAGS) {
     }
     ## UNDISTORTED RESULTS
     # if distortion-fixing is disabled, we skip this section; and inherit the entries in 'current_results' be 'NA'
-    if (isTRUE(do_correct_distortion)) {
+    if (isTRUE(input$do_correct_distortion)) {
         if (repackaged_pixel_counts_undistorted[[grep("identifier",names(repackaged_pixel_counts_undistorted))]]==0) {
 
         } else {
