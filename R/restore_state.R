@@ -24,6 +24,7 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
     input_state <- readRDS(state_file)
     ## Restore DATA
     DATA <- input_state$DATA
+    selected_spectra <- input_state$input$selected_spectra
     DATA$r__tbl_dir_files <- input_state$DATA$r__tbl_dir_files
     DEBUGKEYS <- input_state$DEBUGKEYS
     FLAGS <- input_state$FLAGS
@@ -135,5 +136,5 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
         inputId = "identifier_area",
         value = input_state$input$identifier_area
     )
-    return(list(loaded_path=loaded_path,spectrums=DATA$spectrums))
+    return(list(loaded_path=loaded_path,spectrums=DATA$spectrums,selected_spectra = selected_spectra))
 }

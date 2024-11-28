@@ -1339,6 +1339,7 @@ duflor_gui <- function() {
 
                 DATA$spectrums <- state_unpack$spectrums
                 DATA$folder_path <- state_unpack$loaded_path
+                DATA$selected_spectra <- state_unpack$selected_spectra
                 # once the loaded-path was updated, recompute the input-table
                 image_files_()
                 removeNotification(id = "restore_state.ongoing")
