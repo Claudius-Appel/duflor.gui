@@ -1,6 +1,6 @@
 #'
 #'
-#' @param pixel.idx natrixmatrix of
+#' @param pixel.idx matrix of pixel-coordinate pairs for matched pixels.
 #' @param distortions list of distortion-factors to apply. Values must be numeric, on a scale from -100 <> +100
 #' Currently, only `barrel`-distortion can be applied.
 #' @param image_dimensions actual dimensions of the image, without cropping.
