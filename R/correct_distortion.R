@@ -1,4 +1,4 @@
-#'
+#' correct for (barrel-) distortion
 #'
 #' @param pixel.idx matrix of pixel-coordinate pairs for matched pixels.
 #' @param distortions list of distortion-factors to apply. Values must be numeric, on a scale from -100 <> +100
@@ -6,7 +6,7 @@
 #' @param image_dimensions actual dimensions of the image, without cropping.
 #' @param do_crop_image boolean to check if the image was cropped.
 #' @param x0 coordinates of the cropping top left corner. Necessary to correct coordinate-space for cropping.
-#' @param y0 coordinates of the
+#' @param y0 ''
 #'
 #' @return sum of distortion-corrected pixels, rounded to the closest integer value.
 #' @keywords internal
