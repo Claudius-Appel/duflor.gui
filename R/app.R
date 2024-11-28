@@ -234,6 +234,7 @@ duflor_gui <- function() {
             last_im = NA,
             folder_path = NA,
             search_root = NA,
+            selected_spectra = NA
         )
         DEBUGKEYS <- reactiveValues(
             # if you want to have functionality blocked by the dev-console, add
@@ -1078,12 +1079,12 @@ duflor_gui <- function() {
         observeEvent(input$execute_analysis_single, {
             isolate(FLAGS$analyse_single_image)
             FLAGS$analyse_single_image <- TRUE
-            select_spectra_gui_comp(input)
+            select_spectra_gui_comp(input,DATA,FLAGS)
         })
         observeEvent(input$execute_analysis, {  ## to access output-variables at all, you must ingest them into a reactive-object before retrieving them from there.
             isolate(FLAGS$analyse_single_image)
             FLAGS$analyse_single_image <- FALSE
-            select_spectra_gui_comp(input)
+            select_spectra_gui_comp(input,DATA,FLAGS)
         })
         observeEvent(input$submit_selected_spectra, {
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
@@ -1100,6 +1101,7 @@ duflor_gui <- function() {
                     return()
                 }
                 removeModal()
+                DATA$selected_spectra <- input$selected_spectra
                 spectrums <- DATA$spectrums
                 # remove all spectra not selected in `input$selected_spectra`
                 spectrums$lower_bound <- duflor:::remove_key_from_list(DATA$spectrums$lower_bound,names(DATA$spectrums$lower_bound)[!(names(DATA$spectrums$lower_bound) %in% input$selected_spectra)])
