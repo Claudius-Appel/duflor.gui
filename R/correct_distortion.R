@@ -1,12 +1,12 @@
+#' correct for (barrel-) distortion
 #'
-#'
-#' @param pixel.idx natrixmatrix of
+#' @param pixel.idx matrix of pixel-coordinate pairs for matched pixels.
 #' @param distortions list of distortion-factors to apply. Values must be numeric, on a scale from -100 <> +100
 #' Currently, only `barrel`-distortion can be applied.
 #' @param image_dimensions actual dimensions of the image, without cropping.
 #' @param do_crop_image boolean to check if the image was cropped.
 #' @param x0 coordinates of the cropping top left corner. Necessary to correct coordinate-space for cropping.
-#' @param y0 coordinates of the
+#' @param y0 ''
 #'
 #' @return sum of distortion-corrected pixels, rounded to the closest integer value.
 #' @keywords internal
@@ -20,8 +20,12 @@ correct_distortion <- function(pixel.idx, distortions, image_dimensions, do_crop
 
     # Image dimensions and center
     center_coords <- c(round(image_dimensions[1] / 2), round(image_dimensions[2] / 2))
-    euclidean_distance_edge <- sqrt((image_dimensions[1] - center_coords[1])^2 +
-                                        (image_dimensions[2] - center_coords[2])^2)
+    corners <- matrix(c(0, 0,
+                        0, image_dimensions[2],
+                        image_dimensions[1], 0,
+                        image_dimensions[1], image_dimensions[2]),
+                      ncol = 2, byrow = TRUE)
+    euclidean_distance_edge <- max(euclidean_distance(center_coords, corners))
 
     # correct coordinates if cropped
     if (do_crop_image) {
