@@ -260,51 +260,99 @@ duflor_gui <- function() {
         volumes <- getVolumes()()
         #### DISPLAYING AND RENDERING FILES AND STUFF ####
         image_files_ <- reactive({ # image_files is a list of filepaths, which gets set reactively.
-            folder_path <- DATA$folder_path # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
-            # all buttons listed here must be disabled by default
-            # they will be enabled if the `list.files()` returns a non-empty vector of files.
-            buttons_to_toggle <- c(
-                    "render_plant",
-                    "select_crops",
-                    "select_identifiercrops",
-                    "execute_analysis",
-                    "execute_analysis_single"
-                )
-            for (each in buttons_to_toggle) { ## disable all buttons which are dependent on the input-table to contain images
-                updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = TRUE)
-            }
-            if (dir.exists(folder_path)) {
-                ## we do not recurse to force all input-files to be in the same level
-                images_ <- list.files(folder_path,pattern = paste0("*.(",str_to_lower(input$image_file_suffix),"|",str_to_upper(input$image_file_suffix),")"),recursive = F,full.names = T)
-                if (length(images_)>0) {
-                    images_filtered <- images_ ##[!str_count(basename(images_),"_")]# BUG: WHY WAS THIS HERE?
-                    ret <- as.data.frame(images_filtered)
-                    ret$index <- c(1:1:dim(ret)[1])
-                    DATA$r__tbl_dir_files <- ret
-                    for (each in buttons_to_toggle) { ## enable all buttons which are dependent on the input-table to contain images
-                        updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = FALSE)
-                    }
-                    image_files$image_files <- ret
-                } else { ## no images found for the current settings
-                    showNotification(
-                        ui = str_c(
-                            "No '.",
-                            input$image_file_suffix,
-                            "'-files found in folder '",
-                            folder_path,"'."
-                        ),
-                        duration = DATA$notification_duration * 5,
-                        type = "warning"
+            tryCatch({
+
+                folder_path <- DATA$folder_path # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+                # all buttons listed here must be disabled by default
+                # they will be enabled if the `list.files()` returns a non-empty vector of files.
+                buttons_to_toggle <- c(
+                        "render_plant",
+                        "select_crops",
+                        "select_identifiercrops",
+                        "execute_analysis",
+                        "execute_analysis_single"
                     )
-                    ret <- data.frame(images_filtered = character(),
-                                                  index = numeric(),
-                                                  stringsAsFactors = FALSE)
-                    image_files$image_files <- ret
+                for (each in buttons_to_toggle) { ## disable all buttons which are dependent on the input-table to contain images
+                    updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = TRUE)
                 }
-            }
+                if (dir.exists(folder_path)) {
+                    ## we do not recurse to force all input-files to be in the same level
+                    images_ <- list.files(folder_path,pattern = paste0("*.(",str_to_lower(input$image_file_suffix),"|",str_to_upper(input$image_file_suffix),")"),recursive = F,full.names = T)
+                    if (length(images_)>0) {
+                        images_filtered <- images_ ##[!str_count(basename(images_),"_")]# BUG: WHY WAS THIS HERE?
+                        ret <- as.data.frame(images_filtered)
+                        ret$index <- c(1:1:dim(ret)[1])
+                        DATA$r__tbl_dir_files <- ret
+                        for (each in buttons_to_toggle) { ## enable all buttons which are dependent on the input-table to contain images
+                            updateActionButton(session = getDefaultReactiveDomain(),inputId = each,disabled = FALSE)
+                        }
+                        image_files$image_files <- ret
+                    } else { ## no images found for the current settings
+                        showNotification(
+                            ui = str_c(
+                                "No '.",
+                                input$image_file_suffix,
+                                "'-files found in folder '",
+                                folder_path,"'."
+                            ),
+                            duration = DATA$notification_duration * 5,
+                            type = "warning"
+                        )
+                        ret <- data.frame(images_filtered = character(),
+                                                      index = numeric(),
+                                                      stringsAsFactors = FALSE)
+                        image_files$image_files <- ret
+                    }
+                }
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "image_files_"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'input$image_files_'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         output$ctrl_current_folder <- renderText({
-            file_selected <- parseDirPath(roots = volumes, input$folder)
+            tryCatch({
+                if (isFALSE(is.na(DATA$search_root))) {
+                    r <- dirname(DATA$search_root)
+                    showNotification(str_c("searching from ",DATA$search_root))
+                    if (isFALSE(hasName(volumes,"search_root"))) {
+                        volumes <- c(volumes,search_root = DATA$search_root)
+                    }
+                }
+                file_selected <- parseDirPath(roots = volumes, input$folder)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "ctrl_current_folder"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'output$ctrl_current_folder'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         output$tbl_dir_files <- renderDataTable({
             image_files$image_files},
@@ -345,20 +393,21 @@ duflor_gui <- function() {
         })
         observeEvent(input$folder, {
             req(input$folder[[1]],input$image_file_suffix)
-            if (isFALSE(is.na(DATA$search_root))) {
-                r <- dirname(DATA$search_root)
-                showNotification(str_c("searching from ",DATA$search_root))
-                if (isFALSE(hasName(volumes,"search_root"))) {
-                    volumes <- c(volumes,search_root = DATA$search_root)
-                }
-                shinyDirChoose(input = input, 'folder', roots=volumes,defaultRoot = "search_root")
-            } else {
-                shinyDirChoose(input = input, 'folder', roots=volumes)
-            }
-            folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
-            req(dir.exists(folder_path))
+
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             tryCatch({
+                if (isFALSE(is.na(DATA$search_root))) {
+                    r <- dirname(DATA$search_root)
+                    showNotification(str_c("searching from ",DATA$search_root))
+                    if (isFALSE(hasName(volumes,"search_root"))) {
+                        volumes <- c(volumes,search_root = DATA$search_root)
+                    }
+                    shinyDirChoose(input = input, 'folder', roots=volumes,defaultRoot = "search_root")
+                } else {
+                    shinyDirChoose(input = input, 'folder', roots=volumes)
+                }
+                folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+                req(dir.exists(folder_path))
                 DATA$folder_path <- folder_path
                 image_files_()
             }, error = function(e) {
