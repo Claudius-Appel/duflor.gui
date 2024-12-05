@@ -393,20 +393,21 @@ duflor_gui <- function() {
         })
         observeEvent(input$folder, {
             req(input$folder[[1]],input$image_file_suffix)
-            if (isFALSE(is.na(DATA$search_root))) {
-                r <- dirname(DATA$search_root)
-                showNotification(str_c("searching from ",DATA$search_root))
-                if (isFALSE(hasName(volumes,"search_root"))) {
-                    volumes <- c(volumes,search_root = DATA$search_root)
-                }
-                shinyDirChoose(input = input, 'folder', roots=volumes,defaultRoot = "search_root")
-            } else {
-                shinyDirChoose(input = input, 'folder', roots=volumes)
-            }
-            folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
-            req(dir.exists(folder_path))
+
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
             tryCatch({
+                if (isFALSE(is.na(DATA$search_root))) {
+                    r <- dirname(DATA$search_root)
+                    showNotification(str_c("searching from ",DATA$search_root))
+                    if (isFALSE(hasName(volumes,"search_root"))) {
+                        volumes <- c(volumes,search_root = DATA$search_root)
+                    }
+                    shinyDirChoose(input = input, 'folder', roots=volumes,defaultRoot = "search_root")
+                } else {
+                    shinyDirChoose(input = input, 'folder', roots=volumes)
+                }
+                folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+                req(dir.exists(folder_path))
                 DATA$folder_path <- folder_path
                 image_files_()
             }, error = function(e) {
