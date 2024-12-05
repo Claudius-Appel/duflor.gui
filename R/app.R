@@ -304,7 +304,34 @@ duflor_gui <- function() {
             }
         })
         output$ctrl_current_folder <- renderText({
-            file_selected <- parseDirPath(roots = volumes, input$folder)
+            tryCatch({
+                if (isFALSE(is.na(DATA$search_root))) {
+                    r <- dirname(DATA$search_root)
+                    showNotification(str_c("searching from ",DATA$search_root))
+                    if (isFALSE(hasName(volumes,"search_root"))) {
+                        volumes <- c(volumes,search_root = DATA$search_root)
+                    }
+                }
+                file_selected <- parseDirPath(roots = volumes, input$folder)
+            }, error = function(e) {
+                DATA$stacktrace = traceback(1, 1)
+                error_state_path <- save_error_state(
+                    input = input_mirror,
+                    DATA = DATA,
+                    DEBUGKEYS = DEBUGKEYS,
+                    FLAGS = FLAGS,
+                    volumes = getVolumes(),
+                    error = e,
+                    errordir_path = DATA$folder_path,
+                    erroneous_callback = "ctrl_current_folder"
+                )
+                showNotification(
+                    ui = str_c("Error occured during callback 'output$ctrl_current_folder'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    id = "error_state_generated.done",
+                    duration = NULL,
+                    type = "error"
+                )
+            })
         })
         output$tbl_dir_files <- renderDataTable({
             image_files$image_files},
