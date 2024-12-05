@@ -89,63 +89,101 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
     updateNumericInput(session = getDefaultReactiveDomain(), inputId = "upper_bound_S", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][2])
     updateNumericInput(session = getDefaultReactiveDomain(), inputId = "upper_bound_V", value = spectrums$upper_bound[[input$selected_HSV_spectrum]][3])
     ## restore CROPPING
-    if (hasName(input_state$input,"do_crop_image") && input_state$input$do_crop_image) {
+    if (hasName(input_state$input,"do_crop_image")) {
+        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_crop_image",value = input_state$input$do_crop_image)
+        if (input_state$input$do_crop_image) {
         show("CROPPING_PANEL")
         updateNumericInput(session = getDefaultReactiveDomain(),"x0",value = input_state$input$x0)
         updateNumericInput(session = getDefaultReactiveDomain(),"x1",value = input_state$input$x1)
         updateNumericInput(session = getDefaultReactiveDomain(),"y1",value = input_state$input$y1)
         updateNumericInput(session = getDefaultReactiveDomain(),"y0",value = input_state$input$y0)
-        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_crop_image",value = input_state$input$do_crop_image)
     } else {
         hide("CROPPING_PANEL")
-        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_crop_image",value = input_state$input$do_crop_image)
+            updateNumericInput(session = getDefaultReactiveDomain(),"x0",value = 0)
+            updateNumericInput(session = getDefaultReactiveDomain(),"x1",value = 0)
+            updateNumericInput(session = getDefaultReactiveDomain(),"y1",value = 0)
+            updateNumericInput(session = getDefaultReactiveDomain(),"y0",value = 0)
+        }
+    } else {
+        hide("CROPPING_PANEL")
+        updateNumericInput(session = getDefaultReactiveDomain(),"x0",value = 0)
+        updateNumericInput(session = getDefaultReactiveDomain(),"x1",value = 0)
+        updateNumericInput(session = getDefaultReactiveDomain(),"y1",value = 0)
+        updateNumericInput(session = getDefaultReactiveDomain(),"y0",value = 0)
+        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_crop_image",value = FALSE)
     }
     ## restore IDENTCROPPING
-    if (hasName(input_state$input,"do_crop_identifier_range") && input_state$input$do_crop_identifier_range) {
+    if (hasName(input_state$input,"do_crop_identifier_range")) {
+        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_crop_identifier_range",value = input_state$input$do_crop_identifier_range)
+        if (input_state$input$do_crop_identifier_range) {
         show("IDENTIFIERCROPPING_PANEL")
         updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_x0",value = input_state$input$identifiersearch_x0)
         updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_x1",value = input_state$input$identifiersearch_x1)
         updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_y1",value = input_state$input$identifiersearch_y1)
         updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_y0",value = input_state$input$identifiersearch_y0)
-        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_crop_identifier_range",value = input_state$input$do_crop_identifier_range)
     } else {
         hide("IDENTIFIERCROPPING_PANEL")
-        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_crop_identifier_range",value = input_state$input$do_crop_identifier_range)
+            updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_x0",value = 0)
+            updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_x1",value = 0)
+            updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_y1",value = 0)
+            updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_y0",value = 0)
+        }
+    } else {
+        hide("IDENTIFIERCROPPING_PANEL")
+        updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_x0",value = 0)
+        updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_x1",value = 0)
+        updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_y1",value = 0)
+        updateNumericInput(session = getDefaultReactiveDomain(),"identifiersearch_y0",value = 0)
+        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_crop_identifier_range",value = FALSE)
     }
 
     ## restore PARALLEL
     FLAGS$restoring_state <- TRUE
-    if (hasName(input_state$input,"open_parallelPanel") && input_state$input$open_parallelPanel) {
-        show("PARALLEL_PANEL")
+    if (hasName(input_state$input,"open_parallelPanel")) {
         updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "open_parallelPanel",value = input_state$input$open_parallelPanel)
+        if (input_state$input$open_parallelPanel) {
+            show("PARALLEL_PANEL")
         updateNumericInput(session = getDefaultReactiveDomain(),inputId = "parallel_cores",value = input_state$input$parallel_cores)
     } else {
         hide("PARALLEL_PANEL")
-        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "open_parallelPanel",value = input_state$input$open_parallelPanel)
+            updateNumericInput(session = getDefaultReactiveDomain(),inputId = "parallel_cores",value = 1)
+        }
+    } else {
+        hide("PARALLEL_PANEL")
+        updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "open_parallelPanel",value = FALSE)
         updateNumericInput(session = getDefaultReactiveDomain(),inputId = "parallel_cores",value = 1)
     }
     ## restore DISTORTION
     FLAGS$restoring_state <- TRUE
-    if (hasName(input_state$input,"do_correct_distortion") && input_state$input$do_correct_distortion) {
-        show("DISTORTION_PANEL")
+    if (hasName(input_state$input,"do_correct_distortion")) {
         updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_correct_distortion",value = input_state$input$do_correct_distortion)
+        if (input_state$input$do_correct_distortion) {
+            show("DISTORTION_PANEL")
         updateNumericInput(session = getDefaultReactiveDomain(),inputId = "barrel_correction_factor",value = input_state$input$barrel_correction_factor)
+        } else {
+            hide("DISTORTION_PANEL")
+            updateNumericInput(session = getDefaultReactiveDomain(),inputId = "barrel_correction_factor",value = 0)
+        }
     } else {
         hide("DISTORTION_PANEL")
         updateCheckboxInput(session = getDefaultReactiveDomain(),inputId = "do_correct_distortion",value = input_state$input$do_correct_distortion)
-        updateNumericInput(session = getDefaultReactiveDomain(),inputId = "barrel_correction_factor",value = 1)
+        updateNumericInput(session = getDefaultReactiveDomain(),inputId = "barrel_correction_factor",value = 0)
     }
     ## restore dateofshooting
+    if (hasName(input_state$input,"date_of_image_shooting")) {
     updateDateInput(
         session = getDefaultReactiveDomain(),
         inputId = "date_of_image_shooting",
         value = input_state$input$date_of_image_shooting
     )
+    }
     ## restore identifierarea
+    if (hasName(input_state$input,"identifier_area")) {
     updateNumericInput(
         session = getDefaultReactiveDomain(),
         inputId = "identifier_area",
         value = input_state$input$identifier_area
     )
+    }
     return(list(loaded_path=loaded_path,spectrums=DATA$spectrums,selected_spectra = selected_spectra))
 }
