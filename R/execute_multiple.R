@@ -192,7 +192,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                                 apply_HSV_color_by_mask(
                                     pixel.array = im,
                                     pixel.idx = hsv_results[[name]]$pixel.idx,
-                                    target.color = "red",
+                                    target.color = ifelse(stringr::str_count(name,"identifier"),"white","red"),
                                     mask_extreme = do_save_high_contrast_masks
                                 )
                             )),file = mask_path)
@@ -372,7 +372,7 @@ execute_multiple <- function(files, input, DATA, DEBUGKEYS, FLAGS) {
                                 apply_HSV_color_by_mask(
                                     pixel.array = im,
                                     pixel.idx = hsv_results[[name]]$pixel.idx,
-                                    target.color = "red",
+                                    target.color = ifelse(stringr::str_count(name,"identifier"),"white","red"),
                                     mask_extreme = input$do_save_high_contrast_masks
                                 )
                             )),file = mask_path)
