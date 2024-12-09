@@ -123,7 +123,7 @@ render_selected_mask <- function(input, DATA, FLAGS) {
         mask <- apply_HSV_color_by_mask(
             pixel.array = im,
             pixel.idx = hsv_results[[1]]$pixel.idx,
-            target.color = ifelse(stringr::str_count(mask,"identifier"),"white","red"),
+            target.color = ifelse(str_count(mask,"identifier"),"white","red"),
             mask_extreme = input$mask_extreme
         )
         # display the mask
