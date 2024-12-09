@@ -66,6 +66,7 @@
 #' @importFrom parallel detectCores
 #' @importFrom foreach getDoParRegistered
 #' @importFrom foreach getDoParWorkers
+#' @importFrom fs path_rel
 #' @importFrom stats df
 #' @importFrom imager draw_rect
 #' @importFrom imager grabRect
@@ -234,7 +235,9 @@ duflor_gui <- function() {
             last_im = NA,
             folder_path = NA,
             search_root = NA,
-            selected_spectra = NA
+            selected_spectra = NA,
+            do_save_masks = NA,
+            do_save_high_contrast_masks = NA
         )
         DEBUGKEYS <- reactiveValues(
             # if you want to have functionality blocked by the dev-console, add
@@ -406,10 +409,6 @@ duflor_gui <- function() {
                 } else {
                     shinyDirChoose(input = input, 'folder', roots=volumes)
                 }
-                folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
-                req(dir.exists(folder_path))
-                DATA$folder_path <- folder_path
-                image_files_()
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
@@ -423,12 +422,19 @@ duflor_gui <- function() {
                     erroneous_callback = "folder"
                 )
                 showNotification(
-                    ui = str_c("Error occured during callback 'input$folder'. The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    ui = str_c("Error occured during callback 'input$folder' (1). The configuration which triggered this error was stored to '",error_state_path,"'."),
                     id = "error_state_generated.done",
                     duration = NULL,
                     type = "error"
                 )
             })
+            folder_path <- parseDirPath(roots = volumes,input$folder) # this is how you conver thte shinydirselection-objet to a valid path. cf: https://search.r-project.org/CRAN/refmans/shinyFiles/html/shinyFiles-parsers.html
+            if (length(folder_path)>0) {
+                if (dir.exists(folder_path)) {
+                    DATA$folder_path <- folder_path
+                    image_files_()
+                }
+            }
         })
         #### REACTIVE - RESULTS_TABLE, FILTERED BY SPECTRUM ####
         filtered_results <- reactive({
@@ -1389,6 +1395,8 @@ duflor_gui <- function() {
                 DATA$spectrums <- state_unpack$spectrums
                 DATA$folder_path <- state_unpack$loaded_path
                 DATA$selected_spectra <- state_unpack$selected_spectra
+                DATA$do_save_masks <- state_unpack$do_save_masks
+                DATA$do_save_high_contrast_masks <- state_unpack$do_save_high_contrast_masks
                 # once the loaded-path was updated, recompute the input-table
                 image_files_()
                 removeNotification(id = "restore_state.ongoing")
@@ -1430,48 +1438,43 @@ duflor_gui <- function() {
         observeEvent(input$save_state, {
             # Save directory selection
             input_mirror <- input ## mirror input so that the error-trycatch can pass it to save_state
-            shinyFileSave(
-                input,
-                "save_state",
-                roots = volumes,
-                session = getDefaultReactiveDomain(),
-                allowDirCreate = T
-            )
-            savedir_path <- parseDirPath(roots = volumes, selection = input$save_state)
-            req(isFALSE(is.numeric(input$save_state[[1]])))
-            req(dir.exists(savedir_path))
-            tryCatch({
-                showNotification(
-                    ui = "State is being saved.",
-                    id = "save_state.ongoing",
-                    duration = NA,
-                    type = "warning"
-                )
-                # but first we must remove some values which are not to be saved to ensure filesize is minimal:
-                # - DATA$last_im (which caches the last-loaded image of the 'render_selected_mask'-subroutine)
-                saved_state_path <- save_state(
-                    input = input,
-                    DATA = DATA,
-                    DEBUGKEYS = DEBUGKEYS,
-                    FLAGS = FLAGS,
-                    volumes = getVolumes()
-                )
-                removeNotification(id = "save_state.ongoing")
-                if (file.exists(saved_state_path)) {
-                    showNotification(
-                        ui = str_c("State successfully saved to '",saved_state_path,"'."),
-                        id = "save_state.done",
-                        duration = DATA$notification_duration * 4,
-                        type = "message"
-                    )
-                } else {
-                    showNotification(
-                        ui = str_c("State was not successfully saved to '",saved_state_path,"'."),
-                        id = "save_state.error",
-                        duration = DATA$notification_duration * 4,
-                        type = "error"
-                    )
+            if (isFALSE(is.na(DATA$folder_path))) {
+                r <- dirname(DATA$folder_path)
+                showNotification(str_c("searching from ",DATA$folder_path))
+                if (isFALSE(hasName(volumes,"reprex_location"))) {
+                    reprex_location = DATA$folder_path
+                    reprex_root <- volumes[which(str_count(r,volumes)==1)]
+                    reprex_path <- path_rel(path = reprex_location,start = reprex_root)
+                    if (isTRUE(as.logical(str_count(reprex_location,volumes[which(str_count(r,volumes)==1)])))) {
+                        shinyFileSave(
+                            input,
+                            "save_state",
+                            roots = volumes,
+                            defaultRoot = names(reprex_root),
+                            defaultPath = reprex_path,
+                            session = getDefaultReactiveDomain(),
+                            allowDirCreate = T
+                        )
+                    } else {
+                        shinyFileSave(
+                            input,
+                            "save_state",
+                            roots = volumes,
+                            session = getDefaultReactiveDomain(),
+                            allowDirCreate = T
+                        )
+                    }
                 }
+            } else {
+                shinyFileSave(
+                    input,
+                    "save_state",
+                    roots = volumes,
+                    session = getDefaultReactiveDomain(),
+                    allowDirCreate = T
+                )
+            }
+            tryCatch({
             }, error = function(e) {
                 DATA$stacktrace = traceback(1, 1)
                 error_state_path <- save_error_state(
@@ -1485,12 +1488,69 @@ duflor_gui <- function() {
                     erroneous_callback = "save_state"
                 )
                 showNotification(
-                    ui = str_c("Error occured while saving state (during callback 'input$save_state'). The configuration which triggered this error was stored to '",error_state_path,"'."),
+                    ui = str_c("Error occured during callback 'input$save_state'. The configuration which triggered this error was stored to '",error_state_path,"'."),
                     id = "error_state_generated.done",
                     duration = NULL,
                     type = "error"
                 )
             })
+            if (isFALSE(is.numeric(input$save_state[[1]]))) {
+                savedir_path <- parseDirPath(roots = volumes, selection = input$save_state)
+
+                if (isTRUE(dir.exists(savedir_path))) {
+                    tryCatch({
+                        showNotification(
+                            ui = "State is being saved.",
+                            id = "save_state.ongoing",
+                            duration = NA,
+                            type = "warning"
+                        )
+                        # but first we must remove some values which are not to be saved to ensure filesize is minimal:
+                        # - DATA$last_im (which caches the last-loaded image of the 'render_selected_mask'-subroutine)
+                        saved_state_path <- save_state(
+                            input = input,
+                            DATA = DATA,
+                            DEBUGKEYS = DEBUGKEYS,
+                            FLAGS = FLAGS,
+                            volumes = volumes
+                        )
+                        removeNotification(id = "save_state.ongoing")
+                        if (file.exists(saved_state_path)) {
+                            showNotification(
+                                ui = str_c("State successfully saved to '",saved_state_path,"'."),
+                                id = "save_state.done",
+                                duration = DATA$notification_duration * 4,
+                                type = "message"
+                            )
+                        } else {
+                            showNotification(
+                                ui = str_c("State was not successfully saved to '",saved_state_path,"'."),
+                                id = "save_state.error",
+                                duration = DATA$notification_duration * 4,
+                                type = "error"
+                            )
+                        }
+                    }, error = function(e) {
+                        DATA$stacktrace = traceback(1, 1)
+                        error_state_path <- save_error_state(
+                            input = input_mirror,
+                            DATA = DATA,
+                            DEBUGKEYS = DEBUGKEYS,
+                            FLAGS = FLAGS,
+                            volumes = getVolumes(),
+                            error = e,
+                            errordir_path = DATA$folder_path,
+                            erroneous_callback = "save_state"
+                        )
+                        showNotification(
+                            ui = str_c("Error occured while saving state (during callback 'input$save_state'). The configuration which triggered this error was stored to '",error_state_path,"'."),
+                            id = "error_state_generated.done",
+                            duration = NULL,
+                            type = "error"
+                        )
+                    })
+                }
+            }
         })
     }
     #### LAUNCH APP ####
