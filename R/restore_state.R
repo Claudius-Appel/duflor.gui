@@ -36,6 +36,8 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
     }
     DATA$spectrums <- DATA_spectr
     selected_spectra <- input_state$input$selected_spectra
+    do_save_high_contrast_masks <- input_state$input$do_save_high_contrast_masks
+    do_save_masks <- input_state$input$do_save_masks
     DATA$r__tbl_dir_files <- input_state$DATA$r__tbl_dir_files
     DEBUGKEYS <- input_state$DEBUGKEYS
     FLAGS <- input_state$FLAGS
@@ -185,5 +187,13 @@ restore_state <- function(input, output, DATA, FLAGS, DEBUGKEYS, session, volume
             value = input_state$input$identifier_area
         )
     }
-    return(list(loaded_path=loaded_path,spectrums=DATA$spectrums,selected_spectra = selected_spectra))
+    return(
+        list(
+            loaded_path = loaded_path,
+            spectrums = DATA$spectrums,
+            selected_spectra = selected_spectra,
+            do_save_masks = do_save_masks,
+            do_save_high_contrast_masks = do_save_high_contrast_masks
+        )
+    )
 }

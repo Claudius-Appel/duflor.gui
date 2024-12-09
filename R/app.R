@@ -234,7 +234,9 @@ duflor_gui <- function() {
             last_im = NA,
             folder_path = NA,
             search_root = NA,
-            selected_spectra = NA
+            selected_spectra = NA,
+            do_save_masks = NA,
+            do_save_high_contrast_masks = NA
         )
         DEBUGKEYS <- reactiveValues(
             # if you want to have functionality blocked by the dev-console, add
@@ -1392,6 +1394,8 @@ duflor_gui <- function() {
                 DATA$spectrums <- state_unpack$spectrums
                 DATA$folder_path <- state_unpack$loaded_path
                 DATA$selected_spectra <- state_unpack$selected_spectra
+                DATA$do_save_masks <- state_unpack$do_save_masks
+                DATA$do_save_high_contrast_masks <- state_unpack$do_save_high_contrast_masks
                 # once the loaded-path was updated, recompute the input-table
                 image_files_()
                 removeNotification(id = "restore_state.ongoing")
