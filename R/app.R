@@ -66,6 +66,7 @@
 #' @importFrom parallel detectCores
 #' @importFrom foreach getDoParRegistered
 #' @importFrom foreach getDoParWorkers
+#' @importFrom fs path_rel
 #' @importFrom stats df
 #' @importFrom imager draw_rect
 #' @importFrom imager grabRect
@@ -1443,8 +1444,8 @@ duflor_gui <- function() {
                 if (isFALSE(hasName(volumes,"reprex_location"))) {
                     reprex_location = DATA$folder_path
                     reprex_root <- volumes[which(str_count(r,volumes)==1)]
-                    reprex_path <- fs::path_rel(path = reprex_location,start = reprex_root)
-                    if (isTRUE(as.logical(str_count(reprex_location,volumes[which(stringr::str_count(r,volumes)==1)])))) {
+                    reprex_path <- path_rel(path = reprex_location,start = reprex_root)
+                    if (isTRUE(as.logical(str_count(reprex_location,volumes[which(str_count(r,volumes)==1)])))) {
                         shinyFileSave(
                             input,
                             "save_state",

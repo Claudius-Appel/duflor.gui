@@ -16,6 +16,7 @@ Imports:
     doParallel,
     duflor,
     foreach,
+    fs,
     shiny,
     shinyjs,
     shinyFiles,
